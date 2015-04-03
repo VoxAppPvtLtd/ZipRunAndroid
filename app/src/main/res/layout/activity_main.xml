@@ -25,12 +25,14 @@
         android:textColor="@android:color/primary_text_light"
         android:layout_gravity="center_horizontal"/>
 
+
+
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/powered_by_google_light"
-        android:layout_below="@id/pickup_location"
-        android:layout_gravity="bottom"/>
+        android:src="@drawable/icon_map_marker"
+        android:layout_centerInParent="true"
+        />
 
 
 </RelativeLayout>

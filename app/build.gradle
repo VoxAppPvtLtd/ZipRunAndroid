@@ -35,6 +35,8 @@ android {
 
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
     }
 
 }
@@ -65,5 +67,7 @@ dependencies {
     }
 
     compile 'com.facebook.stetho:stetho:1.0.1'
+
+    compile 'net.danlew:android.joda:2.7.1'
 
 }

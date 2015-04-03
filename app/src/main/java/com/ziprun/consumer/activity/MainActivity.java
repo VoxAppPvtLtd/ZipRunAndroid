@@ -1,7 +1,6 @@
 package com.ziprun.consumer.activity;
 
-import android.location.Address;
-import android.location.Geocoder;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -20,43 +19,48 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.ziprun.consumer.PlaceAutocompleteAdapter;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.utils.ClearableAutoCompleteTextView;
 import com.ziprun.consumer.utils.Utils;
-
-import java.io.IOException;
+import com.ziprun.maputils.GoogleDirectionAPI;
+import com.ziprun.maputils.models.Directions;
 
 import javax.inject.Inject;
 
-import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
 public class MainActivity extends BaseActivity implements
-        OnMapReadyCallback, GoogleMap.OnMarkerDragListener,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+        OnMapReadyCallback,
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnCameraChangeListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
     protected GoogleApiClient mGoogleApiClient;
 
-    private PlaceAutocompleteAdapter mAdapter;
+    private PlaceAutocompleteAdapter mPickupAdapter;
 
-    private ClearableAutoCompleteTextView mAutocompleteView;
-
-    private Marker mpickupLocMarker;
+    private ClearableAutoCompleteTextView mPickupView;
 
     private GoogleMap mGoogleMap;
 
+    private LatLng pickupLocation;
+
     private static final LatLngBounds DELHI_BOUNDS = new LatLngBounds(
             new LatLng(28.401067, 28.401067), new LatLng(28.889816, 77.341815));
+
+
+    private LatLng latlng1 = new LatLng(28.401067, 28.401067);
+    private LatLng latlng2 = new LatLng(28.889816, 77.341815);
+
+    private static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
+
 
     @Inject
     Utils utils;
@@ -75,15 +79,41 @@ public class MainActivity extends BaseActivity implements
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.map);
 
-        mAutocompleteView = (ClearableAutoCompleteTextView)
-                findViewById(R.id.pickup_location);
 
-        mAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
-                DELHI_BOUNDS, null);
+        GoogleDirectionAPI directionAPI = new GoogleDirectionAPI(API_KEY,
+                "Surat, Gujarat", "Delhi" +
+                "");
 
-        mAutocompleteView.setAdapter(mAdapter);
 
-        mAutocompleteView.setOnItemClickListener(mPlaceSelector);
+        directionAPI.getDirections().subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Action1<Directions>() {
+                   @Override
+                   public void call(Directions directions) {
+                    Log.i(TAG, "Got Directions " + API_KEY);
+                    if(directions.status == Directions.StatusCode.OK){
+                        directions.showRoute(0, mGoogleMap, Color.RED);
+                    }
+
+                   }
+               }, new Action1<Throwable>() {
+                   @Override
+                   public void call(Throwable throwable) {
+                       Log.e(TAG, throwable.getMessage(), throwable);
+                   }
+               }
+            );
+
+//        mPickupView = (ClearableAutoCompleteTextView)
+//                findViewById(R.id.pickup_location);
+//
+//        mPickupAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
+//                DELHI_BOUNDS, null);
+//
+//        mPickupView.setAdapter(mPickupAdapter);
+//
+//        mPickupView.setOnItemClickListener(mPlaceSelector);
+
 
         mapFragment.getMapAsync(this);
     }
@@ -97,7 +127,9 @@ public class MainActivity extends BaseActivity implements
              The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
              read the place ID.
               */
-            final PlaceAutocompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+            PlaceAutocompleteAdapter adapter = (PlaceAutocompleteAdapter) parent.getAdapter();
+
+            final PlaceAutocompleteAdapter.PlaceAutocomplete item = adapter.getItem(position);
             final String placeId = String.valueOf(item.placeId);
             Log.i(TAG, "Autocomplete item selected: " + item.description);
 
@@ -127,19 +159,12 @@ public class MainActivity extends BaseActivity implements
                 places.release();
             }
             // Get the Place object from the buffer.
-            final Place place = places.get(0);
-
-            if(mpickupLocMarker != null) {
-                mpickupLocMarker.setPosition(place.getLatLng());
-                mpickupLocMarker.setTitle(place.getName().toString());
-                Log.i(TAG, "Location Marker Updated: " + place.getLatLng()
-                        .toString());
-
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(place
-                        .getLatLng()));
-            }
+            Place place = places.get(0);
 
             Log.i(TAG, "Place details received: " + place.getLatLng());
+
+            pickupLocation = place.getLatLng();
+
             places.release();
 
         }
@@ -191,55 +216,8 @@ public class MainActivity extends BaseActivity implements
         LatLng delhi = new LatLng(28.586086, 77.171541);
 
         mGoogleMap.setMyLocationEnabled(true);
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(delhi, 13));
-        mpickupLocMarker = googleMap.addMarker(new MarkerOptions()
-                                               .position(delhi)
-                                               .draggable(true));
-
-        mGoogleMap.setOnMarkerDragListener(this);
-    }
-
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDrag(Marker marker) {
-
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        LatLng markerPos = marker.getPosition();
-        Log.i(TAG, "New Marker " + markerPos.toString());
-        Geocoder geocoder = new Geocoder(this);
-        try {
-            Observable.from(geocoder.getFromLocation(markerPos.latitude,
-                                                     markerPos.longitude, 1))
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new Action1<Address>() {
-                        @Override
-                        public void call(Address address) {
-                            Log.i(TAG, "Address Geocoded " + utils
-                                    .addressToString(address) + " " + address.toString());
-
-                            mAutocompleteView.setText(utils.addressToString(address));
-
-                        }
-                    }, new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.e(TAG, "Error while geocoding: " + throwable.getMessage(),
-                                    throwable);
-                        }
-                    });
-        } catch (IOException e) {
-            Log.e(TAG, "", e);
-        }
-
-
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(delhi, 13));
+        mGoogleMap.setOnCameraChangeListener(this);
     }
 
     @Override
@@ -254,7 +232,7 @@ public class MainActivity extends BaseActivity implements
                 Toast.LENGTH_SHORT).show();
 
         // Disable API access in the adapter because the client was not initialised correctly.
-        mAdapter.setGoogleApiClient(null);
+        mPickupAdapter.setGoogleApiClient(null);
 
     }
 
@@ -262,7 +240,7 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         // Successfully connected to the API client. Pass it to the adapter to enable API access.
-        mAdapter.setGoogleApiClient(mGoogleApiClient);
+        //mPickupAdapter.setGoogleApiClient(mGoogleApiClient);
         Log.i(TAG, "GoogleApiClient connected.");
 
     }
@@ -270,7 +248,39 @@ public class MainActivity extends BaseActivity implements
     @Override
     public void onConnectionSuspended(int i) {
         // Connection to the API client has been suspended. Disable API access in the client.
-        mAdapter.setGoogleApiClient(null);
+        //        mPickupAdapter.setGoogleApiClient(null);
         Log.e(TAG, "GoogleApiClient connection suspended.");
+    }
+
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+        LatLng markerPos = cameraPosition.target;
+//        mPickupView.setText("Fetching Target");
+//        Log.i(TAG, "New Marker " + markerPos.toString());
+//        Geocoder geocoder = new Geocoder(this);
+//        try {
+//            Observable.from(geocoder.getFromLocation(markerPos.latitude,
+//                    markerPos.longitude, 1))
+//                    .subscribeOn(Schedulers.newThread())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(new Action1<Address>() {
+//                        @Override
+//                        public void call(Address address) {
+//                            Log.i(TAG, "Address Geocoded " + utils
+//                                    .addressToString(address) + " " + address.toString());
+//
+//                            mPickupView.setText(utils.addressToString(address));
+//
+//                        }
+//                    }, new Action1<Throwable>() {
+//                        @Override
+//                        public void call(Throwable throwable) {
+//                            Log.e(TAG, "Error while geocoding: " + throwable.getMessage(),
+//                                    throwable);
+//                        }
+//                    });
+//        } catch (IOException e) {
+//            Log.e(TAG, "", e);
+//        }
     }
 }
