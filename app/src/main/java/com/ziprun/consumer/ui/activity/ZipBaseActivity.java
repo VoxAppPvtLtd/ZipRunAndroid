@@ -1,17 +1,13 @@
-package com.ziprun.consumer.activity;
+package com.ziprun.consumer.ui.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
-import com.ziprun.consumer.ZipRunApplication;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.ziprun.consumer.ZipRunApp;
 
 import dagger.ObjectGraph;
 
-public abstract class BaseActivity extends ActionBarActivity {
+public abstract class ZipBaseActivity extends ActionBarActivity {
 
     private ObjectGraph activityGraph;
 
@@ -19,21 +15,20 @@ public abstract class BaseActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        ZipRunApplication application = (ZipRunApplication) getApplication();
+        ZipRunApp application = (ZipRunApp) getApplication();
         activityGraph = application.getApplicationGraph().plus(
-                getModules().toArray());
+                getModules());
         activityGraph.inject(this);
     }
 
 
     /**
-     * A list of modules to use for the individual com.voxapp.sdk.activity graph. Subclasses
+     * A list of modules to use for the individual activity graph. Subclasses
      * can override this method to provide additional modules provided they call
      * and include the modules returned by calling {@code super.getModules()}.
      */
-    protected List<Object> getModules() {
-        return new ArrayList<Object>(Arrays.<Object>asList(new ActivityModule
-                (this)));
+    protected Object[] getModules() {
+        return new Object[]{new ActivityModule(this)};
     }
 
     

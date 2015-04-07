@@ -75,5 +75,53 @@ public class Directions {
         googleMap.addPolyline(new PolylineOptions().addAll(points)).setColor(color);
     }
 
+    public int getTotalDistance(){
+        return getTotalDistance(0);
+    }
+
+    public int getTotalDistance(int routeIndex){
+        if(this.status != StatusCode.OK){
+            return -1;
+        }
+
+        if (routeIndex >= this.routes.length){
+            throw new IndexOutOfBoundsException("Route Index is out of bounds");
+        }
+
+        int totalDistance = 0;
+
+        DirectionsRoute route = routes[routeIndex];
+
+        for(DirectionsLeg leg : route.legs){
+            totalDistance += leg.getDistance().inMeters;
+        }
+
+        return totalDistance;
+    }
+
+    public int getTotalDuration(){
+        return getTotalDuration(0);
+    }
+
+    public int getTotalDuration(int routeIndex){
+
+        if(this.status != StatusCode.OK){
+            return -1;
+        }
+
+        if (routeIndex >= this.routes.length){
+            throw new IndexOutOfBoundsException("Route Index is out of bounds");
+        }
+
+        int totalDuration = 0;
+
+        DirectionsRoute route = routes[routeIndex];
+
+        for(DirectionsLeg leg : route.legs){
+            totalDuration += leg.getDuration().inSeconds;
+        }
+
+        return totalDuration;
+    }
 
 }

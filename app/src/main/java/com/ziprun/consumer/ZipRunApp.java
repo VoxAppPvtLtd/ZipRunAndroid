@@ -3,15 +3,11 @@ package com.ziprun.consumer;
 import android.app.Application;
 import android.content.Context;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import dagger.ObjectGraph;
 
-public class ZipRunApplication extends Application {
-    private static final String TAG = ZipRunApplication.class.getCanonicalName();
-    public static ZipRunApplication APPLICATION;
+public class ZipRunApp extends Application {
+    private static final String TAG = ZipRunApp.class.getCanonicalName();
+    public static ZipRunApp APPLICATION;
     private static Context context;
     protected ObjectGraph applicationGraph;
 
@@ -19,13 +15,13 @@ public class ZipRunApplication extends Application {
     public void onCreate() {
         super.onCreate();
         APPLICATION = this;
-        ZipRunApplication.context = getApplicationContext();
-        applicationGraph = ObjectGraph.create(getModules().toArray());
+        ZipRunApp.context = getApplicationContext();
+        applicationGraph = ObjectGraph.create(getModules());
         applicationGraph.inject(this);
     }
 
     public static Context getAppContext() {
-        return ZipRunApplication.context;
+        return ZipRunApp.context;
     }
 
     public ObjectGraph getApplicationGraph() {
@@ -40,10 +36,8 @@ public class ZipRunApplication extends Application {
         return applicationGraph.get(cls);
     }
 
-    protected List<Object> getModules() {
-
-        return new ArrayList<Object>(Arrays.asList(new Object[]{new
-                ApplicationModule(this)}));
-    }    
+    protected Object[] getModules() {
+        return Modules.list(this);
+    }
 }
 

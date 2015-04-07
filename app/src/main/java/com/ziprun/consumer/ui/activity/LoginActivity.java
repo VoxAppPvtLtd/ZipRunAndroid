@@ -1,7 +1,6 @@
-package com.ziprun.consumer.activity;
+package com.ziprun.consumer.ui.activity;
 
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,7 +18,7 @@ import com.ziprun.consumer.R;
 import io.fabric.sdk.android.Fabric;
 
 
-public class LoginActivity extends ActionBarActivity {
+public class LoginActivity extends ZipBaseActivity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "al9udcuqmC6j6XQQnal6HigDd";

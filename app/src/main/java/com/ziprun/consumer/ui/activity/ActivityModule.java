@@ -1,4 +1,4 @@
-package com.ziprun.consumer.activity;
+package com.ziprun.consumer.ui.activity;
 
 import dagger.Module;
 
@@ -7,9 +7,9 @@ import dagger.Module;
         library = true)
 public class ActivityModule {
     private static final String TAG = ActivityModule.class.getCanonicalName();
-    private final BaseActivity activity;
+    private final ZipBaseActivity activity;
 
-    public ActivityModule(BaseActivity activity) {
+    public ActivityModule(ZipBaseActivity activity) {
         this.activity = activity;
     }
 }

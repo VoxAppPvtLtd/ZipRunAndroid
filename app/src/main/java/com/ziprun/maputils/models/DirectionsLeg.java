@@ -100,4 +100,11 @@ public class DirectionsLeg {
      */
     public String endAddress;
 
+    public Distance getDistance() {
+        return distance;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
 }

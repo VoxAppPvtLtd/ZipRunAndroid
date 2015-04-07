@@ -11,14 +11,14 @@ import dagger.Module;
 import dagger.Provides;
 import retrofit.RestAdapter;
 
-@Module(library = true, injects={ZipRunApplication.class})
+@Module(library = true, injects={ZipRunApp.class})
 public class ApplicationModule {
     private static final String TAG = ApplicationModule.class.getCanonicalName();
 
     private final Application application;
 
-    public ApplicationModule(ZipRunApplication zipRunApplication) {
-        application = zipRunApplication;
+    public ApplicationModule(ZipRunApp zipRunApp) {
+        application = zipRunApp;
     }
 
     @Provides

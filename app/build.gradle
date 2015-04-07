@@ -1,14 +1,18 @@
 buildscript {
     repositories {
+        mavenCentral()
         maven { url 'https://maven.fabric.io/public' }
     }
 
     dependencies {
+        classpath 'com.android.tools.build:gradle:1.1.3'
         classpath 'io.fabric.tools:gradle:1.18.0'
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.neenbedankt.android-apt'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -16,20 +20,33 @@ repositories {
 
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 22
+    buildToolsVersion "22.0.1"
 
     defaultConfig {
         applicationId "com.ziprun.consumer"
         minSdkVersion 15
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
     }
     buildTypes {
+        debug {
+            applicationIdSuffix '.debug'
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        internal {
+            applicationId 'com.ziprun.consumer.dev'
+        }
+        production {
+            applicationId 'com.ziprun.consumer'
         }
     }
 
@@ -38,27 +55,35 @@ android {
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
     }
+}
 
+configurations {
+    internalDebugCompile
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:support-annotations:22.0.0'
     compile 'com.android.support:appcompat-v7:22.0.0'
+
     compile 'com.google.android.gms:play-services-analytics:7.0.0'
     compile 'com.google.android.gms:play-services-gcm:7.0.0'
     compile 'com.google.android.gms:play-services-location:7.0.0'
     compile 'com.google.android.gms:play-services-maps:7.0.0'
-    compile('com.digits.sdk.android:digits:1.3.0@aar') {
-        transitive = true;
-    }
+
     compile 'com.squareup.dagger:dagger:1.2.2'
-    compile 'com.squareup.dagger:dagger-compiler:1.2.2'
+    apt 'com.squareup.dagger:dagger-compiler:1.2.2'
+
     compile 'com.squareup.okhttp:okhttp:2.3.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
-    compile 'com.squareup.okio:okio:1.0.1'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    internalDebugCompile 'com.squareup.retrofit:retrofit-mock:1.9.0'
+
     compile 'com.jakewharton:butterknife:6.1.0'
+
+    compile 'io.reactivex:rxjava:1.0.8'
     compile 'io.reactivex:rxandroid:0.24.0'
+
     compile('com.crashlytics.sdk.android:crashlytics:2.2.2@aar') {
         transitive = true;
     }
@@ -66,8 +91,10 @@ dependencies {
         transitive = true;
     }
 
-    compile 'com.facebook.stetho:stetho:1.0.1'
-
     compile 'net.danlew:android.joda:2.7.1'
+
+    compile 'com.nhaarman.supertooltips:library:3.0.0'
+
+    internalCompile 'com.facebook.stetho:stetho:1.0.1'
 
 }

@@ -1,4 +1,4 @@
-package com.ziprun.consumer.activity;
+package com.ziprun.consumer.ui.activity;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,7 +22,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.ziprun.consumer.PlaceAutocompleteAdapter;
+import com.nhaarman.supertooltips.ToolTip;
+import com.nhaarman.supertooltips.ToolTipRelativeLayout;
+import com.nhaarman.supertooltips.ToolTipView;
+import com.ziprun.consumer.utils.PlaceAutocompleteAdapter;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.utils.ClearableAutoCompleteTextView;
 import com.ziprun.consumer.utils.Utils;
@@ -36,9 +39,9 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class MainActivity extends BaseActivity implements
+public class MainActivity extends ZipBaseActivity implements
         OnMapReadyCallback,
-        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnCameraChangeListener {
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks, GoogleMap.OnCameraChangeListener, ToolTipView.OnToolTipViewClickedListener {
 
     private static final String TAG = MainActivity.class.getCanonicalName();
 
@@ -64,6 +67,7 @@ public class MainActivity extends BaseActivity implements
 
     @Inject
     Utils utils;
+    private ToolTipView myToolTipView;
 
 
     @Override
@@ -116,6 +120,17 @@ public class MainActivity extends BaseActivity implements
 
 
         mapFragment.getMapAsync(this);
+
+        ToolTipRelativeLayout toolTipRelativeLayout = (ToolTipRelativeLayout)
+                findViewById(R.id.tooltipView);
+
+        ToolTip toolTip = new ToolTip()
+                .withText("A beautiful View")
+                .withColor(Color.RED)
+                .withShadow()
+                .withAnimationType(ToolTip.AnimationType.FROM_TOP);
+        myToolTipView = toolTipRelativeLayout.showToolTipForView(toolTip, findViewById(R.id.map_marker));
+        myToolTipView.setOnToolTipViewClickedListener(MainActivity.this);
     }
 
     private AdapterView.OnItemClickListener mPlaceSelector
@@ -282,5 +297,10 @@ public class MainActivity extends BaseActivity implements
 //        } catch (IOException e) {
 //            Log.e(TAG, "", e);
 //        }
+    }
+
+    @Override
+    public void onToolTipViewClicked(ToolTipView toolTipView) {
+
     }
 }
