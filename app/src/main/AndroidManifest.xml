@@ -30,7 +30,7 @@
             android:value="f04f029d6fa55f9110e0047d4fae4265687b9844" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBw2iDDOhrIfwWUCjTByc90onBkxxbJcS0" />
+            android:value="AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
@@ -38,9 +38,13 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:label="ZipRun" >
+        </activity>
+
+        <activity
+            android:name=".ui.activity.DeliveryActivity"
+            android:label="@string/title_activity_delivery" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

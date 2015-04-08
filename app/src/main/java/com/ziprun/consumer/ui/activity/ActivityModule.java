@@ -1,10 +1,16 @@
 package com.ziprun.consumer.ui.activity;
 
 import dagger.Module;
+import dagger.Provides;
+import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 
 
-@Module(injects = {LoginActivity.class, MainActivity.class}, complete = false,
-        library = true)
+@Module(injects = {
+        LoginActivity.class,
+        MainActivity.class,
+        DeliveryActivity.class
+    }, complete = false,
+       library = true)
 public class ActivityModule {
     private static final String TAG = ActivityModule.class.getCanonicalName();
     private final ZipBaseActivity activity;
@@ -12,4 +18,11 @@ public class ActivityModule {
     public ActivityModule(ZipBaseActivity activity) {
         this.activity = activity;
     }
+
+    @Provides
+    ReactiveLocationProvider provideReactiveLocationProvider(){
+        return new ReactiveLocationProvider(activity);
+    }
+
+
 }

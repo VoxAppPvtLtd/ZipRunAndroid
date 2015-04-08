@@ -3,9 +3,18 @@ package com.ziprun.consumer;
 import android.app.Application;
 import android.content.Context;
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
 import dagger.ObjectGraph;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 public class ZipRunApp extends Application {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "SlgQ5jkFlMG5LEJafj996OQ9M";
+    private static final String TWITTER_SECRET = "L2X0uZSxbBH6NGaSIJ8m1Cc1n9alCtq8XBZXWKtCqZ4pn08HcT";
+
     private static final String TAG = ZipRunApp.class.getCanonicalName();
     public static ZipRunApp APPLICATION;
     private static Context context;
@@ -14,6 +23,8 @@ public class ZipRunApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Crashlytics(), new Twitter(authConfig));
         APPLICATION = this;
         ZipRunApp.context = getApplicationContext();
         applicationGraph = ObjectGraph.create(getModules());

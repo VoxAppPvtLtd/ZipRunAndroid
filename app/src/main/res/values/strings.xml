@@ -4,6 +4,9 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main">MainActivity</string>
-    <string name="pickup_location">Enter Pickup Location</string>
+    <string name="pickup_location">Select A Location To Pickup Or Buy
+        Items</string>
     <string name="destination">Enter Destination</string>
+    <string name="title_activity_delivery">DeliveryActivity</string>
+    <string name="check_location_settings_failed">"Unable to Fetch Current Location "</string>
 </resources>
