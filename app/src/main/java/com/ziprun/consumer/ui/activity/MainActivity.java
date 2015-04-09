@@ -25,18 +25,12 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.nhaarman.supertooltips.ToolTip;
 import com.nhaarman.supertooltips.ToolTipRelativeLayout;
 import com.nhaarman.supertooltips.ToolTipView;
-import com.ziprun.consumer.utils.PlaceAutocompleteAdapter;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.utils.ClearableAutoCompleteTextView;
+import com.ziprun.consumer.utils.PlaceAutocompleteAdapter;
 import com.ziprun.consumer.utils.Utils;
-import com.ziprun.maputils.GoogleDirectionAPI;
-import com.ziprun.maputils.models.Directions;
 
 import javax.inject.Inject;
-
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 
 public class MainActivity extends ZipBaseActivity implements
@@ -84,39 +78,39 @@ public class MainActivity extends ZipBaseActivity implements
                 .findFragmentById(R.id.map);
 
 
-        GoogleDirectionAPI directionAPI = new GoogleDirectionAPI(API_KEY,
-                "Surat, Gujarat", "Delhi" +
-                "");
-
-
-        directionAPI.getDirections().subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<Directions>() {
-                   @Override
-                   public void call(Directions directions) {
-                    Log.i(TAG, "Got Directions " + API_KEY);
-                    if(directions.status == Directions.StatusCode.OK){
-                        directions.showRoute(0, mGoogleMap, Color.RED);
-                    }
-
-                   }
-               }, new Action1<Throwable>() {
-                   @Override
-                   public void call(Throwable throwable) {
-                       Log.e(TAG, throwable.getMessage(), throwable);
-                   }
-               }
-            );
-
-//        mPickupView = (ClearableAutoCompleteTextView)
-//                findViewById(R.id.pickup_location);
+//        GoogleDirectionAPI directionAPI = new GoogleDirectionAPI(API_KEY,
+//                "Surat, Gujarat", "Delhi" +
+//                "");
 //
-//        mPickupAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
-//                DELHI_BOUNDS, null);
 //
-//        mPickupView.setAdapter(mPickupAdapter);
+//        directionAPI.getDirections().subscribeOn(Schedulers.newThread())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(new Action1<Directions>() {
+//                   @Override
+//                   public void call(Directions directions) {
+//                    Log.i(TAG, "Got Directions " + API_KEY);
+//                    if(directions.status == Directions.StatusCode.OK){
+//                        directions.showRoute(0, mGoogleMap, Color.RED);
+//                    }
 //
-//        mPickupView.setOnItemClickListener(mPlaceSelector);
+//                   }
+//               }, new Action1<Throwable>() {
+//                   @Override
+//                   public void call(Throwable throwable) {
+//                       Log.e(TAG, throwable.getMessage(), throwable);
+//                   }
+//               }
+//            );
+
+        mPickupView = (ClearableAutoCompleteTextView)
+                findViewById(R.id.pickup_location);
+
+        mPickupAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
+                DELHI_BOUNDS, null);
+
+        mPickupView.setAdapter(mPickupAdapter);
+
+        mPickupView.setOnItemClickListener(mPlaceSelector);
 
 
         mapFragment.getMapAsync(this);
@@ -255,7 +249,7 @@ public class MainActivity extends ZipBaseActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         // Successfully connected to the API client. Pass it to the adapter to enable API access.
-        //mPickupAdapter.setGoogleApiClient(mGoogleApiClient);
+        mPickupAdapter.setGoogleApiClient(mGoogleApiClient);
         Log.i(TAG, "GoogleApiClient connected.");
 
     }

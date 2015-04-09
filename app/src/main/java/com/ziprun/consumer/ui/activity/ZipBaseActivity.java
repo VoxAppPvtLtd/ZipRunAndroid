@@ -4,12 +4,16 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
 import com.ziprun.consumer.ZipRunApp;
+import com.ziprun.consumer.ui.fragment.BackHandlerFragment;
 
 import dagger.ObjectGraph;
 
-public abstract class ZipBaseActivity extends ActionBarActivity {
+public abstract class ZipBaseActivity extends ActionBarActivity implements
+        BackHandlerFragment.BackHandlerInterface {
 
     private ObjectGraph activityGraph;
+
+    private BackHandlerFragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,4 +47,16 @@ public abstract class ZipBaseActivity extends ActionBarActivity {
         return activityGraph;
     }
 
+    @Override
+    public void setSelectedFragment(BackHandlerFragment selectedFragment) {
+        currentFragment = selectedFragment;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(currentFragment != null && currentFragment.onBackPressed()){
+            return;
+        }
+        super.onBackPressed();
+    }
 }

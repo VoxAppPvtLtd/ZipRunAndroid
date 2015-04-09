@@ -1,13 +1,12 @@
 package com.ziprun.consumer.ui.fragment;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
 import com.ziprun.consumer.ui.activity.ZipBaseActivity;
 
 import dagger.ObjectGraph;
 
-public class ZipBaseFragment extends Fragment {
+public abstract class ZipBaseFragment extends BackHandlerFragment {
 
     private ObjectGraph fragmentGraph;
 
@@ -22,4 +21,5 @@ public class ZipBaseFragment extends Fragment {
     protected Object[] getModules() {
         return new Object[] {new FragmentModule(this)};
     }
+
 }
