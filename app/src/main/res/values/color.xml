@@ -5,10 +5,9 @@
     <color name="text_color_hint">#42000000</color>
 
     <color name="primary_color">#336799</color>
-    <color name="secondar_color">#91d30d</color>
+    <color name="secondary_color">#91d30d</color>
     <color name="statusbar_color">#29538f</color>
     <color name="content_background">#fffafafa</color>
-
-
+    <color name="faint_grey_background">#eeeeee</color>
 
 </resources>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true">
+
+        <com.astuetz.PagerSlidingTabStrip
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/primary_color"
+            android:textColor="#99ffffff"
+            app:pstsTextColorSelected="@color/white"
+            app:pstsIndicatorColor="@color/secondary_color"
+            app:pstsTabPaddingLeftRight="30dp"
+            app:pstsIndicatorHeight="4dp"
+            app:pstsShouldExpand="false"
+            app:pstsPaddingMiddle="false" />
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+        tools:context=".DeliveryActivity"/>
+    </LinearLayout>
+
+
+    <Button android:id="@+id/nextBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_margin="20dp"
+            android:text="Select Delivery Location"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="18dp"
+            android:padding="10dp"
+            android:drawableRight="@drawable/ic_action_forward"
+            android:layout_alignParentBottom="true"
+            android:background="#91d30d"/>
+
+</RelativeLayout>

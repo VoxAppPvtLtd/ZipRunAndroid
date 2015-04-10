@@ -3,7 +3,8 @@ package com.ziprun.consumer.ui.fragment;
 import dagger.Module;
 
 @Module(injects = {
-        LocationPickerFragment.class
+        LocationPickerFragment.class,
+        InstructionFragment.class,
     }, complete = false,
     library = true)
 public class FragmentModule {

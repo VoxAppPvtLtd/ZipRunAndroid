@@ -10,10 +10,13 @@ public abstract class ZipBaseFragment extends BackHandlerFragment {
 
     private ObjectGraph fragmentGraph;
 
+    protected ZipBaseActivity activity;
+
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        ZipBaseActivity activity = (ZipBaseActivity) getActivity();
+        activity = (ZipBaseActivity) getActivity();
         fragmentGraph = activity.getActivityGraph().plus(getModules());
         fragmentGraph.inject(this);
     }

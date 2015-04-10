@@ -9,4 +9,8 @@
     <string name="destination">Enter Destination</string>
     <string name="title_activity_delivery">DeliveryActivity</string>
     <string name="check_location_settings_failed">"Unable to Fetch Current Location "</string>
+
+    <string name="instruction_buy_something">Buy Something</string>
+    <string name="instruction_pickup_something">Pick Up Something</string>
+    <string name="instruction_fragment_title">Give Instructions To</string>
 </resources>

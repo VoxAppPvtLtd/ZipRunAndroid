@@ -3,10 +3,12 @@ package com.ziprun.consumer.ui.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 
 import butterknife.ButterKnife;
@@ -14,7 +16,11 @@ import butterknife.InjectView;
 
 public class DeliveryActivity extends ZipBaseActivity {
 
+    private static final String TAG = DeliveryActivity.class.getCanonicalName();
+
     private LocationPickerFragment locationPickerFragment;
+
+    private InstructionFragment instructionFragment;
 
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
@@ -31,10 +37,12 @@ public class DeliveryActivity extends ZipBaseActivity {
 
         locationPickerFragment = new LocationPickerFragment();
 
+        instructionFragment = new InstructionFragment();
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, locationPickerFragment)
+                    .add(R.id.container, instructionFragment)
                     .commit();
         }
     }
@@ -53,10 +61,19 @@ public class DeliveryActivity extends ZipBaseActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        switch(id){
+            case android.R.id.home: {
+                Log.i(TAG, "Back Button Pressed in action bar");
+            }
+
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
+
+
 
         return super.onOptionsItemSelected(item);
     }
