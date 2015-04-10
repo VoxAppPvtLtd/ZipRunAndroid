@@ -2,20 +2,33 @@ package com.ziprun.consumer.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
 public class DeliveryActivity extends ZipBaseActivity {
 
     private LocationPickerFragment locationPickerFragment;
+
+    @InjectView(R.id.action_bar)
+    Toolbar actionBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delivery);
+        ButterKnife.inject(this);
+        setSupportActionBar(actionBar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        actionBar.setLogo(R.drawable.ziprun_white_emboss);
+
         locationPickerFragment = new LocationPickerFragment();
 
 
@@ -29,7 +42,6 @@ public class DeliveryActivity extends ZipBaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_delivery, menu);
         return true;
     }

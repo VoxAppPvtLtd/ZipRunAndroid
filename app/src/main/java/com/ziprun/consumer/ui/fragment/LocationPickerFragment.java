@@ -28,8 +28,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
 import com.ziprun.consumer.utils.Utils;
@@ -44,7 +47,9 @@ import butterknife.OnClick;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 public class LocationPickerFragment extends ZipBaseFragment implements
         OnMapReadyCallback, GoogleMap.OnCameraChangeListener,
@@ -75,7 +80,6 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @InjectView(R.id.currentLocationBtn)
     ButtonFloat currentLocationBtn;
 
-
     @InjectView(R.id.map_marker)
     ImageView mapMarker;
 
@@ -102,6 +106,8 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     private Location currentLocation;
     private LatLng markerPosition;
 
+    private Marker currentLocationMarker;
+
     private boolean firstLoad = true;
 
     private Subscription locationUpdateSubcription;
@@ -124,8 +130,10 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
 
         ButterKnife.inject(this, view);
+
         searchLocBtn.setBackgroundColor(getActivity().getResources()
                 .getColor(R.color.white));
+
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
         return  view;
@@ -190,9 +198,12 @@ public class LocationPickerFragment extends ZipBaseFragment implements
             Log.i(TAG, "Location Update " + location.toString());
             currentLocation = location;
 
-            if(!isMapMarkerSet)
+            if(!isMapMarkerSet) {
                 setMapMarker();
-
+            }else{
+                currentLocationMarker.setPosition(
+                        utils.getLatLngFromLocation(currentLocation));
+            }
         }
     };
 
@@ -201,23 +212,25 @@ public class LocationPickerFragment extends ZipBaseFragment implements
                 new LocationSettingsRequest.Builder()
                         .addLocationRequest(locationRequest)
                         .build()
-        ).subscribe(new Action1<LocationSettingsResult>() {
+        )
+        .subscribeOn(Schedulers.newThread())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Action1<LocationSettingsResult>() {
             @Override
             public void call(LocationSettingsResult locationSettingsResult) {
                 Status status = locationSettingsResult.getStatus();
                 Log.i(TAG, "Location Settings Status " + status
                         .getStatusMessage());
 
-                if(status.isSuccess()){
+                if (status.isSuccess()) {
                     isLocationEnabled(true);
-                }
-                else if (status.hasResolution()) {
+                } else if (status.hasResolution()) {
                     try {
                         status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
                     } catch (IntentSender.SendIntentException th) {
                         Log.e(TAG, "Error opening settings activity.", th);
                     }
-                }else{
+                } else {
                     Toast.makeText(getActivity(),
                             R.string.check_location_settings_failed,
                             Toast.LENGTH_SHORT).show();
@@ -236,19 +249,22 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         if(!isMapReady || locationEnabledFlag == null)
             return;
 
+
         else if(!locationEnabledFlag){
             googleMap.moveCamera(CameraUpdateFactory.newLatLng(DELHI_LATLNG));
             isMapMarkerSet = true;
             currentLocationBtn.setVisibility(View.GONE);
         }
-        else {
+        else if(currentLocation != null) {
             currentLocationBtn.setVisibility(View.VISIBLE);
-            if(currentLocation != null) {
-                googleMap.moveCamera(
-                    CameraUpdateFactory.newLatLng(
-                        utils.getLatLngFromLocation(currentLocation)));
-                isMapMarkerSet = true;
-            }
+            LatLng latLng = utils.getLatLngFromLocation(currentLocation);
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLng(latLng));
+            isMapMarkerSet = true;
+            currentLocationMarker = googleMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .icon(BitmapDescriptorFactory
+                    .fromResource(R.drawable.icon_red_dot)));
         }
     }
 
@@ -259,6 +275,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         isMapReady = true;
         this.googleMap.setMyLocationEnabled(false);
         this.googleMap.setOnCameraChangeListener(this);
+        setMapMarker();
     }
 
     @Override
@@ -267,25 +284,32 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         Log.i(TAG, "Camera Changed " + this.markerPosition);
         locationProvider.getGeocodeObservable(this.markerPosition.latitude,
                 this.markerPosition.longitude, 1)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Action1<List<Address>>() {
                 @Override
                 public void call(List<Address> addresses) {
-                    if(addresses.size() == 0)
+                    if (addresses.size() == 0)
                         return;
 
                     String address = utils.addressToString(addresses.get(0),
-                                                           "<br/>");
+                            "<br/>");
                     Log.i(TAG, "Reverse Geocoded Address " + address);
 
-                    if(firstLoad){
+                    if (firstLoad) {
                         firstLoad = false;
                         return;
                     }
 
-                    if(staticAddressView.getVisibility() == View.GONE)
+                    if (staticAddressView.getVisibility() == View.GONE)
                         showStaticAddressView();
 
                     addressView.setText(Html.fromHtml(address));
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    Log.e(TAG, throwable.getMessage(), throwable);
                 }
             });
     }

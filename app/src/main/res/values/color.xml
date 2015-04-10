@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_color_primary">#dd000000</color>
+    <color name="text_color_secondary">#89000000</color>
+    <color name="text_color_hint">#42000000</color>
+
+    <color name="primary_color">#336799</color>
+    <color name="secondar_color">#91d30d</color>
+    <color name="statusbar_color">#29538f</color>
+    <color name="content_background">#fffafafa</color>
+
+
+
+</resources>

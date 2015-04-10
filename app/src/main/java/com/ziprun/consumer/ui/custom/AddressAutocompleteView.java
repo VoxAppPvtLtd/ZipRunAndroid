@@ -64,9 +64,6 @@ public class AddressAutocompleteView extends RelativeLayout {
 
     OnAddressSelectedListener onAddressSelectedListener;
 
-    GoogleApiClient googleApiClient;
-
-
     public AddressAutocompleteView(Context context) {
         super(context);
         init();
@@ -157,12 +154,13 @@ public class AddressAutocompleteView extends RelativeLayout {
                 public Boolean call(String s) {
                     return !TextUtils.isEmpty(s);
                 }
-        }).flatMap(new Func1<String,
+        })
+        .flatMap(new Func1<String,
                 Observable<AutocompletePredictionBuffer>>() {
             @Override
             public Observable<AutocompletePredictionBuffer> call(String query) {
                 LatLngBounds bounds = null;
-                if(currentLocation != null){
+                if (currentLocation != null) {
                     double latitude = currentLocation.getLatitude();
                     double longitude = currentLocation.getLongitude();
                     bounds = new LatLngBounds(
