@@ -9,5 +9,6 @@
     <color name="statusbar_color">#29538f</color>
     <color name="content_background">#fffafafa</color>
     <color name="faint_grey_background">#eeeeee</color>
+    <color name="route_color">#00b2fc</color>
 
 </resources>

@@ -3,7 +3,6 @@ package com.ziprun.maputils.models;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.util.List;
@@ -53,6 +52,15 @@ public class Directions {
         this.status = StatusCode.valueOf(status.toUpperCase());
     }
 
+    public List<LatLng> getPoints(int routeIndex){
+        if (routeIndex >= this.routes.length){
+            throw new IndexOutOfBoundsException("Route Index is out of bounds");
+        }
+
+
+        return routes[routeIndex].overviewPolyline.decodePath();
+    }
+
 
     public void showRoute(int routeIndex, GoogleMap googleMap, int color){
         if (routeIndex >= this.routes.length){
@@ -65,11 +73,11 @@ public class Directions {
 
         googleMap.animateCamera(CameraUpdateFactory.newLatLng(points.get(0)));
 
-        googleMap.addMarker(new MarkerOptions()
-                .position(startPoint));
-
-        googleMap.addMarker(new MarkerOptions()
-                .position(endPoint));
+//        googleMap.addMarker(new MarkerOptions()
+//                .position(startPoint));
+//
+//        googleMap.addMarker(new MarkerOptions()
+//                .position(endPoint));
 
 
         googleMap.addPolyline(new PolylineOptions().addAll(points)).setColor(color);

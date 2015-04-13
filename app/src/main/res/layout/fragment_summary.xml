@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoPanelHeight="300dp"
+        sothree:umanoShadowHeight="4dp">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            map:cameraZoom="15"
+            map:mapType="normal"
+            map:uiCompass="false"
+            map:uiZoomControls="false"
+            map:uiZoomGestures="true"
+            />
+
+
+        <RelativeLayout
+            android:id="@+id/summary_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/content_background"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/estimate_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:textColor="@color/text_color_primary"
+                android:textSize="20sp"
+                android:text="Ride Esitmate for 10 Kms"
+                android:layout_marginBottom="10dp"/>
+
+
+            <LinearLayout
+                android:id="@+id/estimate_cost_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_below="@id/estimate_distance"
+                android:layout_centerHorizontal="true">
+
+                <TextView
+                    android:id="@+id/estimate_cost"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/primary_color"
+                    android:textSize="32sp"
+                    android:text="120.00"/>
+
+                <TextView
+                    android:id="@+id/currency"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="5dp"
+                    android:gravity="center"
+                    android:textColor="@color/primary_color"
+                    android:textSize="16sp"
+                    android:text="Rs"
+                    android:textAlignment="center"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/source_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/estimate_distance"
+                android:layout_marginTop="5dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_blue_map_marker"/>
+
+            <TextView
+                android:id="@+id/extra_charge"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_color_secondary"
+                android:text="+ 2% charge on items purchased"
+                android:singleLine="false"
+                android:layout_below="@+id/estimate_cost_container"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                />
+
+
+            <ImageView
+                android:id="@+id/dest_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/estimate_distance"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_green_map_marker"/>
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="2px"
+                android:layout_below="@+id/estimate_cost_container"
+                android:layout_toLeftOf="@id/extra_charge"
+                android:layout_toRightOf="@id/source_marker"
+                android:layerType="software"
+                android:background="@drawable/dotted"/>
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="2px"
+                android:layout_below="@+id/estimate_cost_container"
+                android:layout_toLeftOf="@id/dest_marker"
+                android:layout_toRightOf="@id/extra_charge"
+                android:layerType="software"
+                android:background="@drawable/dotted"/>
+
+            <TextView
+                android:id="@+id/source_address"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:textSize="16sp"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@id/source_marker"
+                android:textColor="@color/text_color_primary"
+                android:gravity="left"
+                android:text="Buy From:"/>
+
+            <TextView
+                android:id="@+id/dest_address"
+                android:layout_width="125dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="20dp"
+                android:textSize="16sp"
+                android:layout_alignParentRight="true"
+                android:layout_below="@id/dest_marker"
+                android:textColor="@color/text_color_primary"
+                android:gravity="right"
+                android:text="Deliver To:"
+                android:phoneNumber="false"/>
+
+            <LinearLayout
+                android:id="@+id/notes_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:padding="10dp"
+                android:layout_below="@id/source_address"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/txtview_review"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/source_address"
+                    android:layout_marginBottom="10dp"
+                    android:text="Review or Edit Instructions"
+                    android:textColor="@color/text_color_primary"
+                    android:textSize="16sp"
+                    android:gravity="left"
+                    />
+
+                <EditText
+                    android:id="@+id/review_notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_below="@id/txtview_review"
+                    android:textSize="24sp"
+                    android:textColor="@color/text_color_primary"
+                    android:singleLine="false"/>
+
+                <TextView
+                    android:id="@+id/txtview_calculation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:layout_below="@id/review_notes"
+                    android:text="How it is calculated?"
+                    android:textColor="@color/text_color_primary"
+                    android:gravity="left"
+                    />
+            </LinearLayout>
+
+
+        </RelativeLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+
+    <Button android:id="@+id/nextBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="20dp"
+            android:text="Confirm"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="18dp"
+            android:drawableRight="@drawable/ic_action_forward"
+            android:background="#91d30d"/>
+</RelativeLayout>
+
+
+
+

@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
+import com.ziprun.consumer.ui.fragment.SummaryFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -22,8 +23,11 @@ public class DeliveryActivity extends ZipBaseActivity {
 
     private InstructionFragment instructionFragment;
 
+    private SummaryFragment summaryFragment;
+
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
+
 
 
     @Override
@@ -39,10 +43,12 @@ public class DeliveryActivity extends ZipBaseActivity {
 
         instructionFragment = new InstructionFragment();
 
+        summaryFragment = new SummaryFragment();
+
 
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, instructionFragment)
+                    .add(R.id.container, summaryFragment)
                     .commit();
         }
     }

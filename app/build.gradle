@@ -107,6 +107,8 @@ dependencies {
 
     compile 'com.jpardogo.materialtabstrip:library:1.0.9'
 
+    compile 'com.sothree.slidinguppanel:library:3.0.0'
+
     internalCompile 'com.facebook.stetho:stetho:1.0.1'
 
 }

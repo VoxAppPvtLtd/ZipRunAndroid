@@ -5,6 +5,7 @@ import dagger.Module;
 @Module(injects = {
         LocationPickerFragment.class,
         InstructionFragment.class,
+        SummaryFragment.class,
     }, complete = false,
     library = true)
 public class FragmentModule {

@@ -1,6 +1,7 @@
 package com.ziprun.maputils;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -215,6 +216,7 @@ public class GoogleDirectionAPI {
 
 
     public Observable<Directions> getDirections() {
+        Log.i(TAG, "Get Direction Method Called");
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(DateTime.class, new DateTimeAdapter())
                 .registerTypeAdapter(Distance.class, new DistanceAdapter())
