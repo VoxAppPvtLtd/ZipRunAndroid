@@ -1,8 +1,6 @@
 package com.ziprun.consumer.ui.fragment;
 
 import android.content.IntentSender;
-import android.location.Address;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
@@ -10,18 +8,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gc.materialdesign.views.ButtonFloat;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,11 +26,13 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.pnikosis.materialishprogress.ProgressWheel;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.presenter.SourceLocationPresenter;
+import com.ziprun.consumer.ui.activity.DeliveryActivity;
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
 import com.ziprun.consumer.utils.Utils;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -46,10 +41,6 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 public class LocationPickerFragment extends ZipBaseFragment implements
         OnMapReadyCallback, GoogleMap.OnCameraChangeListener,
@@ -66,7 +57,9 @@ public class LocationPickerFragment extends ZipBaseFragment implements
                            .setSmallestDisplacement(10)
                            .setInterval(100);
 
-    private static final int STATIC_ADDRESS_VIEW_HEIGHT = 200; //dp
+
+    @InjectView(R.id.sliding_layout)
+    SlidingUpPanelLayout slidingLayout;
 
     @InjectView(R.id.map)
     MapView mapView;
@@ -92,6 +85,12 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @InjectView(R.id.address)
     TextView addressView;
 
+    @InjectView(R.id.gecode_progress_wheel)
+    ProgressWheel geocodeProgessWheel;
+
+    @InjectView(R.id.pickup_location_help_text)
+    TextView helpText;
+
     @InjectView(R.id.closeAddressBtn)
     ImageView closeAddresBtn;
 
@@ -99,26 +98,18 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     ReactiveLocationProvider locationProvider;
 
     @Inject
+    SourceLocationPresenter presenter;
+
+    @Inject
     Utils utils;
 
-
     private GoogleMap googleMap;
-    private Location currentLocation;
-    private LatLng markerPosition;
 
     private Marker currentLocationMarker;
 
-    private boolean firstLoad = true;
-
-    private Subscription locationUpdateSubcription;
-
-    private Boolean locationEnabledFlag = null;
-
-    private boolean isMapReady =  false;
-
-    private boolean isMapMarkerSet = false;
-
     private boolean inSearchMode = false;
+
+    private boolean slidingPanelExpanded = false;
 
 
     @Override
@@ -136,15 +127,32 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        setupSlidingLayout();
+
         return  view;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        Bundle args;
+
+        if(savedInstanceState != null){
+            args = savedInstanceState;
+        }else{
+            args = getArguments();
+        }
+        presenter.initialize();
+        presenter.setBooking(args.getString(DeliveryActivity.KEY_BOOKING));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        setUpLocationUpdates();
+        presenter.start();
         addressAutocompleteView.setOnAddressSelectedListener(this);
-
     }
 
     @Override
@@ -162,12 +170,13 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void onStop() {
         super.onStop();
-        locationUpdateSubcription.unsubscribe();
+        presenter.stop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        presenter.destroy();
         mapView.onDestroy();
     }
 
@@ -183,135 +192,17 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         mapView.onSaveInstanceState(outState);
     }
 
-    private void setUpLocationUpdates(){
-        checkLocationSettings();
-
-        locationUpdateSubcription = locationProvider.getLastKnownLocation()
-                .concatWith(locationProvider.getUpdatedLocation(locationRequest))
-                .subscribe(locationSetter);
-
-    }
-
-    private Action1<Location> locationSetter = new Action1<Location>() {
-        @Override
-        public void call(Location location) {
-            Log.i(TAG, "Location Update " + location.toString());
-            currentLocation = location;
-
-            if(!isMapMarkerSet) {
-                setMapMarker();
-            }else{
-                currentLocationMarker.setPosition(
-                        utils.getLatLngFromLocation(currentLocation));
-            }
-        }
-    };
-
-    public void checkLocationSettings() {
-        locationProvider.checkLocationSettings(
-                new LocationSettingsRequest.Builder()
-                        .addLocationRequest(locationRequest)
-                        .build()
-        )
-        .subscribeOn(Schedulers.newThread())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Action1<LocationSettingsResult>() {
-            @Override
-            public void call(LocationSettingsResult locationSettingsResult) {
-                Status status = locationSettingsResult.getStatus();
-                Log.i(TAG, "Location Settings Status " + status
-                        .getStatusMessage());
-
-                if (status.isSuccess()) {
-                    isLocationEnabled(true);
-                } else if (status.hasResolution()) {
-                    try {
-                        status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
-                    } catch (IntentSender.SendIntentException th) {
-                        Log.e(TAG, "Error opening settings activity.", th);
-                    }
-                } else {
-                    Toast.makeText(getActivity(),
-                            R.string.check_location_settings_failed,
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-    public void isLocationEnabled(Boolean flag) {
-        locationEnabledFlag = flag;
-        setMapMarker();
-
-    }
-
-    private void setMapMarker() {
-        if(!isMapReady || locationEnabledFlag == null)
-            return;
-
-
-        else if(!locationEnabledFlag){
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(DELHI_LATLNG));
-            isMapMarkerSet = true;
-            currentLocationBtn.setVisibility(View.GONE);
-        }
-        else if(currentLocation != null) {
-            currentLocationBtn.setVisibility(View.VISIBLE);
-            LatLng latLng = utils.getLatLngFromLocation(currentLocation);
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLng(latLng));
-            isMapMarkerSet = true;
-            currentLocationMarker = googleMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .icon(BitmapDescriptorFactory
-                    .fromResource(R.drawable.icon_red_dot)));
-        }
-    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         MapsInitializer.initialize(this.getActivity());
-        isMapReady = true;
         this.googleMap.setMyLocationEnabled(false);
-        this.googleMap.setOnCameraChangeListener(this);
-        setMapMarker();
+        presenter.onMapReady();
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        this.markerPosition = cameraPosition.target;
-        Log.i(TAG, "Camera Changed " + this.markerPosition);
-        locationProvider.getGeocodeObservable(this.markerPosition.latitude,
-                this.markerPosition.longitude, 1)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Action1<List<Address>>() {
-                @Override
-                public void call(List<Address> addresses) {
-                    if (addresses.size() == 0)
-                        return;
-
-                    String address = utils.addressToString(addresses.get(0),
-                            "<br/>");
-                    Log.i(TAG, "Reverse Geocoded Address " + address);
-
-                    if (firstLoad) {
-                        firstLoad = false;
-                        return;
-                    }
-
-                    if (staticAddressView.getVisibility() == View.GONE)
-                        showStaticAddressView();
-
-                    addressView.setText(Html.fromHtml(address));
-                }
-            }, new Action1<Throwable>() {
-                @Override
-                public void call(Throwable throwable) {
-                    Log.e(TAG, throwable.getMessage(), throwable);
-                }
-            });
+        presenter.onCameraChanged(cameraPosition.target);
     }
 
     @OnClick(R.id.searchBtn)
@@ -322,8 +213,8 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
     @OnClick(R.id.currentLocationBtn)
     public void moveToCurrentLocation(View view){
-        googleMap.animateCamera(CameraUpdateFactory.newLatLng(
-                        utils.getLatLngFromLocation(currentLocation)));
+        presenter.moveToCurrentPosition();
+
     }
 
     @OnClick(R.id.closeAddressBtn)
@@ -342,49 +233,170 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         }
     }
 
+    private void setupSlidingLayout() {
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        slidingLayout.setTouchEnabled(false);
+        slidingLayout.setEnableDragViewTouchEvents(false);
+        staticAddressView.setVisibility(View.GONE);
+    }
+
+
     @Override
     public void onAddressSelected(Observable<Place> place) {
         addressAutocompleteView.setVisibility(View.GONE);
         addressAutocompleteView.reset();
         inSearchMode = false;
-        place.subscribe(new Action1<Place>() {
-            @Override
-            public void call(Place place) {
-                Log.i(TAG, "Place Selected : " + place.getAddress
-                        ().toString());
+        presenter.onPlaceSelected(place);
 
-                googleMap.animateCamera(CameraUpdateFactory
-                        .newLatLng(place.getLatLng()));
-            }
-        });
     }
 
-    public void showStaticAddressView(){
-        int activityHeight = mapContainer.getHeight();
+    public void setInitialPosition(LatLng pos){
+       moveCameraAndDisableListener(pos);
+    }
 
-        int newHeight = activityHeight - utils.convertDpToPixel
-                (STATIC_ADDRESS_VIEW_HEIGHT, getActivity());
-
-        mapContainer.setLayoutParams(new RelativeLayout.LayoutParams
-                (ViewGroup.LayoutParams.MATCH_PARENT, newHeight));
-
-        Animation bottomUp = AnimationUtils.loadAnimation(getActivity(),
-                R.anim.bottom_up);
-
-        staticAddressView.startAnimation(bottomUp);
+    public void showAddressView(){
         staticAddressView.setVisibility(View.VISIBLE);
+        slidingPanelExpanded = true;
+        final int origHeight = mapContainer.getHeight();
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View view, float offset) {
+            }
+
+            @Override
+            public void onPanelCollapsed(View view) {
+            }
+
+            @Override
+            public void onPanelExpanded(View view) {
+                ViewGroup.LayoutParams lp =
+                        (ViewGroup.LayoutParams)mapContainer.getLayoutParams();
+
+                lp.height = origHeight - view.getHeight();
+
+                mapContainer.setLayoutParams(lp);
+
+                mapContainer.requestLayout();
+            }
+
+            @Override
+            public void onPanelAnchored(View view) {
+            }
+
+            @Override
+            public void onPanelHidden(View view) {
+                view.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     public void hideStaticAddressView(){
-
-        mapContainer.setLayoutParams(new RelativeLayout.LayoutParams
-                (ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
-        Animation bottom_down = AnimationUtils.loadAnimation(getActivity(),
-                R.anim.bottom_down);
-
-        staticAddressView.startAnimation(bottom_down);
         staticAddressView.setVisibility(View.GONE);
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
 
+    }
+
+    public void updateAddress(String address){
+        if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
+            showAddressView();
+
+        geocodeProgessWheel.setVisibility(View.GONE);
+        helpText.setText(R.string.pickup_location);
+
+        if(address == null){
+            Toast.makeText(getActivity(), "Unable to fetch address. Please " +
+                            "Check Internet Connectivity or try again later",
+                    Toast.LENGTH_LONG).show();
+
+            addressView.setText("Address Not Found");
+
+            return;
+        }
+
+        addressView.setText(Html.fromHtml(address));
+    }
+
+
+    public void startResolutionActivity(Status status) {
+        try {
+            status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(TAG, "Unable to resolve status error", e);
+            presenter.enableLocationFlag(false);
+        }
+
+    }
+
+    public void checkLocationSettings(){
+        presenter.checkLocationSettings();
+    }
+
+    public void enableLocationFlag(boolean flag){
+        presenter.enableLocationFlag(flag);
+    }
+
+    public void setCurrentLocationMarker(LatLng currentLocation) {
+        if(currentLocationMarker == null){
+            currentLocationMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(currentLocation)
+                    .icon(BitmapDescriptorFactory
+                            .fromResource(R.drawable.icon_red_dot)));
+        }else{
+            currentLocationMarker.setPosition(currentLocation);
+        }
+    }
+
+    public void showCurrentLocationBtn(boolean enabled) {
+        currentLocationBtn.setVisibility(enabled ? View.VISIBLE : View.GONE);
+    }
+
+    public void moveCameraAndDisableListener(LatLng pos){
+        googleMap.setOnCameraChangeListener(null);
+        presenter.setPerformGeocode(false);
+        moveCamera(pos, true, new GoogleMap.CancelableCallback() {
+            @Override
+            public void onFinish() {
+                presenter.setPerformGeocode(true);
+                googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
+            }
+
+            @Override
+            public void onCancel() {
+                presenter.setPerformGeocode(true);
+                googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
+            }
+        });
+
+    }
+
+    public void moveCamera(LatLng sourceLocation) {
+        moveCamera(sourceLocation, false, null);
+    }
+
+    public void moveCamera(LatLng sourceLocation, boolean animate) {
+        moveCamera(sourceLocation, animate, null);
+    }
+
+    public void moveCamera(LatLng sourceLocation, boolean animate,
+                           GoogleMap.CancelableCallback callback) {
+        if(animate){
+            if(callback != null)
+                googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLng(sourceLocation), callback);
+            else
+                googleMap.animateCamera(
+                        CameraUpdateFactory.newLatLng(sourceLocation));
+
+        }else {
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sourceLocation));
+        }
+
+    }
+
+    public void startGeocoding() {
+        geocodeProgessWheel.setVisibility(View.VISIBLE);
+        helpText.setText("Fetching Address");
     }
 }

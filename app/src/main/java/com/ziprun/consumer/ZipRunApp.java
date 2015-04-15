@@ -3,10 +3,12 @@ package com.ziprun.consumer;
 import android.app.Application;
 import android.content.Context;
 
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.maps.model.LatLng;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+
 import dagger.ObjectGraph;
-import com.crashlytics.android.Crashlytics;
 import io.fabric.sdk.android.Fabric;
 
 public class ZipRunApp extends Application {
@@ -49,6 +51,13 @@ public class ZipRunApp extends Application {
 
     protected Object[] getModules() {
         return Modules.list(this);
+    }
+
+
+    public final static class Constants {
+
+        public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
+
     }
 }
 

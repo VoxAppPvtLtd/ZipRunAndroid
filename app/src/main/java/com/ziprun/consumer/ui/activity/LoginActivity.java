@@ -49,6 +49,9 @@ public class LoginActivity extends ZipBaseActivity {
                 // Do something on failure
             }
         });
+
+        digitsButton
+                .setAuthTheme(android.R.style.Theme_Material);
     }
 
 

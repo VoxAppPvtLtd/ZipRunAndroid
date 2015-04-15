@@ -1,6 +1,10 @@
 package com.ziprun.consumer.ui.activity;
 
+import android.content.Context;
+
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
+
+import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -8,6 +12,7 @@ import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 
 
 @Module(injects = {
+        SplashActivity.class,
         LoginActivity.class,
         MainActivity.class,
         DeliveryActivity.class,
@@ -22,6 +27,11 @@ public class ActivityModule {
         this.activity = activity;
     }
 
+    @Provides @Singleton
+    @ForActivity
+    Context provideActivityContext() {
+        return activity;
+    }
     @Provides
     ReactiveLocationProvider provideReactiveLocationProvider(){
         return new ReactiveLocationProvider(activity);

@@ -5,10 +5,13 @@ import android.graphics.Point;
 import android.location.Address;
 import android.location.Location;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Display;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.ziprun.consumer.ForApplication;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.inject.Inject;
@@ -25,6 +28,7 @@ public final class Utils {
     @Inject
     Display display;
 
+    @ForApplication
     @Inject
     Context appContext;
 
@@ -91,5 +95,29 @@ public final class Utils {
         return appContext.getResources().getColor(resID);
     }
 
+
+    public boolean isOnline(){
+        Runtime runtime = Runtime.getRuntime();
+        Process ipProcess = null;
+        try {
+            ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
+            int     exitValue = 0;
+            exitValue = ipProcess.waitFor();
+            return (exitValue == 0);
+        } catch (InterruptedException e) {
+            Log.e(TAG, "Unable to check if app is online", e);
+        } catch (IOException e) {
+            Log.e(TAG, "Unable to check if app is online", e);
+        }
+        return false;
+    }
+
+    public float calculateDistance(LatLng source, LatLng dest){
+        float[] results = new float[1];
+        Location.distanceBetween(source.latitude, source.longitude,
+                dest.latitude, dest.longitude, results);
+
+        return results[0];
+    }
 
 }

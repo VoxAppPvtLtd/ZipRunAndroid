@@ -4,19 +4,24 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:map="http://schemas.android.com/apk/res-auto"
              xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
+             xmlns:sothree="http://schemas.android.com/apk/res-auto"
+             xmlns:wheel="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:fitsSystemWindows="true">
 
-    <RelativeLayout
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        sothree:umanoFadeColor="@android:color/transparent"
+        sothree:umanoShadowHeight="4dp">
 
-        <RelativeLayout
+        <FrameLayout
             android:id="@+id/mapContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true">
+            android:layout_height="match_parent">
 
             <com.google.android.gms.maps.MapView
                 android:id="@+id/map"
@@ -29,16 +34,40 @@
                 map:uiZoomGestures="true"
             />
 
-            <!--<TextView-->
-                <!--android:id="@+id/pickup_location_help_text"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="50dp"-->
-                <!--android:layout_margin="20dp"-->
-                <!--android:padding="10dp"-->
-                <!--android:text="@string/pickup_location"-->
-                <!--android:background="#ffffff"-->
-                <!--android:textColor="@android:color/primary_text_light"-->
-                <!--android:layout_gravity="center_horizontal"/>-->
+
+            <LinearLayout
+                android:id="@+id/container_geocode_progess"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:background="#ffffff"
+                android:orientation="horizontal">
+
+                <com.pnikosis.materialishprogress.ProgressWheel
+                    android:id="@+id/gecode_progress_wheel"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    matProg_rimWidth="3dp"
+                    wheel:matProg_spinSpeed="0.8"
+                    wheel:matProg_barColor="@color/text_color_hint"
+                    wheel:matProg_progressIndeterminate="true" />
+
+                <TextView
+                    android:id="@+id/pickup_location_help_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/pickup_location"
+                    android:textSize="16sp"
+                    android:background="#ffffff"
+                    android:textColor="@color/text_color_secondary"
+                    android:gravity="center"/>
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/map_marker"
@@ -46,17 +75,16 @@
                 android:layout_height="64dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_blue_map_marker"
-                android:layout_centerInParent="true"
+                android:layout_gravity="center"
                 />
 
             <com.gc.materialdesign.views.ButtonFloat
                 android:id="@+id/currentLocationBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
+                android:layout_gravity="bottom|right"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="60dp"
                 materialdesign:animate="true"
                 materialdesign:iconDrawable="@drawable/icon_current_location" />
 
@@ -65,22 +93,19 @@
                 android:id="@+id/searchBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_above="@id/currentLocationBtn"
+                android:layout_gravity="bottom|right"
                 android:layout_marginRight="15dp"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="140dp"
                 materialdesign:animate="true"
                 materialdesign:iconDrawable="@drawable/icon_search" />
 
 
-        </RelativeLayout>
+        </FrameLayout>
         <RelativeLayout
             android:id="@+id/static_address"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_alignParentBottom="true"
             android:padding="20dp"
-            android:visibility="gone"
             android:background="@color/content_background">
 
             <ImageView
@@ -114,7 +139,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_color_secondary"
-                    android:textSize="18dp"
+                    android:textSize="16dp"
                     android:singleLine="false"
                 />
 
@@ -131,7 +156,7 @@
                 android:background="#91d30d"/>
 
         </RelativeLayout>
-    </RelativeLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
     <com.ziprun.consumer.ui.custom.AddressAutocompleteView
         android:id="@+id/address_autocomplete_view"

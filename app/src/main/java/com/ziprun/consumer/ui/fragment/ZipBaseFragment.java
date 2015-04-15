@@ -25,4 +25,8 @@ public abstract class ZipBaseFragment extends BackHandlerFragment {
         return new Object[] {new FragmentModule(this)};
     }
 
+    public void inject(Object object) {
+        fragmentGraph.inject(object);
+    }
+
 }

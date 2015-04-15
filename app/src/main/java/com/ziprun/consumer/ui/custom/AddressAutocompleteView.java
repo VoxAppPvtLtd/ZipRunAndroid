@@ -117,6 +117,10 @@ public class AddressAutocompleteView extends RelativeLayout {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view,
                                     int position, long id) {
+
+                if(onAddressSelectedListener == null)
+                    return;
+
                 PlaceAutocomplete autocomplete =
                         autocompleteAdapter.getItem(position);
 

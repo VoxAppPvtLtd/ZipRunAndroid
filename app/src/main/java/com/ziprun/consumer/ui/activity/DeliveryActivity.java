@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.ui.fragment.SummaryFragment;
@@ -19,15 +20,18 @@ public class DeliveryActivity extends ZipBaseActivity {
 
     private static final String TAG = DeliveryActivity.class.getCanonicalName();
 
+    public static final String KEY_BOOKING = "booking";
+
     private LocationPickerFragment locationPickerFragment;
 
     private InstructionFragment instructionFragment;
 
     private SummaryFragment summaryFragment;
 
+    private Booking booking;
+
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
-
 
 
     @Override
@@ -45,10 +49,15 @@ public class DeliveryActivity extends ZipBaseActivity {
 
         summaryFragment = new SummaryFragment();
 
+        booking = new Booking();
 
         if (savedInstanceState == null) {
+            Bundle args = new Bundle();
+            Log.i(TAG, "Booking: " + booking.toJson());
+            args.putString(KEY_BOOKING, booking.toJson());
+            locationPickerFragment.setArguments(args);
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, summaryFragment)
+                    .add(R.id.container, locationPickerFragment)
                     .commit();
         }
     }
@@ -79,8 +88,6 @@ public class DeliveryActivity extends ZipBaseActivity {
             return true;
         }
 
-
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -88,11 +95,12 @@ public class DeliveryActivity extends ZipBaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == LocationPickerFragment.REQUEST_CHECK_LOCATION_SETTINGS &&
                 locationPickerFragment != null){
-
+            Log.i(TAG, "Result Code " + resultCode);
             if(resultCode == RESULT_OK){
                     locationPickerFragment.checkLocationSettings();
             }else{
-                locationPickerFragment.isLocationEnabled(false);
+                Log.i(TAG, "Disabled Location Flag");
+                locationPickerFragment.enableLocationFlag(false);
             }
         }
 

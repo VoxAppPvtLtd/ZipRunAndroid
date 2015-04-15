@@ -4,7 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
 import com.ziprun.consumer.ZipRunApp;
+import com.ziprun.consumer.data.ZipRunSession;
 import com.ziprun.consumer.ui.fragment.BackHandlerFragment;
+import com.ziprun.consumer.utils.Utils;
+
+import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 
@@ -14,6 +18,12 @@ public abstract class ZipBaseActivity extends ActionBarActivity implements
     private ObjectGraph activityGraph;
 
     private BackHandlerFragment currentFragment;
+
+    @Inject
+    Utils utils;
+
+    @Inject
+    ZipRunSession zipRunSession;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,4 +69,5 @@ public abstract class ZipBaseActivity extends ActionBarActivity implements
         }
         super.onBackPressed();
     }
+
 }

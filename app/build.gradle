@@ -109,6 +109,8 @@ dependencies {
 
     compile 'com.sothree.slidinguppanel:library:3.0.0'
 
+    compile 'com.pnikosis:materialish-progress:1.5'
+
     internalCompile 'com.facebook.stetho:stetho:1.0.1'
 
 }
