@@ -1,8 +1,12 @@
 package com.ziprun.consumer.ui.fragment;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 
 import com.ziprun.consumer.ui.activity.ZipBaseActivity;
+import com.ziprun.consumer.utils.AndroidBus;
+
+import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 
@@ -12,6 +16,8 @@ public abstract class ZipBaseFragment extends BackHandlerFragment {
 
     protected ZipBaseActivity activity;
 
+    @Inject
+    AndroidBus bus;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -19,6 +25,21 @@ public abstract class ZipBaseFragment extends BackHandlerFragment {
         activity = (ZipBaseActivity) getActivity();
         fragmentGraph = activity.getActivityGraph().plus(getModules());
         fragmentGraph.inject(this);
+        setActionBar(activity.getSupportActionBar());
+    }
+
+    protected abstract void setActionBar(ActionBar supportActionBar);
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        bus.register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        bus.unregister(this);
     }
 
     protected Object[] getModules() {

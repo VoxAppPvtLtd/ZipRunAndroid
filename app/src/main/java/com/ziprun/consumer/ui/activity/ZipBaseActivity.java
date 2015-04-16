@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
 import com.ziprun.consumer.ui.fragment.BackHandlerFragment;
+import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.Utils;
 
 import javax.inject.Inject;
@@ -25,6 +26,9 @@ public abstract class ZipBaseActivity extends ActionBarActivity implements
     @Inject
     ZipRunSession zipRunSession;
 
+    @Inject
+    AndroidBus bus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -35,6 +39,17 @@ public abstract class ZipBaseActivity extends ActionBarActivity implements
         activityGraph.inject(this);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bus.register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        bus.unregister(this);
+    }
 
     /**
      * A list of modules to use for the individual activity graph. Subclasses

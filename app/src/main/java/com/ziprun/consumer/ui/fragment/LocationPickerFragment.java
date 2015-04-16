@@ -3,6 +3,7 @@ package com.ziprun.consumer.ui.fragment;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.presenter.SourceLocationPresenter;
 import com.ziprun.consumer.ui.activity.DeliveryActivity;
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
@@ -125,10 +127,15 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         searchLocBtn.setBackgroundColor(getActivity().getResources()
                 .getColor(R.color.white));
 
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(this);
+        currentLocationBtn.setBackgroundColor(getActivity().getResources()
+                .getColor(R.color.button_float_color));
+
+
+        mapView.onCreate(null);
 
         setupSlidingLayout();
+
+//        debugContainer();
 
         return  view;
     }
@@ -136,14 +143,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        Bundle args;
-
-        if(savedInstanceState != null){
-            args = savedInstanceState;
-        }else{
-            args = getArguments();
-        }
+        Bundle args = getArguments();
         presenter.initialize();
         presenter.setBooking(args.getString(DeliveryActivity.KEY_BOOKING));
     }
@@ -152,6 +152,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     public void onStart() {
         super.onStart();
         presenter.start();
+        mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
     }
 
@@ -171,6 +172,10 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     public void onStop() {
         super.onStop();
         presenter.stop();
+        addressAutocompleteView.setOnAddressSelectedListener(null);
+        if(googleMap != null)
+            googleMap.clear();
+        currentLocationMarker = null;
     }
 
     @Override
@@ -184,12 +189,6 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
     }
 
     @Override
@@ -222,6 +221,11 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         hideStaticAddressView();
     }
 
+    @OnClick(R.id.nextBtn)
+    public void onNextBtnClicked(View view){
+        bus.post(new OnSourceLocationSet());
+    }
+
     @Override
     public boolean onBackPressed() {
         if(inSearchMode){
@@ -232,6 +236,13 @@ public class LocationPickerFragment extends ZipBaseFragment implements
             return false;
         }
     }
+
+    @Override
+    public void setActionBar(ActionBar actionBar){
+        actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setLogo(R.drawable.ziprun_white_emboss);
+    }
+
 
     private void setupSlidingLayout() {
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -248,10 +259,6 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         inSearchMode = false;
         presenter.onPlaceSelected(place);
 
-    }
-
-    public void setInitialPosition(LatLng pos){
-       moveCameraAndDisableListener(pos);
     }
 
     public void showAddressView(){
@@ -273,11 +280,18 @@ public class LocationPickerFragment extends ZipBaseFragment implements
                 ViewGroup.LayoutParams lp =
                         (ViewGroup.LayoutParams)mapContainer.getLayoutParams();
 
+
+
                 lp.height = origHeight - view.getHeight();
+
+                Log.i(TAG," On Panel Expanded" +  origHeight + " " + view
+                        .getHeight() + " " + mapContainer.getHeight());
 
                 mapContainer.setLayoutParams(lp);
 
                 mapContainer.requestLayout();
+//                debugContainer();
+
             }
 
             @Override
@@ -291,6 +305,28 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         });
 
     }
+
+//    private void debugContainer(){
+//        ViewTreeObserver vto = mapContainer.getViewTreeObserver();
+//        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                mapContainer.getViewTreeObserver().removeGlobalOnLayoutListener
+//                        (this);
+//                int height = mapContainer.getMeasuredHeight();
+//
+//                Log.i(TAG, "Map Container Height " + height );
+//                Log.i(TAG, "Current Position Top " +
+//                        currentLocationBtn.getTop());
+//                Log.i(TAG, "Map Container Top " + mapContainer.getTop());
+//
+//                Log.i(TAG, "Search Btn Position Top " +
+//                        searchLocBtn.getTop());
+//
+//
+//            }
+//        });
+//    }
 
     public void hideStaticAddressView(){
         staticAddressView.setVisibility(View.GONE);
@@ -352,23 +388,33 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         currentLocationBtn.setVisibility(enabled ? View.VISIBLE : View.GONE);
     }
 
-    public void moveCameraAndDisableListener(LatLng pos){
+    public void enableCameraListener(boolean enabled){
+        googleMap.setOnCameraChangeListener(enabled ? this : null);
+    }
+
+    public void setInitialPosition(LatLng pos){
+        moveCamera(pos);
+        enableCameraListener(true);
+    }
+
+    public void moveCameraAndDisableListener(final LatLng pos){
         googleMap.setOnCameraChangeListener(null);
-        presenter.setPerformGeocode(false);
+        presenter.enableGeocode(false);
         moveCamera(pos, true, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
-                presenter.setPerformGeocode(true);
+                Log.i(TAG, "Camera Reached " + pos.toString());
+                presenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
 
             @Override
             public void onCancel() {
-                presenter.setPerformGeocode(true);
+                Log.i(TAG, "Camera Cancelled " + pos.toString());
+                presenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
         });
-
     }
 
     public void moveCamera(LatLng sourceLocation) {
@@ -397,6 +443,6 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
     public void startGeocoding() {
         geocodeProgessWheel.setVisibility(View.VISIBLE);
-        helpText.setText("Fetching Address");
+        helpText.setText(R.string.fetching_address);
     }
 }

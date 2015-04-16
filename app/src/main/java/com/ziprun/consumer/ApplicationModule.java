@@ -6,6 +6,7 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.GoogleMapService;
 import com.ziprun.consumer.utils.Utils;
 
@@ -51,6 +52,12 @@ public class ApplicationModule {
     Display providesDisplay(){
         return ((WindowManager) application.getSystemService(Context
                 .WINDOW_SERVICE)).getDefaultDisplay();
+    }
+
+    @Provides
+    @Singleton
+    AndroidBus providesAndroidBus(){
+        return new AndroidBus();
     }
 
 

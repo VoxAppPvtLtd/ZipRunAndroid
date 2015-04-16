@@ -2,6 +2,7 @@ package com.ziprun.consumer.ui.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +73,17 @@ public class SummaryFragment extends ZipBaseFragment implements OnMapReadyCallba
         mapView.getMapAsync(this);
 
         return view;
+    }
+
+    @Override
+    protected void setActionBar(ActionBar actionBar) {
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setDisplayUseLogoEnabled(false);
+        actionBar.setTitle(R.string.confirm_fragment_title);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+
+
     }
 
     @Override

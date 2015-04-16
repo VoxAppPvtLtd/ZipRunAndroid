@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.model.AddressLocationPair;
 import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
 
@@ -72,11 +73,16 @@ public class SourceLocationPresenter extends BasePresenter {
 
     @Override
     public void initialize() {
+        super.initialize();
         view.inject(this);
     }
 
     @Override
     public void start() {
+        super.start();
+        Log.i(TAG, "Presenter Started");
+        isMapReady = false;
+        locationEnabledFlag = null;
         compositeSubscription = new CompositeSubscription();
         checkLocationSettings();
         setUpLocationUpdates();
@@ -84,17 +90,18 @@ public class SourceLocationPresenter extends BasePresenter {
 
     @Override
     public void pause() {
-
+        super.pause();
     }
 
     @Override
     public void stop() {
+        super.stop();
         compositeSubscription.clear();
     }
 
     @Override
     public void destroy() {
-
+        super.destroy();
     }
 
     private Action1<LocationSettingsResult> locationSettingsManager =
@@ -119,12 +126,12 @@ public class SourceLocationPresenter extends BasePresenter {
     private Action1<Location> locationSetter = new Action1<Location>() {
         @Override
         public void call(Location location) {
-            Log.i(TAG, "New Location Updated " + location.toString());
             if(locationEnabledFlag != null && locationEnabledFlag == false)
                 return;
 
             currentLocation = location;
             currentLatLng = utils.getLatLngFromLocation(currentLocation);
+            Log.i(TAG, "New Location Updated " + location.toString());
 
             if(isMapReady){
                view.setCurrentLocationMarker(currentLatLng);
@@ -164,9 +171,11 @@ public class SourceLocationPresenter extends BasePresenter {
             booking = Booking.fromJson(bookingJson);
             sourceLocation = booking.getSourceLocation();
         }
+        Log.i(TAG, "Booking Json " + bookingJson);
     }
 
     public void onMapReady(){
+        Log.i(TAG, "Map Ready");
         isMapReady = true;
         setSourceLocation();
     }
@@ -179,32 +188,32 @@ public class SourceLocationPresenter extends BasePresenter {
     }
 
     private void setSourceLocation(){
-        if(!isMapReady)
+        if(!isMapReady || locationEnabledFlag == null)
             return;
 
-        else if(sourceLocation.latLng != null){
+        else if(sourceLocation.latLng != null && sourceLocation.address != null){
             // If Source Location is already set, we don't care about current
             // Location
-            view.setInitialPosition(sourceLocation.latLng);
+            Log.i(TAG, "Move Camera to Existing Source Address");
+            moveToSourceAddress();
         }
-
-        else if(locationEnabledFlag == null)
-            return;
 
         else if(!locationEnabledFlag){
             // GPS not enabled, hence we are setting current location as some
             // default latlng
-            sourceLocation.latLng = ZipRunApp.Constants.DEFAULT_CAMERA_POSITION;
-            view.setInitialPosition(sourceLocation.latLng);
+
+            view.setInitialPosition(ZipRunApp.Constants.DEFAULT_CAMERA_POSITION);
+
         }
         else if(currentLocation != null) {
             //Current Position Found. Setting it as sourceLocation
-            sourceLocation.latLng = currentLatLng;
-            view.setInitialPosition(sourceLocation.latLng);
+            Log.i(TAG, "Move Camera to Current Location");
+            view.setInitialPosition(currentLatLng);
+            //view.moveCameraAndDisableListener(currentLatLng);
         }
     }
 
-    public void setPerformGeocode(boolean enabled){
+    public void enableGeocode(boolean enabled){
         performGeocode = enabled;
     }
 
@@ -212,19 +221,24 @@ public class SourceLocationPresenter extends BasePresenter {
         placeObservable.subscribe(new Action1<Place>() {
             @Override
             public void call(Place place) {
-                Log.i(TAG, "Place Selected : " + place.getAddress
-                        ().toString());
                 performGeocode = false;
-                view.moveCameraAndDisableListener(place.getLatLng());
-                updateSourceLocation(place.getLatLng());
+                sourceLocation.latLng = place.getLatLng();
                 sourceLocation.address = String.format("%s, %s",
                         place.getName(), place.getAddress());
+                moveToSourceAddress();
 
-                Log.i(TAG, "Place Address: " + sourceLocation.address);
 
-                view.updateAddress(formatAddressAsHtml(sourceLocation.address));
             }
         });
+    }
+
+    public void moveToSourceAddress(){
+        performGeocode = false;
+        view.moveCamera(sourceLocation.latLng, false);
+        Log.i(TAG, "Source Location Address: " + sourceLocation.address);
+        view.updateAddress(formatAddressAsHtml(sourceLocation.address));
+        view.enableCameraListener(true);
+        performGeocode = true;
     }
 
     public void moveToCurrentPosition(){
@@ -232,34 +246,45 @@ public class SourceLocationPresenter extends BasePresenter {
         view.moveCamera(currentLatLng, true);
     }
 
-    public void onCameraChanged(LatLng newPos){
-        updateSourceLocation(newPos);
-    }
+    public void onCameraChanged(LatLng camPos){
+        Log.i(TAG, "Camera Changed. Update Source Location " + camPos.toString()
+                + " "  + performGeocode + "  " + sourceLocation.latLng );
 
-    public void updateSourceLocation(LatLng camPos){
-        Log.i(TAG, "Update Source Location " + camPos.toString());
-
-        try{
-            if(!performGeocode) {
-                Log.i(TAG, "Geocoding is Disabled");
-                return;
-            }
-
-            if(sourceLocation.latLng != null){
-                if(utils.calculateDistance(sourceLocation.latLng, camPos) < 10){
-                    Log.i(TAG, "Distance is very less, " +
-                            "no need to reverse geocode again");
-                    return;
-                }
-            }
-
+        if(shouldDoGeocoding(camPos)) {
+            Log.i(TAG, "Performing Geocoding");
+            updateSourceLocation(camPos);
             performReverseGeocode();
-
-        }finally{
-            sourceLocation.latLng = camPos;
+        }else{
+            Log.i(TAG, "Shouldnt do geocoding, distance is too less");
+            updateSourceLocation(camPos);
+            if(sourceLocation.address != null ){
+                view.updateAddress(formatAddressAsHtml(sourceLocation.address));
+            }
+            performGeocode = true;
         }
     }
 
+    private void updateSourceLocation(LatLng pos) {
+        sourceLocation.latLng = pos;
+        bus.post(new UpdateBookingEvent(booking));
+    }
+
+    private boolean shouldDoGeocoding(LatLng pos){
+        if(!performGeocode)
+            return  false;
+        else if(sourceLocation.latLng != null &&
+                sourceLocation.address != null) {
+
+            float meters = utils.calculateDistance
+                    (sourceLocation.latLng, pos);
+
+            Log.i(TAG, "Ditance btn point in meters " + meters);
+
+
+            return utils.calculateDistance(sourceLocation.latLng, pos) > 10;
+        }
+        return true;
+    }
 
     private void performReverseGeocode(){
         view.startGeocoding();
@@ -322,5 +347,6 @@ public class SourceLocationPresenter extends BasePresenter {
         Collections.reverse(formattedAddress);
         return TextUtils.join("<br/>", formattedAddress);
     }
+
 }
 

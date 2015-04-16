@@ -85,7 +85,7 @@
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="60dp"
-                materialdesign:animate="true"
+                materialdesign:animate="false"
                 materialdesign:iconDrawable="@drawable/icon_current_location" />
 
 
@@ -96,7 +96,7 @@
                 android:layout_gravity="bottom|right"
                 android:layout_marginRight="15dp"
                 android:layout_marginBottom="140dp"
-                materialdesign:animate="true"
+                materialdesign:animate="false"
                 materialdesign:iconDrawable="@drawable/icon_search" />
 
 

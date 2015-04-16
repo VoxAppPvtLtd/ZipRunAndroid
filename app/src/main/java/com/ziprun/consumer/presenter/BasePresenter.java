@@ -4,6 +4,7 @@ package com.ziprun.consumer.presenter;
 import android.content.Context;
 
 import com.ziprun.consumer.ui.activity.ForActivity;
+import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.Utils;
 
 import javax.inject.Inject;
@@ -18,17 +19,28 @@ public abstract class BasePresenter {
     @Inject
     Context context;
 
+    @Inject
+    AndroidBus bus;
+
 
     public BasePresenter(){
     }
 
-    public abstract void initialize();
+    public void initialize(){
+    }
 
-    public abstract void start();
+    public void start(){
+        bus.register(this);
+    }
 
-    public abstract void pause();
+    public void pause(){
+    }
 
-    public abstract void stop();
+    public void stop(){
+        bus.unregister(this);
+    }
 
-    public abstract void destroy();
+    public void destroy(){
+
+    }
 }

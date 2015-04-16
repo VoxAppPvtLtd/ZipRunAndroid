@@ -32,6 +32,7 @@ public class ActivityModule {
     Context provideActivityContext() {
         return activity;
     }
+
     @Provides
     ReactiveLocationProvider provideReactiveLocationProvider(){
         return new ReactiveLocationProvider(activity);

@@ -55,10 +55,16 @@ public class InstructionFragment extends ZipBaseFragment {
         return view;
     }
 
+
     @Override
     public void onStart() {
         super.onStart();
-        ActionBar actionBar = activity.getSupportActionBar();
+    }
+
+
+
+    @Override
+    public void setActionBar(ActionBar actionBar){
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setDisplayUseLogoEnabled(false);
         actionBar.setTitle(R.string.instruction_fragment_title);
