@@ -30,9 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
-import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.presenter.SourceLocationPresenter;
-import com.ziprun.consumer.ui.activity.DeliveryActivity;
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
 import com.ziprun.consumer.utils.Utils;
 
@@ -44,7 +42,7 @@ import butterknife.OnClick;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
 
-public class LocationPickerFragment extends ZipBaseFragment implements
+public class LocationPickerFragment extends DeliveryFragment implements
         OnMapReadyCallback, GoogleMap.OnCameraChangeListener,
         AddressAutocompleteView.OnAddressSelectedListener {
     private static final String TAG = LocationPickerFragment.class.getSimpleName();
@@ -99,11 +97,11 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Inject
     ReactiveLocationProvider locationProvider;
 
-    @Inject
-    SourceLocationPresenter presenter;
 
     @Inject
     Utils utils;
+
+    protected SourceLocationPresenter sourceLocationPresenter;
 
     private GoogleMap googleMap;
 
@@ -143,15 +141,13 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Bundle args = getArguments();
-        presenter.initialize();
-        presenter.setBooking(args.getString(DeliveryActivity.KEY_BOOKING));
+        sourceLocationPresenter = (SourceLocationPresenter)presenter;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        presenter.start();
+        sourceLocationPresenter.start();
         mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
     }
@@ -171,7 +167,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void onStop() {
         super.onStop();
-        presenter.stop();
+        sourceLocationPresenter.stop();
         addressAutocompleteView.setOnAddressSelectedListener(null);
         if(googleMap != null)
             googleMap.clear();
@@ -181,7 +177,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.destroy();
+        sourceLocationPresenter.destroy();
         mapView.onDestroy();
     }
 
@@ -192,16 +188,21 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     }
 
     @Override
+    protected Object getCurrentModule(){
+        return new LocationPickerModule(this);
+    }
+
+    @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         MapsInitializer.initialize(this.getActivity());
         this.googleMap.setMyLocationEnabled(false);
-        presenter.onMapReady();
+        sourceLocationPresenter.onMapReady();
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        presenter.onCameraChanged(cameraPosition.target);
+        sourceLocationPresenter.onCameraChanged(cameraPosition.target);
     }
 
     @OnClick(R.id.searchBtn)
@@ -212,7 +213,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
     @OnClick(R.id.currentLocationBtn)
     public void moveToCurrentLocation(View view){
-        presenter.moveToCurrentPosition();
+        sourceLocationPresenter.moveToCurrentPosition();
 
     }
 
@@ -223,7 +224,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
     @OnClick(R.id.nextBtn)
     public void onNextBtnClicked(View view){
-        bus.post(new OnSourceLocationSet());
+        sourceLocationPresenter.moveForward();
     }
 
     @Override
@@ -240,6 +241,9 @@ public class LocationPickerFragment extends ZipBaseFragment implements
     @Override
     public void setActionBar(ActionBar actionBar){
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setLogo(R.drawable.ziprun_white_emboss);
     }
 
@@ -257,7 +261,7 @@ public class LocationPickerFragment extends ZipBaseFragment implements
         addressAutocompleteView.setVisibility(View.GONE);
         addressAutocompleteView.reset();
         inSearchMode = false;
-        presenter.onPlaceSelected(place);
+        sourceLocationPresenter.onPlaceSelected(place);
 
     }
 
@@ -360,17 +364,17 @@ public class LocationPickerFragment extends ZipBaseFragment implements
             status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
         } catch (IntentSender.SendIntentException e) {
             Log.e(TAG, "Unable to resolve status error", e);
-            presenter.enableLocationFlag(false);
+            sourceLocationPresenter.enableLocationFlag(false);
         }
 
     }
 
     public void checkLocationSettings(){
-        presenter.checkLocationSettings();
+        sourceLocationPresenter.checkLocationSettings();
     }
 
     public void enableLocationFlag(boolean flag){
-        presenter.enableLocationFlag(flag);
+        sourceLocationPresenter.enableLocationFlag(flag);
     }
 
     public void setCurrentLocationMarker(LatLng currentLocation) {
@@ -399,19 +403,19 @@ public class LocationPickerFragment extends ZipBaseFragment implements
 
     public void moveCameraAndDisableListener(final LatLng pos){
         googleMap.setOnCameraChangeListener(null);
-        presenter.enableGeocode(false);
+        sourceLocationPresenter.enableGeocode(false);
         moveCamera(pos, true, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
                 Log.i(TAG, "Camera Reached " + pos.toString());
-                presenter.enableGeocode(true);
+                sourceLocationPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
 
             @Override
             public void onCancel() {
                 Log.i(TAG, "Camera Cancelled " + pos.toString());
-                presenter.enableGeocode(true);
+                sourceLocationPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
         });

@@ -2,10 +2,7 @@ package com.ziprun.consumer.ui.fragment;
 
 import com.ziprun.consumer.presenter.SourceLocationPresenter;
 
-import javax.inject.Singleton;
-
 import dagger.Module;
-import dagger.Provides;
 
 @Module(injects = {
         LocationPickerFragment.class,
@@ -22,10 +19,4 @@ public class FragmentModule {
         this.zipFragment = zipFragment;
     }
 
-
-    @Singleton
-    @Provides
-    public SourceLocationPresenter provideSourceLocationPresenter(){
-        return new SourceLocationPresenter((LocationPickerFragment) zipFragment);
-    }
 }

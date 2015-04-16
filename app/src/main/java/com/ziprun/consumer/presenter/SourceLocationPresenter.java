@@ -14,7 +14,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.model.AddressLocationPair;
-import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
@@ -33,7 +33,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class SourceLocationPresenter extends BasePresenter {
+public class SourceLocationPresenter extends DeliveryPresenter {
     private static final String TAG = SourceLocationPresenter.class.getCanonicalName();
 
     private static final LocationRequest locationRequest =
@@ -45,9 +45,7 @@ public class SourceLocationPresenter extends BasePresenter {
     @Inject
     ReactiveLocationProvider locationProvider;
 
-    private LocationPickerFragment view;
-
-    private Booking booking;
+    private LocationPickerFragment locationPickerView;
 
     private Location currentLocation;
 
@@ -68,13 +66,13 @@ public class SourceLocationPresenter extends BasePresenter {
     private boolean firstLoad = true;
 
     public SourceLocationPresenter(LocationPickerFragment fragment){
-        view = fragment;
+        super(fragment);
+        locationPickerView = fragment;
    }
 
     @Override
     public void initialize() {
         super.initialize();
-        view.inject(this);
     }
 
     @Override
@@ -104,6 +102,16 @@ public class SourceLocationPresenter extends BasePresenter {
         super.destroy();
     }
 
+
+    @Override
+    public void setBooking(@Nullable String bookingJson) {
+        super.setBooking(bookingJson);
+        sourceLocation = booking.getSourceLocation();
+        if(sourceLocation == null){
+            sourceLocation = new AddressLocationPair();
+        }
+    }
+
     private Action1<LocationSettingsResult> locationSettingsManager =
         new Action1<LocationSettingsResult>() {
             @Override
@@ -115,7 +123,7 @@ public class SourceLocationPresenter extends BasePresenter {
                 if (status.isSuccess()) {
                     enableLocationFlag(true);
                 } else if (status.hasResolution()) {
-                    view.startResolutionActivity(status);
+                    locationPickerView.startResolutionActivity(status);
                 } else {
                     enableLocationFlag(false);
                     currentLocation = null;
@@ -134,7 +142,7 @@ public class SourceLocationPresenter extends BasePresenter {
             Log.i(TAG, "New Location Updated " + location.toString());
 
             if(isMapReady){
-               view.setCurrentLocationMarker(currentLatLng);
+               locationPickerView.setCurrentLocationMarker(currentLatLng);
             }
 
             if(sourceLocation.latLng == null)
@@ -164,16 +172,6 @@ public class SourceLocationPresenter extends BasePresenter {
                 .subscribe(locationSetter));
     }
 
-    public void setBooking(@Nullable String bookingJson){
-        if(bookingJson == null){
-            sourceLocation = new AddressLocationPair();
-        }else{
-            booking = Booking.fromJson(bookingJson);
-            sourceLocation = booking.getSourceLocation();
-        }
-        Log.i(TAG, "Booking Json " + bookingJson);
-    }
-
     public void onMapReady(){
         Log.i(TAG, "Map Ready");
         isMapReady = true;
@@ -183,7 +181,7 @@ public class SourceLocationPresenter extends BasePresenter {
 
     public void enableLocationFlag(boolean enabled){
         locationEnabledFlag = enabled;
-        view.showCurrentLocationBtn(enabled);
+        locationPickerView.showCurrentLocationBtn(enabled);
         setSourceLocation();
     }
 
@@ -202,14 +200,14 @@ public class SourceLocationPresenter extends BasePresenter {
             // GPS not enabled, hence we are setting current location as some
             // default latlng
 
-            view.setInitialPosition(ZipRunApp.Constants.DEFAULT_CAMERA_POSITION);
+            locationPickerView.setInitialPosition(ZipRunApp.Constants.DEFAULT_CAMERA_POSITION);
 
         }
         else if(currentLocation != null) {
             //Current Position Found. Setting it as sourceLocation
             Log.i(TAG, "Move Camera to Current Location");
-            view.setInitialPosition(currentLatLng);
-            //view.moveCameraAndDisableListener(currentLatLng);
+            locationPickerView.setInitialPosition(currentLatLng);
+            //locationPickerView.moveCameraAndDisableListener(currentLatLng);
         }
     }
 
@@ -234,16 +232,16 @@ public class SourceLocationPresenter extends BasePresenter {
 
     public void moveToSourceAddress(){
         performGeocode = false;
-        view.moveCamera(sourceLocation.latLng, false);
+        locationPickerView.moveCamera(sourceLocation.latLng, false);
         Log.i(TAG, "Source Location Address: " + sourceLocation.address);
-        view.updateAddress(formatAddressAsHtml(sourceLocation.address));
-        view.enableCameraListener(true);
+        locationPickerView.updateAddress(formatAddressAsHtml(sourceLocation.address));
+        locationPickerView.enableCameraListener(true);
         performGeocode = true;
     }
 
     public void moveToCurrentPosition(){
         performGeocode = true;
-        view.moveCamera(currentLatLng, true);
+        locationPickerView.moveCamera(currentLatLng, true);
     }
 
     public void onCameraChanged(LatLng camPos){
@@ -258,7 +256,7 @@ public class SourceLocationPresenter extends BasePresenter {
             Log.i(TAG, "Shouldnt do geocoding, distance is too less");
             updateSourceLocation(camPos);
             if(sourceLocation.address != null ){
-                view.updateAddress(formatAddressAsHtml(sourceLocation.address));
+                locationPickerView.updateAddress(formatAddressAsHtml(sourceLocation.address));
             }
             performGeocode = true;
         }
@@ -287,7 +285,7 @@ public class SourceLocationPresenter extends BasePresenter {
     }
 
     private void performReverseGeocode(){
-        view.startGeocoding();
+        locationPickerView.startGeocoding();
         if(geocodeSubscription != null){
             compositeSubscription.remove(geocodeSubscription);
         }
@@ -309,13 +307,13 @@ public class SourceLocationPresenter extends BasePresenter {
 
                     String address = formatAddressAsHtml(sourceLocation.address);
                     Log.i(TAG, "Reverse Geocoded Address " + address);
-                    view.updateAddress(address);
+                    locationPickerView.updateAddress(address);
                 }
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
                     Log.e(TAG, throwable.getMessage(), throwable);
-                    view.updateAddress(null);
+                    locationPickerView.updateAddress(null);
                     sourceLocation.address = null;
                 }
             });
@@ -348,5 +346,8 @@ public class SourceLocationPresenter extends BasePresenter {
         return TextUtils.join("<br/>", formattedAddress);
     }
 
+    public void moveForward() {
+        bus.post(new OnSourceLocationSet());
+    }
 }
 
