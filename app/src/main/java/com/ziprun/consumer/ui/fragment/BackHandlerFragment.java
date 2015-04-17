@@ -1,12 +1,17 @@
 package com.ziprun.consumer.ui.fragment;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 public abstract class BackHandlerFragment extends Fragment {
     protected BackHandlerInterface backHandlerInterface;
     public abstract boolean onBackPressed();
+
+    public abstract  boolean handleActivityResult(int requestCode,
+                                                     int resultCode,
+                                                     Intent data);
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,5 +34,7 @@ public abstract class BackHandlerFragment extends Fragment {
 
     public interface BackHandlerInterface {
         public void setSelectedFragment(BackHandlerFragment backHandledFragment);
+
+
     }
 }

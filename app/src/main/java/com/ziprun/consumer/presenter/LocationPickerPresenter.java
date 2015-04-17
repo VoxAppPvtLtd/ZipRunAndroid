@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationSettingsRequest;
@@ -14,7 +15,6 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.model.AddressLocationPair;
-import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
+import pl.charmas.android.reactivelocation.observables.GoogleAPIConnectionException;
 import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -33,8 +34,8 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
-public class SourceLocationPresenter extends DeliveryPresenter {
-    private static final String TAG = SourceLocationPresenter.class.getCanonicalName();
+public abstract class LocationPickerPresenter extends DeliveryPresenter {
+    private static final String TAG = LocationPickerPresenter.class.getCanonicalName();
 
     private static final LocationRequest locationRequest =
             LocationRequest.create()
@@ -51,7 +52,7 @@ public class SourceLocationPresenter extends DeliveryPresenter {
 
     private LatLng currentLatLng;
 
-    private AddressLocationPair sourceLocation;
+    private AddressLocationPair selectedLocation;
 
     Subscription geocodeSubscription;
 
@@ -65,7 +66,8 @@ public class SourceLocationPresenter extends DeliveryPresenter {
 
     private boolean firstLoad = true;
 
-    public SourceLocationPresenter(LocationPickerFragment fragment){
+
+    public LocationPickerPresenter(LocationPickerFragment fragment){
         super(fragment);
         locationPickerView = fragment;
    }
@@ -106,11 +108,13 @@ public class SourceLocationPresenter extends DeliveryPresenter {
     @Override
     public void setBooking(@Nullable String bookingJson) {
         super.setBooking(bookingJson);
-        sourceLocation = booking.getSourceLocation();
-        if(sourceLocation == null){
-            sourceLocation = new AddressLocationPair();
+        selectedLocation = getSelectedLocaion();
+        if(selectedLocation == null){
+            selectedLocation = new AddressLocationPair();
         }
     }
+
+    public abstract AddressLocationPair getSelectedLocaion();
 
     private Action1<LocationSettingsResult> locationSettingsManager =
         new Action1<LocationSettingsResult>() {
@@ -123,7 +127,7 @@ public class SourceLocationPresenter extends DeliveryPresenter {
                 if (status.isSuccess()) {
                     enableLocationFlag(true);
                 } else if (status.hasResolution()) {
-                    locationPickerView.startResolutionActivity(status);
+                    locationPickerView.enableLocationServices(status);
                 } else {
                     enableLocationFlag(false);
                     currentLocation = null;
@@ -145,55 +149,83 @@ public class SourceLocationPresenter extends DeliveryPresenter {
                locationPickerView.setCurrentLocationMarker(currentLatLng);
             }
 
-            if(sourceLocation.latLng == null)
-                setSourceLocation();
+            if(selectedLocation.latLng == null)
+                setSelectedLocation();
         }
     };
 
+    private Action1<Throwable> locationProviderError = new Action1<Throwable>() {
+        @Override
+        public void call(Throwable throwable) {
+            Log.e(TAG, "Unable to Check Location Settings ",
+                    throwable);
+            if (throwable instanceof GoogleAPIConnectionException) {
+                ConnectionResult connectionResult =
+                        ((GoogleAPIConnectionException) throwable).getConnectionResult();
+                try {
+                    view.resolveGoogleAPIConnectionError(connectionResult);
+                } catch (Exception e) {
+                    Log.e(TAG, "Unable to connect to google api", e);
+                    enableLocationFlag(false);
+                }
+
+            }else{
+                Log.e(TAG, "Unable to provide location updates");
+                enableLocationFlag(false);
+            }
+        }
+    };
+
+
     public void checkLocationSettings(){
         compositeSubscription.add(
-                locationProvider.checkLocationSettings(
-                        new LocationSettingsRequest.Builder()
-                                .addLocationRequest(locationRequest)
-                                .build()
-                ).subscribeOn(Schedulers.newThread())
-                 .observeOn(AndroidSchedulers.mainThread())
-                 .subscribe(locationSettingsManager));
+            locationProvider.checkLocationSettings(
+                    new LocationSettingsRequest.Builder()
+                            .addLocationRequest(locationRequest)
+                            .build()
+            ).subscribeOn(Schedulers.newThread())
+             .observeOn(AndroidSchedulers.mainThread())
+             .subscribe(locationSettingsManager, locationProviderError)
+        );
 
     }
 
-    private void setUpLocationUpdates(){
+    public void setUpLocationUpdates(){
 
         compositeSubscription.add(locationProvider.getLastKnownLocation()
                 .concatWith(locationProvider.getUpdatedLocation
                         (locationRequest))
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(locationSetter));
+                .subscribe(locationSetter, locationProviderError));
     }
 
     public void onMapReady(){
         Log.i(TAG, "Map Ready");
         isMapReady = true;
-        setSourceLocation();
+        setSelectedLocation();
     }
 
 
     public void enableLocationFlag(boolean enabled){
         locationEnabledFlag = enabled;
         locationPickerView.showCurrentLocationBtn(enabled);
-        setSourceLocation();
+        if(!enabled) {
+            currentLatLng = null;
+            currentLocation = null;
+        }
+        setSelectedLocation();
     }
 
-    private void setSourceLocation(){
+    private void setSelectedLocation(){
         if(!isMapReady || locationEnabledFlag == null)
             return;
 
-        else if(sourceLocation.latLng != null && sourceLocation.address != null){
-            // If Source Location is already set, we don't care about current
+        else if(selectedLocation.latLng != null && selectedLocation.address != null){
+            // If Selected Location is already set, we don't care about current
             // Location
-            Log.i(TAG, "Move Camera to Existing Source Address");
-            moveToSourceAddress();
+            Log.i(TAG, "Move Camera to Existing Selected Address");
+            moveToSelectedAddress();
         }
 
         else if(!locationEnabledFlag){
@@ -204,7 +236,7 @@ public class SourceLocationPresenter extends DeliveryPresenter {
 
         }
         else if(currentLocation != null) {
-            //Current Position Found. Setting it as sourceLocation
+            //Current Position Found. Setting it as selectedLocation
             Log.i(TAG, "Move Camera to Current Location");
             locationPickerView.setInitialPosition(currentLatLng);
             //locationPickerView.moveCameraAndDisableListener(currentLatLng);
@@ -220,21 +252,21 @@ public class SourceLocationPresenter extends DeliveryPresenter {
             @Override
             public void call(Place place) {
                 performGeocode = false;
-                sourceLocation.latLng = place.getLatLng();
-                sourceLocation.address = String.format("%s, %s",
+                selectedLocation.latLng = place.getLatLng();
+                selectedLocation.address = String.format("%s, %s",
                         place.getName(), place.getAddress());
-                moveToSourceAddress();
+                moveToSelectedAddress();
 
 
             }
         });
     }
 
-    public void moveToSourceAddress(){
+    public void moveToSelectedAddress(){
         performGeocode = false;
-        locationPickerView.moveCamera(sourceLocation.latLng, false);
-        Log.i(TAG, "Source Location Address: " + sourceLocation.address);
-        locationPickerView.updateAddress(formatAddressAsHtml(sourceLocation.address));
+        locationPickerView.moveCamera(selectedLocation.latLng, false);
+        Log.i(TAG, "Selected Location Address: " + selectedLocation.address);
+        locationPickerView.updateAddress(formatAddressAsHtml(selectedLocation.address));
         locationPickerView.enableCameraListener(true);
         performGeocode = true;
     }
@@ -245,41 +277,41 @@ public class SourceLocationPresenter extends DeliveryPresenter {
     }
 
     public void onCameraChanged(LatLng camPos){
-        Log.i(TAG, "Camera Changed. Update Source Location " + camPos.toString()
-                + " "  + performGeocode + "  " + sourceLocation.latLng );
+        Log.i(TAG, "Camera Changed. Update Selected Location " + camPos.toString()
+                + " "  + performGeocode + "  " + selectedLocation.latLng );
 
         if(shouldDoGeocoding(camPos)) {
             Log.i(TAG, "Performing Geocoding");
-            updateSourceLocation(camPos);
+            updateSelectedLocation(camPos);
             performReverseGeocode();
         }else{
             Log.i(TAG, "Shouldnt do geocoding, distance is too less");
-            updateSourceLocation(camPos);
-            if(sourceLocation.address != null ){
-                locationPickerView.updateAddress(formatAddressAsHtml(sourceLocation.address));
+            updateSelectedLocation(camPos);
+            if(selectedLocation.address != null ){
+                locationPickerView.updateAddress(formatAddressAsHtml(selectedLocation.address));
             }
             performGeocode = true;
         }
     }
 
-    private void updateSourceLocation(LatLng pos) {
-        sourceLocation.latLng = pos;
+    private void updateSelectedLocation(LatLng pos) {
+        selectedLocation.latLng = pos;
         bus.post(new UpdateBookingEvent(booking));
     }
 
     private boolean shouldDoGeocoding(LatLng pos){
         if(!performGeocode)
             return  false;
-        else if(sourceLocation.latLng != null &&
-                sourceLocation.address != null) {
+        else if(selectedLocation.latLng != null &&
+                selectedLocation.address != null) {
 
             float meters = utils.calculateDistance
-                    (sourceLocation.latLng, pos);
+                    (selectedLocation.latLng, pos);
 
             Log.i(TAG, "Ditance btn point in meters " + meters);
 
 
-            return utils.calculateDistance(sourceLocation.latLng, pos) > 10;
+            return utils.calculateDistance(selectedLocation.latLng, pos) > 10;
         }
         return true;
     }
@@ -290,8 +322,8 @@ public class SourceLocationPresenter extends DeliveryPresenter {
             compositeSubscription.remove(geocodeSubscription);
         }
         geocodeSubscription = locationProvider
-            .getGeocodeObservable(sourceLocation.latLng.latitude,
-                    sourceLocation.latLng.longitude, 1)
+            .getGeocodeObservable(selectedLocation.latLng.latitude,
+                    selectedLocation.latLng.longitude, 1)
             .retryWhen(new RetryWithDelay(3, 2000))
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
@@ -302,10 +334,10 @@ public class SourceLocationPresenter extends DeliveryPresenter {
                     if (addresses.size() == 0)
                         return;
 
-                    sourceLocation.address = utils.addressToString(
+                    selectedLocation.address = utils.addressToString(
                             addresses.get(0), ", ");
 
-                    String address = formatAddressAsHtml(sourceLocation.address);
+                    String address = formatAddressAsHtml(selectedLocation.address);
                     Log.i(TAG, "Reverse Geocoded Address " + address);
                     locationPickerView.updateAddress(address);
                 }
@@ -314,7 +346,7 @@ public class SourceLocationPresenter extends DeliveryPresenter {
                 public void call(Throwable throwable) {
                     Log.e(TAG, throwable.getMessage(), throwable);
                     locationPickerView.updateAddress(null);
-                    sourceLocation.address = null;
+                    selectedLocation.address = null;
                 }
             });
 
@@ -346,8 +378,6 @@ public class SourceLocationPresenter extends DeliveryPresenter {
         return TextUtils.join("<br/>", formattedAddress);
     }
 
-    public void moveForward() {
-        bus.post(new OnSourceLocationSet());
-    }
+    public abstract void moveForward();
 }
 

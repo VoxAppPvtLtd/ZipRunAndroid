@@ -15,4 +15,5 @@
     <string name="instruction_fragment_title">Give Instructions To</string>
     <string name="confirm_fragment_title">Confirm</string>
     <string name="fetching_address">Fetching Address</string>
+    <string name="title_delivery_location">Choose Delivery Location</string>
 </resources>

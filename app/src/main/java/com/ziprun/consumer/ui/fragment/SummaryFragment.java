@@ -36,7 +36,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-public class SummaryFragment extends ZipBaseFragment implements OnMapReadyCallback {
+public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallback {
     private static final String TAG = SummaryFragment.class.getCanonicalName();
 
     @InjectView(R.id.sliding_layout)
@@ -217,5 +217,10 @@ public class SummaryFragment extends ZipBaseFragment implements OnMapReadyCallba
                                 .setColor(getResources().getColor(R.color.route_color));
                     }
                 });
+    }
+
+    @Override
+    protected Object getCurrentModule() {
+        return null;
     }
 }

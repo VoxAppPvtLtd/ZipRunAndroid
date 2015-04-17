@@ -5,7 +5,6 @@ import android.support.v7.app.ActionBarActivity;
 
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
-import com.ziprun.consumer.ui.fragment.BackHandlerFragment;
 import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.Utils;
 
@@ -13,12 +12,9 @@ import javax.inject.Inject;
 
 import dagger.ObjectGraph;
 
-public abstract class ZipBaseActivity extends ActionBarActivity implements
-        BackHandlerFragment.BackHandlerInterface {
+public abstract class ZipBaseActivity extends ActionBarActivity {
 
     private ObjectGraph activityGraph;
-
-    private BackHandlerFragment currentFragment;
 
     @Inject
     Utils utils;
@@ -72,17 +68,5 @@ public abstract class ZipBaseActivity extends ActionBarActivity implements
         return activityGraph;
     }
 
-    @Override
-    public void setSelectedFragment(BackHandlerFragment selectedFragment) {
-        currentFragment = selectedFragment;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if(currentFragment != null && currentFragment.onBackPressed()){
-            return;
-        }
-        super.onBackPressed();
-    }
 
 }

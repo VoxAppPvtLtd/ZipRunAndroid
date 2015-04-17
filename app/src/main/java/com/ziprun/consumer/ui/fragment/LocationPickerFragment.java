@@ -1,9 +1,10 @@
 package com.ziprun.consumer.ui.fragment;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,7 +31,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
-import com.ziprun.consumer.presenter.SourceLocationPresenter;
+import com.ziprun.consumer.presenter.LocationPickerPresenter;
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
 import com.ziprun.consumer.utils.Utils;
 
@@ -42,7 +43,7 @@ import butterknife.OnClick;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
 
-public class LocationPickerFragment extends DeliveryFragment implements
+public abstract class LocationPickerFragment extends DeliveryFragment implements
         OnMapReadyCallback, GoogleMap.OnCameraChangeListener,
         AddressAutocompleteView.OnAddressSelectedListener {
     private static final String TAG = LocationPickerFragment.class.getSimpleName();
@@ -57,6 +58,14 @@ public class LocationPickerFragment extends DeliveryFragment implements
                            .setSmallestDisplacement(10)
                            .setInterval(100);
 
+    private static final int REQUEST_FIX_GOOGLE_API_ERROR = 1;
+    private static final String DIALOG_ERROR = "Dialog Error";
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
 
     @InjectView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingLayout;
@@ -101,16 +110,13 @@ public class LocationPickerFragment extends DeliveryFragment implements
     @Inject
     Utils utils;
 
-    protected SourceLocationPresenter sourceLocationPresenter;
+    protected LocationPickerPresenter locationPickerPresenter;
 
     private GoogleMap googleMap;
 
     private Marker currentLocationMarker;
 
     private boolean inSearchMode = false;
-
-    private boolean slidingPanelExpanded = false;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -134,20 +140,23 @@ public class LocationPickerFragment extends DeliveryFragment implements
         setupSlidingLayout();
 
 //        debugContainer();
+        mapMarker.setImageResource(getMarkerResource());
 
-        return  view;
+        return view;
     }
+
+    public abstract int getMarkerResource();
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        sourceLocationPresenter = (SourceLocationPresenter)presenter;
+        locationPickerPresenter = (LocationPickerPresenter)presenter;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        sourceLocationPresenter.start();
+        locationPickerPresenter.start();
         mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
     }
@@ -167,17 +176,18 @@ public class LocationPickerFragment extends DeliveryFragment implements
     @Override
     public void onStop() {
         super.onStop();
-        sourceLocationPresenter.stop();
+        locationPickerPresenter.stop();
         addressAutocompleteView.setOnAddressSelectedListener(null);
         if(googleMap != null)
             googleMap.clear();
         currentLocationMarker = null;
+        googleMap = null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        sourceLocationPresenter.destroy();
+        locationPickerPresenter.destroy();
         mapView.onDestroy();
     }
 
@@ -188,43 +198,22 @@ public class LocationPickerFragment extends DeliveryFragment implements
     }
 
     @Override
-    protected Object getCurrentModule(){
-        return new LocationPickerModule(this);
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
         MapsInitializer.initialize(this.getActivity());
         this.googleMap.setMyLocationEnabled(false);
-        sourceLocationPresenter.onMapReady();
+        locationPickerPresenter.onMapReady();
     }
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        sourceLocationPresenter.onCameraChanged(cameraPosition.target);
+        locationPickerPresenter.onCameraChanged(cameraPosition.target);
     }
 
     @OnClick(R.id.searchBtn)
     public void searchAddress(View view) {
         addressAutocompleteView.setVisibility(View.VISIBLE);
         inSearchMode = true;
-    }
-
-    @OnClick(R.id.currentLocationBtn)
-    public void moveToCurrentLocation(View view){
-        sourceLocationPresenter.moveToCurrentPosition();
-
-    }
-
-    @OnClick(R.id.closeAddressBtn)
-    public void closeAddressArea(View view) {
-        hideStaticAddressView();
-    }
-
-    @OnClick(R.id.nextBtn)
-    public void onNextBtnClicked(View view){
-        sourceLocationPresenter.moveForward();
     }
 
     @Override
@@ -239,14 +228,42 @@ public class LocationPickerFragment extends DeliveryFragment implements
     }
 
     @Override
-    public void setActionBar(ActionBar actionBar){
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayUseLogoEnabled(true);
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setLogo(R.drawable.ziprun_white_emboss);
+    public boolean handleActivityResult(int requestCode,
+                                           int resultCode, Intent data) {
+        if(requestCode == REQUEST_CHECK_LOCATION_SETTINGS){
+            if(resultCode == Activity.RESULT_OK){
+                locationPickerPresenter.checkLocationSettings();
+            }else{
+                locationPickerPresenter.enableLocationFlag(false);
+            }
+            return true;
+        }else if(requestCode == REQUEST_FIX_GOOGLE_API_ERROR){
+            if(resultCode == Activity.RESULT_OK){
+                locationPickerPresenter.checkLocationSettings();
+                locationPickerPresenter.setUpLocationUpdates();
+            }else{
+                locationPickerPresenter.enableLocationFlag(false);
+            }
+
+        }
+        return false;
     }
 
+    @OnClick(R.id.currentLocationBtn)
+    public void moveToCurrentLocation(View view){
+        locationPickerPresenter.moveToCurrentPosition();
+
+    }
+
+    @OnClick(R.id.closeAddressBtn)
+    public void closeAddressArea(View view) {
+        hideStaticAddressView();
+    }
+
+    @OnClick(R.id.nextBtn)
+    public void onNextBtnClicked(View view){
+        locationPickerPresenter.moveForward();
+    }
 
     private void setupSlidingLayout() {
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
@@ -261,13 +278,12 @@ public class LocationPickerFragment extends DeliveryFragment implements
         addressAutocompleteView.setVisibility(View.GONE);
         addressAutocompleteView.reset();
         inSearchMode = false;
-        sourceLocationPresenter.onPlaceSelected(place);
+        locationPickerPresenter.onPlaceSelected(place);
 
     }
 
     public void showAddressView(){
         staticAddressView.setVisibility(View.VISIBLE);
-        slidingPanelExpanded = true;
         final int origHeight = mapContainer.getHeight();
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
         slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
@@ -283,8 +299,6 @@ public class LocationPickerFragment extends DeliveryFragment implements
             public void onPanelExpanded(View view) {
                 ViewGroup.LayoutParams lp =
                         (ViewGroup.LayoutParams)mapContainer.getLayoutParams();
-
-
 
                 lp.height = origHeight - view.getHeight();
 
@@ -359,22 +373,22 @@ public class LocationPickerFragment extends DeliveryFragment implements
     }
 
 
-    public void startResolutionActivity(Status status) {
+    public void enableLocationServices(Status status) {
         try {
             status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
         } catch (IntentSender.SendIntentException e) {
             Log.e(TAG, "Unable to resolve status error", e);
-            sourceLocationPresenter.enableLocationFlag(false);
+            locationPickerPresenter.enableLocationFlag(false);
         }
-
     }
 
+
     public void checkLocationSettings(){
-        sourceLocationPresenter.checkLocationSettings();
+        locationPickerPresenter.checkLocationSettings();
     }
 
     public void enableLocationFlag(boolean flag){
-        sourceLocationPresenter.enableLocationFlag(flag);
+        locationPickerPresenter.enableLocationFlag(flag);
     }
 
     public void setCurrentLocationMarker(LatLng currentLocation) {
@@ -403,19 +417,19 @@ public class LocationPickerFragment extends DeliveryFragment implements
 
     public void moveCameraAndDisableListener(final LatLng pos){
         googleMap.setOnCameraChangeListener(null);
-        sourceLocationPresenter.enableGeocode(false);
+        locationPickerPresenter.enableGeocode(false);
         moveCamera(pos, true, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
                 Log.i(TAG, "Camera Reached " + pos.toString());
-                sourceLocationPresenter.enableGeocode(true);
+                locationPickerPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
 
             @Override
             public void onCancel() {
                 Log.i(TAG, "Camera Cancelled " + pos.toString());
-                sourceLocationPresenter.enableGeocode(true);
+                locationPickerPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
         });
@@ -449,4 +463,5 @@ public class LocationPickerFragment extends DeliveryFragment implements
         geocodeProgessWheel.setVisibility(View.VISIBLE);
         helpText.setText(R.string.fetching_address);
     }
+
 }

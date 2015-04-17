@@ -1,6 +1,6 @@
 package com.ziprun.consumer.ui.fragment;
 
-import com.ziprun.consumer.presenter.SourceLocationPresenter;
+import com.ziprun.consumer.presenter.LocationPickerPresenter;
 
 import dagger.Module;
 
@@ -8,7 +8,7 @@ import dagger.Module;
         LocationPickerFragment.class,
         InstructionFragment.class,
         SummaryFragment.class,
-        SourceLocationPresenter.class,
+        LocationPickerPresenter.class,
     }, complete = false,
     library = true)
 public class FragmentModule {
