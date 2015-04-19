@@ -11,9 +11,17 @@ public class DestinationLocationPickerPresenter extends LocationPickerPresenter 
         super(fragment);
     }
 
+
     @Override
     public AddressLocationPair getSelectedLocaion() {
-        return booking.getDestLocation();
+        AddressLocationPair locationPair = booking.getDestLocation();
+        if(locationPair.latLng == null) {
+            locationPair.latLng = booking.getSourceLocation().latLng;
+            locationPair.address = booking.getSourceLocation().address;
+        }
+
+
+        return locationPair;
     }
 
     @Override

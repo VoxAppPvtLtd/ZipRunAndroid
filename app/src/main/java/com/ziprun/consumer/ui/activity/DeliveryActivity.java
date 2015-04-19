@@ -17,10 +17,10 @@ import com.ziprun.consumer.event.OnDestinationSet;
 import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.BackHandlerFragment;
+import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DestinationLocationPickerFragment;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.SourceLocationPickerFragment;
-import com.ziprun.consumer.ui.fragment.SummaryFragment;
 import com.ziprun.consumer.ui.fragment.ZipBaseFragment;
 
 import java.util.ArrayList;
@@ -35,6 +35,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     public static final String KEY_BOOKING = "booking";
     private static final String GOOGLE_CONNECTION_ERROR = "connection_error";
+    public static final String KEY_LOCATION_TYPE = "locationType";
 
     protected BackHandlerFragment currentFragment;
 
@@ -44,7 +45,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     private DestinationLocationPickerFragment destPickerFrament;
 
-    private SummaryFragment summaryFragment;
+    private ConfirmationFragment confirmationFragment;
 
     private ArrayList<String> fragmentTags = new ArrayList<>();
 
@@ -69,7 +70,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
         instructionFragment = new InstructionFragment();
 
-        summaryFragment = new SummaryFragment();
+        confirmationFragment = new ConfirmationFragment();
 
         destPickerFrament = new DestinationLocationPickerFragment();
 
@@ -80,7 +81,9 @@ public class DeliveryActivity extends ZipBaseActivity implements
             booking = new Booking();
         }
 
-        sourcePickerFragment.setArguments(getBookingBundle());
+        Bundle args = getBookingBundle();
+
+        sourcePickerFragment.setArguments(args);
         fragmentManager.beginTransaction()
                 .add(R.id.container, sourcePickerFragment,
                         sourcePickerFragment.getClass().getSimpleName())
@@ -154,12 +157,14 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     @Subscribe
     public void onBookingInstructionSet(OnBookingInstructionSet event){
+        //sourcePickerFragment.getArguments().putString(KEY_BOOKING,
+          //      booking.toJson());
         moveToFragment(destPickerFrament);
     }
 
     @Subscribe
     public void onDestinationLocationSet(OnDestinationSet event){
-        moveToFragment(summaryFragment);
+        moveToFragment(confirmationFragment);
     }
 
 
@@ -177,7 +182,6 @@ public class DeliveryActivity extends ZipBaseActivity implements
                 .commit();
         fragmentTags.add(fragment.getClass().getSimpleName());
 
-        Log.i(TAG, "Back Stack: " + fragmentManager.getBackStackEntryCount());
     }
 
     @Override

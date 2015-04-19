@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.ziprun.consumer.ForApplication;
+import com.ziprun.consumer.data.model.DeliveryRateCard;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,6 +26,8 @@ public class ZipRunSession {
 
     private static final String KEY_IS_AUTHENTICATED = "is_authenticated";
 
+    private static final String KEY_RATE_CARD = "rate_card";
+
     Context appContext;
 
     @Inject
@@ -36,5 +39,15 @@ public class ZipRunSession {
     public boolean isUserAuthenticated(){
         return preferences.getBoolean(KEY_IS_AUTHENTICATED, false);
     }
+
+    public void setRateCard(DeliveryRateCard rateCard){
+        preferences.edit().putString(KEY_RATE_CARD, rateCard.toJson()).apply();
+    }
+
+    public DeliveryRateCard getRateCard(){
+        return DeliveryRateCard.fromJson(
+                preferences.getString(KEY_RATE_CARD, null));
+    }
+
 
 }

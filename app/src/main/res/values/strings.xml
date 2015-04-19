@@ -16,4 +16,11 @@
     <string name="confirm_fragment_title">Confirm</string>
     <string name="fetching_address">Fetching Address</string>
     <string name="title_delivery_location">Choose Delivery Location</string>
+    <string name="txt_estimate_distance">Ride Esitmate for %d Kms</string>
+    <string name="currency">Rs</string>
+    <string name="txt_transaction_cost">+ %d%% charge on items
+        purchased</string>
+    <string name="txt_buy_from">Buy From:</string>
+    <string name="txt_deliver_to">Deliver To:</string>
+    <string name="txt_review_instructions">Review or Edit Instructions</string>
 </resources>

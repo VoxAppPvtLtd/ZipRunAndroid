@@ -13,6 +13,8 @@ import com.ziprun.consumer.ForApplication;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -118,6 +120,22 @@ public final class Utils {
                 dest.latitude, dest.longitude, results);
 
         return results[0];
+    }
+
+    public String formatAddressAsHtml(String address) {
+        String[] addComps = address.split(", ");
+        List<String> formattedAddress = new ArrayList<>();
+
+        for (int i = addComps.length - 1; i >= 0; i = i - 2) {
+            if (i > 0)
+                formattedAddress.add(String.format("%s, %s",
+                        addComps[i - 1], addComps[i]));
+            else {
+                formattedAddress.add(addComps[i]);
+            }
+        }
+        Collections.reverse(formattedAddress);
+        return TextUtils.join("<br/>", formattedAddress);
     }
 
 }

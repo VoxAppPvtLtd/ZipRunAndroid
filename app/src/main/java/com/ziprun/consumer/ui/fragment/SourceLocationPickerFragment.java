@@ -25,5 +25,6 @@ public class SourceLocationPickerFragment extends LocationPickerFragment {
     @Override
     public int getMarkerResource() {
         return R.drawable.icon_blue_map_marker;
+
     }
 }

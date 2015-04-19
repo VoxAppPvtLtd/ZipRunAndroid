@@ -1,9 +1,11 @@
 package com.ziprun.consumer.data.model;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 
 public class Booking {
     private static final String TAG = Booking.class.getCanonicalName();
+
 
     public enum BookingType {
         BUY("buy"), PICKUP("pickup");
@@ -44,6 +46,23 @@ public class Booking {
     public AddressLocationPair getDestLocation() {
         return destLocation;
     }
+
+    public LatLng getSourceLatLng(){
+        return sourceLocation.latLng;
+    }
+
+    public LatLng getDestinationLatLng(){
+        return destLocation.latLng;
+    }
+
+    public String getSourceAddress() {
+        return sourceLocation.address;
+    }
+
+    public String getDesinationAddress(){
+        return destLocation.address;
+    }
+
 
     public void setDestLocation(AddressLocationPair destLocation) {
         this.destLocation = destLocation;

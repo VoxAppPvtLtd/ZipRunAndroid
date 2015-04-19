@@ -11,6 +11,7 @@ public class SourceLocationPickerPresenter extends LocationPickerPresenter {
         super(fragment);
     }
 
+
     @Override
     public AddressLocationPair getSelectedLocaion() {
         return booking.getSourceLocation();
@@ -18,6 +19,6 @@ public class SourceLocationPickerPresenter extends LocationPickerPresenter {
 
     @Override
     public void moveForward() {
-        bus.post(new OnSourceLocationSet());
+        bus.post(new OnSourceLocationSet()) ;
     }
 }

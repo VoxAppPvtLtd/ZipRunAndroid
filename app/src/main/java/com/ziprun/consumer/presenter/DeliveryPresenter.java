@@ -2,6 +2,7 @@ package com.ziprun.consumer.presenter;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.ui.activity.ForActivity;
@@ -10,6 +11,8 @@ import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.Utils;
 
 import javax.inject.Inject;
+
+import rx.subscriptions.CompositeSubscription;
 
 public abstract class  DeliveryPresenter implements PresenterInterface {
     private static final String TAG = DeliveryPresenter.class.getCanonicalName();
@@ -27,6 +30,8 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     protected DeliveryFragment view;
     protected Booking booking;
 
+    protected CompositeSubscription compositeSubscription;
+
 
     public DeliveryPresenter(DeliveryFragment view){
         this.view = view;
@@ -40,6 +45,8 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     @Override
     public void start(){
         bus.register(this);
+        compositeSubscription = new CompositeSubscription();
+        Log.i(TAG, "Composite Subscription Created ");
     }
 
     @Override
@@ -49,6 +56,10 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     @Override
     public void stop(){
         bus.unregister(this);
+        if(compositeSubscription != null){
+            compositeSubscription.clear();
+            compositeSubscription = null;
+        }
     }
 
     @Override

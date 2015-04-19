@@ -29,14 +29,14 @@
 
 
         <RelativeLayout
-            android:id="@+id/summary_container"
+            android:id="@+id/estimate_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/content_background"
             android:padding="10dp">
 
             <TextView
-                android:id="@+id/estimate_distance"
+                android:id="@+id/txt_estimate_distance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -44,7 +44,7 @@
                 android:gravity="center"
                 android:textColor="@color/text_color_primary"
                 android:textSize="20sp"
-                android:text="Ride Esitmate for 10 Kms"
+                android:text="@string/txt_estimate_distance"
                 android:layout_marginBottom="10dp"/>
 
 
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_below="@id/estimate_distance"
+                android:layout_below="@id/txt_estimate_distance"
                 android:layout_centerHorizontal="true">
 
                 <TextView
@@ -62,8 +62,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@color/primary_color"
-                    android:textSize="32sp"
-                    android:text="120.00"/>
+                    android:textSize="32sp"/>
 
                 <TextView
                     android:id="@+id/currency"
@@ -73,8 +72,7 @@
                     android:gravity="center"
                     android:textColor="@color/primary_color"
                     android:textSize="16sp"
-                    android:text="Rs"
-                    android:textAlignment="center"/>
+                    android:text="@string/currency"/>
 
             </LinearLayout>
 
@@ -83,17 +81,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@id/estimate_distance"
+                android:layout_below="@id/txt_estimate_distance"
                 android:layout_marginTop="5dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_blue_map_marker"/>
 
             <TextView
-                android:id="@+id/extra_charge"
+                android:id="@+id/txt_transaction_charge"
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_color_secondary"
-                android:text="+ 2% charge on items purchased"
+                android:text="@string/txt_transaction_cost"
                 android:singleLine="false"
                 android:layout_below="@+id/estimate_cost_container"
                 android:layout_centerHorizontal="true"
@@ -106,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_below="@id/estimate_distance"
+                android:layout_below="@id/txt_estimate_distance"
                 android:scaleType="fitCenter"
                 android:src="@drawable/icon_green_map_marker"/>
 
@@ -114,7 +112,7 @@
                 android:layout_width="100dp"
                 android:layout_height="2px"
                 android:layout_below="@+id/estimate_cost_container"
-                android:layout_toLeftOf="@id/extra_charge"
+                android:layout_toLeftOf="@id/txt_transaction_charge"
                 android:layout_toRightOf="@id/source_marker"
                 android:layerType="software"
                 android:background="@drawable/dotted"/>
@@ -124,7 +122,7 @@
                 android:layout_height="2px"
                 android:layout_below="@+id/estimate_cost_container"
                 android:layout_toLeftOf="@id/dest_marker"
-                android:layout_toRightOf="@id/extra_charge"
+                android:layout_toRightOf="@id/txt_transaction_charge"
                 android:layerType="software"
                 android:background="@drawable/dotted"/>
 
@@ -138,7 +136,7 @@
                 android:layout_below="@id/source_marker"
                 android:textColor="@color/text_color_primary"
                 android:gravity="left"
-                android:text="Buy From:"/>
+                android:text="@string/txt_buy_from"/>
 
             <TextView
                 android:id="@+id/dest_address"
@@ -150,8 +148,7 @@
                 android:layout_below="@id/dest_marker"
                 android:textColor="@color/text_color_primary"
                 android:gravity="right"
-                android:text="Deliver To:"
-                android:phoneNumber="false"/>
+                android:text="@string/txt_deliver_to"/>
 
             <LinearLayout
                 android:id="@+id/notes_container"
@@ -167,9 +164,8 @@
                     android:id="@+id/txtview_review"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/source_address"
                     android:layout_marginBottom="10dp"
-                    android:text="Review or Edit Instructions"
+                    android:text="@string/txt_review_instructions"
                     android:textColor="@color/text_color_primary"
                     android:textSize="16sp"
                     android:gravity="left"
@@ -180,7 +176,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:layout_below="@id/txtview_review"
                     android:textSize="24sp"
                     android:textColor="@color/text_color_primary"
                     android:singleLine="false"/>

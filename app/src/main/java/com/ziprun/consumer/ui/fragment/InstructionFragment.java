@@ -145,8 +145,6 @@ public class InstructionFragment extends DeliveryFragment {
 
             EditText instructionText = (EditText) view.findViewById(R.id.edit_instruction);
 
-
-
             instructionText.setText(booking.getNotes());
 
             container.addView(view, position);

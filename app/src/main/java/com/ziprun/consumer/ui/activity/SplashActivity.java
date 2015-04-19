@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.data.model.DeliveryRateCard;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,15 +15,19 @@ public class SplashActivity extends ZipBaseActivity {
     private static final String TAG = SplashActivity.class.getCanonicalName();
     private static final int SPLASH_ACTIVITY_WAIT = 5000    ; //5 seconds
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        DeliveryRateCard rateCard = new DeliveryRateCard(9, 2);
+        zipRunSession.setRateCard(rateCard);
         checkNetworkConnectivity();
 
     }

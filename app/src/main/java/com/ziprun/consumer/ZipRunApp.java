@@ -58,6 +58,7 @@ public class ZipRunApp extends Application {
 
         public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
 
+        public static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
     }
 }
 

@@ -61,13 +61,13 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     private static final int REQUEST_FIX_GOOGLE_API_ERROR = 1;
     private static final String DIALOG_ERROR = "Dialog Error";
 
+
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapView.onSaveInstanceState(outState);
     }
 
-    @InjectView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingLayout;
 
     @InjectView(R.id.map)
@@ -122,41 +122,42 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_location_picker,
-                container, false);
+        Log.i(TAG, "On Create View Called");
 
+        slidingLayout = (SlidingUpPanelLayout)
+                inflater.inflate(R.layout.fragment_location_picker,
+                        container, false);
 
-        ButterKnife.inject(this, view);
+        ButterKnife.inject(this, slidingLayout);
 
+        mapView.onCreate(null);
         searchLocBtn.setBackgroundColor(getActivity().getResources()
                 .getColor(R.color.white));
 
         currentLocationBtn.setBackgroundColor(getActivity().getResources()
                 .getColor(R.color.button_float_color));
 
-
-        mapView.onCreate(null);
-
         setupSlidingLayout();
 
-//        debugContainer();
-        mapMarker.setImageResource(getMarkerResource());
+        addressAutocompleteView.setVisibility(View.GONE);
 
-        return view;
+//        debugContainer();
+
+        return slidingLayout;
     }
 
     public abstract int getMarkerResource();
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void processArguments(Bundle args) {
+        super.processArguments(args);
         locationPickerPresenter = (LocationPickerPresenter)presenter;
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        locationPickerPresenter.start();
+        mapMarker.setImageResource(getMarkerResource());
         mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
     }
@@ -186,6 +187,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     @Override
     public void onDestroy() {
+        Log.i(TAG, "Location Picker Fragment is destroyed");
         super.onDestroy();
         locationPickerPresenter.destroy();
         mapView.onDestroy();
@@ -269,6 +271,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         slidingLayout.setTouchEnabled(false);
         slidingLayout.setEnableDragViewTouchEvents(false);
+        slidingLayout.setPanelHeight(0);
         staticAddressView.setVisibility(View.GONE);
     }
 
@@ -283,6 +286,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     }
 
     public void showAddressView(){
+        Log.i(TAG, "Show Address View Called");
         staticAddressView.setVisibility(View.VISIBLE);
         final int origHeight = mapContainer.getHeight();
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
@@ -308,8 +312,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
                 mapContainer.setLayoutParams(lp);
 
                 mapContainer.requestLayout();
-//                debugContainer();
-
+////                debugContainer();
             }
 
             @Override
@@ -349,7 +352,6 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     public void hideStaticAddressView(){
         staticAddressView.setVisibility(View.GONE);
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
-
     }
 
     public void updateAddress(String address){
@@ -411,6 +413,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     }
 
     public void setInitialPosition(LatLng pos){
+
         moveCamera(pos);
         enableCameraListener(true);
     }
@@ -435,26 +438,26 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         });
     }
 
-    public void moveCamera(LatLng sourceLocation) {
-        moveCamera(sourceLocation, false, null);
+    public void moveCamera(LatLng latlng) {
+        moveCamera(latlng, false, null);
     }
 
-    public void moveCamera(LatLng sourceLocation, boolean animate) {
-        moveCamera(sourceLocation, animate, null);
+    public void moveCamera(LatLng latlng, boolean animate) {
+        moveCamera(latlng, animate, null);
     }
 
-    public void moveCamera(LatLng sourceLocation, boolean animate,
+    public void moveCamera(LatLng latlng, boolean animate,
                            GoogleMap.CancelableCallback callback) {
         if(animate){
             if(callback != null)
                 googleMap.animateCamera(
-                        CameraUpdateFactory.newLatLng(sourceLocation), callback);
+                        CameraUpdateFactory.newLatLng(latlng), callback);
             else
                 googleMap.animateCamera(
-                        CameraUpdateFactory.newLatLng(sourceLocation));
+                        CameraUpdateFactory.newLatLng(latlng));
 
         }else {
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sourceLocation));
+            googleMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
         }
 
     }

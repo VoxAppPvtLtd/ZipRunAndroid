@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,9 +23,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.presenter.ConfirmationPresenter;
 import com.ziprun.consumer.utils.Utils;
-import com.ziprun.maputils.GoogleDirectionAPI;
-import com.ziprun.maputils.models.Directions;
 
 import java.util.List;
 
@@ -31,13 +32,9 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
-public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallback {
-    private static final String TAG = SummaryFragment.class.getCanonicalName();
+public class ConfirmationFragment extends DeliveryFragment implements OnMapReadyCallback {
+    private static final String TAG = ConfirmationFragment.class.getCanonicalName();
 
     @InjectView(R.id.sliding_layout)
     SlidingUpPanelLayout slidingLayout;
@@ -51,18 +48,39 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
     @Inject
     Utils utils;
 
-    Subscription directionSubscriber;
+    @InjectView(R.id.estimate_container)
+    ViewGroup estimateContainer;
 
-    private LatLng latlng1 = new LatLng(21.167790, 72.795143);
-    private LatLng latlng2 = new LatLng(21.154042, 72.772831);
+    @InjectView(R.id.txt_estimate_distance)
+    TextView txtEstimateDistance;
 
-    private static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
+    @InjectView(R.id.estimate_cost)
+    TextView estimateCost;
+
+    @InjectView(R.id.txt_transaction_charge)
+    TextView txtTransactionCharge;
+
+    @InjectView(R.id.source_address)
+    TextView sourceAddress;
+
+    @InjectView(R.id.dest_address)
+    TextView destinationAddress;
+
+    @InjectView(R.id.review_notes)
+    EditText instructions;
+
+    ConfirmationPresenter confirmationPresenter;
+
+    GoogleMap googleMap;
+
+    LatLng sourceLatLng;
+    LatLng destLatLng;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        View view =  inflater.inflate(R.layout.fragment_summary,
+        View view =  inflater.inflate(R.layout.fragment_confirmation,
                 container, false);
 
         ButterKnife.inject(this, view);
@@ -82,13 +100,13 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
         actionBar.setTitle(R.string.confirm_fragment_title);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
-
-
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        sourceLatLng = confirmationPresenter.getSourceLatLng();
+        destLatLng = confirmationPresenter.getDestinationLatLng();
     }
 
     @Override
@@ -97,19 +115,6 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
         mapView.onResume();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        Log.i(TAG, "On Saved Instance State Called");
-
-        super.onSaveInstanceState(outState);
-        for (String key: outState.keySet())
-        {
-            Log.i (TAG, key + " is a key in the bundle: " +  outState.get(key));
-        }
-
-
-        mapView.onSaveInstanceState(outState);
-    }
 
     @Override
     public void onPause() {
@@ -120,9 +125,7 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
     @Override
     public void onStop() {
         super.onStop();
-        if(directionSubscriber != null && !directionSubscriber.isUnsubscribed()){
-            directionSubscriber.unsubscribe();
-        }
+        googleMap.clear();
     }
 
     @Override
@@ -136,9 +139,16 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
         super.onLowMemory();
         mapView.onLowMemory();
     }
-    
+
+    @Override
+    protected void processArguments(Bundle args) {
+        super.processArguments(args);
+        confirmationPresenter = (ConfirmationPresenter) presenter;
+    }
+
     public void setupSlidingLayout() {
-        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        estimateContainer.setVisibility(View.GONE);
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
         slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -165,7 +175,6 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
                 Log.i(TAG, "onPanelHidden");
             }
         });
-        
     }
 
     @Override
@@ -174,53 +183,66 @@ public class SummaryFragment extends DeliveryFragment implements OnMapReadyCallb
     }
 
     @Override
-    public void onMapReady(final GoogleMap googleMap) {
-        MapsInitializer.initialize(getActivity());
-
-        int activityHeight = utils.getScreenHeight();
-
-        int activityWidth = utils.getScreenWidth();
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        builder.include(latlng1);
-        builder.include(latlng2);
-
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder
-                .build(), activityWidth, activityHeight, 10));
-
-        googleMap.addMarker(new MarkerOptions()
-                .position(latlng1)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable
-                        .icon_blue_map_marker))
-                        .anchor(0.5f, 0.7f));
-
-        googleMap.addMarker(new MarkerOptions()
-                .position(latlng2)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable
-                        .icon_green_map_marker))
-                        .anchor(0.5f, 0.8f));
-
-        GoogleDirectionAPI googleDirectionAPI = new GoogleDirectionAPI
-                (API_KEY, latlng1, latlng2);
-
-
-        directionSubscriber = googleDirectionAPI.getDirections()
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Directions>() {
-                    @Override
-                    public void call(Directions directions) {
-                        List<LatLng> points = directions.getPoints(0);
-
-                        googleMap.addPolyline(
-                                new PolylineOptions().addAll(points))
-                                .setColor(getResources().getColor(R.color.route_color));
-                    }
-                });
+    protected Object getCurrentModule() {
+        return new ConfirmationModule(this);
     }
 
+
     @Override
-    protected Object getCurrentModule() {
-        return null;
+    public void onMapReady(final GoogleMap map) {
+
+        Log.i(TAG, "Map is Ready ");
+        this.googleMap = map;
+        MapsInitializer.initialize(getActivity());
+
+        confirmationPresenter.onMapReady();
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        builder.include(sourceLatLng);
+        builder.include(destLatLng);
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngBounds(builder
+                .build(), utils.getScreenWidth(), utils.getScreenHeight(), 10));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(sourceLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable
+                        .icon_blue_map_marker))
+                .anchor(0.5f, 0.7f));
+
+        googleMap.addMarker(new MarkerOptions()
+                .position(destLatLng)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable
+                        .icon_green_map_marker))
+                .anchor(0.5f, 0.8f));
+
+    }
+
+    public void drawRoute(List<LatLng> routePoints){
+        googleMap.addPolyline(new PolylineOptions().addAll(routePoints))
+                .setColor(getResources().getColor(R.color.route_color));
+
+    }
+
+    public void showEstimates(int distance, int cost, int transactionCost) {
+       
+        sourceAddress.setText(utils.formatAddressAsHtml(confirmationPresenter
+                .getSourceAddress()));
+
+        destinationAddress.setText(utils.formatAddressAsHtml(confirmationPresenter
+                .getDestinationAddress()));
+
+        txtEstimateDistance.setText(String.format(getString(R.string
+                .txt_estimate_distance), distance));
+
+        estimateCost.setText(cost + ".00");
+
+        txtTransactionCharge.setText(
+                String.format(getString(R.string.txt_transaction_cost), transactionCost));
+
+        estimateContainer.setVisibility(View.VISIBLE);
+
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
     }
 }

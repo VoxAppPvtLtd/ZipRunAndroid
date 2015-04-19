@@ -25,8 +25,11 @@ public abstract class ZipBaseFragment extends BackHandlerFragment {
         activity = (ZipBaseActivity) getActivity();
         fragmentGraph = activity.getActivityGraph().plus(getModules());
         fragmentGraph.inject(this);
+        processArguments(getArguments());
         setActionBar(activity.getSupportActionBar());
     }
+
+    protected abstract void processArguments(Bundle args);
 
     protected abstract void setActionBar(ActionBar supportActionBar);
 

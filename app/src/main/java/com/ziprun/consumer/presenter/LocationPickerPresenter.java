@@ -2,8 +2,6 @@ package com.ziprun.consumer.presenter;
 
 import android.location.Address;
 import android.location.Location;
-import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -19,8 +17,6 @@ import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,7 +28,6 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
-import rx.subscriptions.CompositeSubscription;
 
 public abstract class LocationPickerPresenter extends DeliveryPresenter {
     private static final String TAG = LocationPickerPresenter.class.getCanonicalName();
@@ -56,7 +51,6 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
 
     Subscription geocodeSubscription;
 
-    private CompositeSubscription compositeSubscription;
 
     private Boolean locationEnabledFlag = null;
 
@@ -81,9 +75,10 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     public void start() {
         super.start();
         Log.i(TAG, "Presenter Started");
-        isMapReady = false;
-        locationEnabledFlag = null;
-        compositeSubscription = new CompositeSubscription();
+        selectedLocation = getSelectedLocaion();
+        if(selectedLocation == null){
+            selectedLocation = new AddressLocationPair();
+        }
         checkLocationSettings();
         setUpLocationUpdates();
     }
@@ -96,7 +91,10 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     @Override
     public void stop() {
         super.stop();
-        compositeSubscription.clear();
+        currentLatLng = null;
+        currentLocation = null;
+        isMapReady = false;
+        locationEnabledFlag = null;
     }
 
     @Override
@@ -104,15 +102,6 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         super.destroy();
     }
 
-
-    @Override
-    public void setBooking(@Nullable String bookingJson) {
-        super.setBooking(bookingJson);
-        selectedLocation = getSelectedLocaion();
-        if(selectedLocation == null){
-            selectedLocation = new AddressLocationPair();
-        }
-    }
 
     public abstract AddressLocationPair getSelectedLocaion();
 
@@ -218,6 +207,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     }
 
     private void setSelectedLocation(){
+
         if(!isMapReady || locationEnabledFlag == null)
             return;
 
@@ -231,14 +221,17 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         else if(!locationEnabledFlag){
             // GPS not enabled, hence we are setting current location as some
             // default latlng
-
+            selectedLocation.latLng = ZipRunApp.Constants
+                    .DEFAULT_CAMERA_POSITION;
             locationPickerView.setInitialPosition(ZipRunApp.Constants.DEFAULT_CAMERA_POSITION);
 
         }
         else if(currentLocation != null) {
             //Current Position Found. Setting it as selectedLocation
             Log.i(TAG, "Move Camera to Current Location");
+            selectedLocation.latLng = currentLatLng;
             locationPickerView.setInitialPosition(currentLatLng);
+
             //locationPickerView.moveCameraAndDisableListener(currentLatLng);
         }
     }
@@ -266,7 +259,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         performGeocode = false;
         locationPickerView.moveCamera(selectedLocation.latLng, false);
         Log.i(TAG, "Selected Location Address: " + selectedLocation.address);
-        locationPickerView.updateAddress(formatAddressAsHtml(selectedLocation.address));
+        locationPickerView.updateAddress(utils.formatAddressAsHtml(selectedLocation.address));
         locationPickerView.enableCameraListener(true);
         performGeocode = true;
     }
@@ -288,7 +281,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             Log.i(TAG, "Shouldnt do geocoding, distance is too less");
             updateSelectedLocation(camPos);
             if(selectedLocation.address != null ){
-                locationPickerView.updateAddress(formatAddressAsHtml(selectedLocation.address));
+                locationPickerView.updateAddress(utils.formatAddressAsHtml(selectedLocation.address));
             }
             performGeocode = true;
         }
@@ -337,7 +330,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
                     selectedLocation.address = utils.addressToString(
                             addresses.get(0), ", ");
 
-                    String address = formatAddressAsHtml(selectedLocation.address);
+                    String address = utils.formatAddressAsHtml(selectedLocation.address);
                     Log.i(TAG, "Reverse Geocoded Address " + address);
                     locationPickerView.updateAddress(address);
                 }
@@ -362,21 +355,6 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         return currentLatLng;
     }
 
-    public String formatAddressAsHtml(String address) {
-        String[] addComps = address.split(", ");
-        List<String> formattedAddress = new ArrayList<>();
-
-        for (int i = addComps.length - 1; i >= 0; i = i - 2) {
-            if (i > 0)
-                formattedAddress.add(String.format("%s, %s",
-                        addComps[i - 1], addComps[i]));
-            else {
-                formattedAddress.add(addComps[i]);
-            }
-        }
-        Collections.reverse(formattedAddress);
-        return TextUtils.join("<br/>", formattedAddress);
-    }
 
     public abstract void moveForward();
 }

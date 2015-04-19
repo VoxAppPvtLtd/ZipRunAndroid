@@ -7,7 +7,7 @@ import dagger.Module;
 @Module(injects = {
         LocationPickerFragment.class,
         InstructionFragment.class,
-        SummaryFragment.class,
+        ConfirmationFragment.class,
         LocationPickerPresenter.class,
     }, complete = false,
     library = true)

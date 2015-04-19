@@ -32,14 +32,34 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     protected static final int REQUEST_FIX_GOOGLE_API_ERROR = 1;
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        presenter.start();
+    }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Bundle args = getArguments();
+    public void onPause() {
+        super.onPause();
+        presenter.pause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        presenter.stop();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
+    }
+
+    @Override
+    protected void processArguments(Bundle args) {
         presenter.initialize();
         presenter.setBooking(args.getString(DeliveryActivity.KEY_BOOKING));
-
     }
 
     @Override
