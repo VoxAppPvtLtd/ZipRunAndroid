@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.ziprun.consumer.R;
@@ -111,14 +112,21 @@ public class InstructionFragment extends DeliveryFragment {
 
     public static class InstructionPagerAdapter extends PagerAdapter {
 
-        private static final int BUY_TAB_RESID = R.string
+        private static final int BUY_TAB_TITLE_RESID = R.string
                 .instruction_buy_something;
 
-        private static final int PICKUP_TAB_RESID = R.string
+        private static final int PICKUP_TAB_TITLE_RESID = R.string
                 .instruction_pickup_something;
+        
+        private static final int BUY_TAB_HELP_RESID = R.string.helptext_buy;
+        private static final int PICKUP_TAB_HELP_RESID = R.string.helptext_pickup;
 
-        private static final int[]TABS_RESID_ARR = new int[]{ BUY_TAB_RESID,
-                PICKUP_TAB_RESID};
+        private static final int[]TABS_RESID_ARR = new int[]{BUY_TAB_TITLE_RESID,
+                PICKUP_TAB_TITLE_RESID};
+
+        private static final int []TABS_HELP_RESID_ARR = new int[]{
+                BUY_TAB_HELP_RESID, PICKUP_TAB_HELP_RESID
+        };
 
         private EditText[] instructionTextArr = new EditText[2];
 
@@ -145,9 +153,13 @@ public class InstructionFragment extends DeliveryFragment {
 
             EditText instructionText = (EditText) view.findViewById(R.id.edit_instruction);
 
-            instructionText.setText(booking.getNotes());
+            ((TextView)view.findViewById(R.id.helptext)).setText
+                    (TABS_HELP_RESID_ARR[position]);
+
+            instructionText.setText(booking.getInstructions());
 
             container.addView(view, position);
+
 
             instructionTextArr[position] = instructionText;
             return view;

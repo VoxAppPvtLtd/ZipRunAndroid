@@ -21,6 +21,22 @@
     <string name="txt_transaction_cost">+ %d%% charge on items
         purchased</string>
     <string name="txt_buy_from">Buy From:</string>
+    <string name="txt_pickup_from">Pickup From:</string>
     <string name="txt_deliver_to">Deliver To:</string>
     <string name="txt_review_instructions">Review or Edit Instructions</string>
+    <string name="txt_calculation_method"
+            formatted="false"><![CDATA[<b>How it is calculated?</b>
+        <br/>Ride estimate is calculated at Rs %d per Km for the
+        entire journey. We also add %d%% of the cash transaction (if
+        any) as convenience charge.]]> </string>
+    <string name="go_to_order_instruction">Give Order Instruction</string>
+    <string name="go_to_confirmation">Route and Confirm</string>
+    <string name="helptext_buy">Please Enter Items to buy along with
+        other instructions necessary to fulfill your order.</string>
+
+    <string name="helptext_pickup">Please Enter Items to be picked up
+        along with name and contact number of the person to meet as
+        well as any other necessary instructions</string>
+
+
 </resources>

@@ -27,4 +27,9 @@ public class DestinationLocationPickerFragment extends LocationPickerFragment {
     public int getMarkerResource() {
         return R.drawable.icon_green_map_marker;
     }
+
+    @Override
+    public int getNextBtnResource() {
+        return R.string.go_to_confirmation;
+    }
 }

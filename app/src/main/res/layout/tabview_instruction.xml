@@ -11,15 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:textSize="16dp"
-        android:textColor="@color/text_color_secondary"
-        android:text="Please Enter Your Note here"/>
+        android:textSize="16sp"
+        android:textColor="@color/text_color_secondary"/>
 
     <EditText
         android:id="@+id/edit_instruction"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="22dp"
+        android:textSize="24sp"
         android:singleLine="false"
         android:textColor="@color/text_color_primary"
     />

@@ -27,4 +27,9 @@ public class SourceLocationPickerFragment extends LocationPickerFragment {
         return R.drawable.icon_blue_map_marker;
 
     }
+
+    @Override
+    public int getNextBtnResource(){
+        return R.string.go_to_order_instruction;
+    }
 }

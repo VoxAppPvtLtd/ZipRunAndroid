@@ -115,6 +115,8 @@ public class DeliveryActivity extends ZipBaseActivity implements
         switch(id){
             case android.R.id.home: {
                 Log.i(TAG, "Back Button Pressed in action bar");
+                onBackPressed();
+
             }
         }
 

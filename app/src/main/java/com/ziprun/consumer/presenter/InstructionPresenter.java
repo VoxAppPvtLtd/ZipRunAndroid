@@ -50,7 +50,7 @@ public class InstructionPresenter extends DeliveryPresenter {
         int currentTab = instructionView.getCurrentTab();
         booking.setBookingType(currentTab == BUY_TAB_POS ? Booking
                 .BookingType.BUY : Booking.BookingType.PICKUP);
-        booking.setNotes(instructionView.getCurrentInstruction());
+        booking.setInstructions(instructionView.getCurrentInstruction());
 
         bus.post(new UpdateBookingEvent(booking));
     }

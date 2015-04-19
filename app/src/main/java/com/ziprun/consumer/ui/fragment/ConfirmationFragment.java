@@ -1,8 +1,10 @@
 package com.ziprun.consumer.ui.fragment;
 
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.presenter.ConfirmationPresenter;
 import com.ziprun.consumer.utils.Utils;
 
@@ -48,7 +51,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @Inject
     Utils utils;
 
-    @InjectView(R.id.estimate_container)
+    @InjectView(R.id.slidingPanel)
     ViewGroup estimateContainer;
 
     @InjectView(R.id.txt_estimate_distance)
@@ -66,8 +69,19 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @InjectView(R.id.dest_address)
     TextView destinationAddress;
 
+    @InjectView(R.id.txt_source_prefix)
+    TextView sourcePrefix;
+
+    @InjectView(R.id.txt_dest_prefix)
+    TextView destinationPrefix;
+
+    @InjectView(R.id.txt_calculation)
+    TextView calculationTxt;
+
     @InjectView(R.id.review_notes)
     EditText instructions;
+
+    ProgressDialog directionProgress;
 
     ConfirmationPresenter confirmationPresenter;
 
@@ -107,6 +121,16 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         super.onStart();
         sourceLatLng = confirmationPresenter.getSourceLatLng();
         destLatLng = confirmationPresenter.getDestinationLatLng();
+        showDirectionProgress();
+
+    }
+
+    private void showDirectionProgress() {
+        if(!confirmationPresenter.hasDirections()){
+            directionProgress = ProgressDialog.show(getActivity(),
+                    "Fetching Directions", "Fetching Directions and " +
+                            "Calculating Estimate", true);
+        }
     }
 
     @Override
@@ -224,18 +248,39 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
     }
 
-    public void showEstimates(int distance, int cost, int transactionCost) {
-       
-        sourceAddress.setText(utils.formatAddressAsHtml(confirmationPresenter
-                .getSourceAddress()));
+    public void showEstimates(int distance, int ratePerKm, int totalCost,
+                              int transactionCost) {
 
-        destinationAddress.setText(utils.formatAddressAsHtml(confirmationPresenter
-                .getDestinationAddress()));
+        directionProgress.dismiss();
+
+
+        instructions.setText(confirmationPresenter.getInstruction());
+
+        sourcePrefix.setText(
+                confirmationPresenter.getBookingType() == Booking.BookingType.BUY
+                    ? getString(R.string.txt_buy_from)
+                    : getString(R.string.txt_pickup_from));
+
+        destinationPrefix.setText(getString(R.string.txt_deliver_to));
+
+        String srcAddress =  utils.formatAddressAsHtml
+                (confirmationPresenter.getSourceAddress());
+
+        String destAddress = utils.formatAddressAsHtml(
+                confirmationPresenter.getDestinationAddress());
+
+        sourceAddress.setText(Html.fromHtml(srcAddress));
+
+        destinationAddress.setText(Html.fromHtml(destAddress));
+
+        calculationTxt.setText(Html.fromHtml(String.format(
+            getString(R.string.txt_calculation_method),  ratePerKm,
+                transactionCost)));
 
         txtEstimateDistance.setText(String.format(getString(R.string
                 .txt_estimate_distance), distance));
 
-        estimateCost.setText(cost + ".00");
+        estimateCost.setText(totalCost + ".00");
 
         txtTransactionCharge.setText(
                 String.format(getString(R.string.txt_transaction_cost), transactionCost));
@@ -243,6 +288,9 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         estimateContainer.setVisibility(View.VISIBLE);
 
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+    }
 
+    public String getInstruction() {
+        return instructions.getText().toString();
     }
 }

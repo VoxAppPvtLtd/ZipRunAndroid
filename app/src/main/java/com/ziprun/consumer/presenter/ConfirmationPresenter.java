@@ -5,7 +5,9 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
+import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
+import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
 import com.ziprun.maputils.GoogleDirectionAPI;
@@ -52,10 +54,17 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     @Override
     public void stop() {
         super.stop();
+        updateBooking();
         isMapReady = false;
         directionFetched = false;
     }
-    
+
+    private void updateBooking() {
+        String instruction = confirmationView.getInstruction();
+        booking.setInstructions(instruction);
+        bus.post(new UpdateBookingEvent(booking));
+    }
+
     public LatLng getSourceLatLng(){
         return booking.getSourceLatLng();
     }
@@ -71,6 +80,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     public String getDestinationAddress(){
         return booking.getDesinationAddress();
     }
+
 
     private void fetchDirections() {
         if(directionsObservable == null){
@@ -109,9 +119,9 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         DeliveryRateCard rateCard = zipSession.getRateCard();
 
-        int distance = deliveryDirection.getTotalDistance(0);
+        int distance = (int) Math.ceil(deliveryDirection.getTotalDistance(0) / 1000);
 
-        int cost = distance / 1000 * rateCard.getRatePerKm();
+        int cost = distance  * rateCard.getRatePerKm();
 
         Log.i(TAG, "Distance " +  distance + " Cost " + cost);
 
@@ -122,8 +132,20 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         confirmationView.drawRoute(points);
 
-        confirmationView.showEstimates(distance, cost,
+        confirmationView.showEstimates(distance, rateCard.getRatePerKm(),  cost,
                 rateCard.getTransactionCost());
 
+    }
+
+    public boolean hasDirections(){
+        return directionFetched;
+    }
+
+    public String getInstruction() {
+        return booking.getInstructions();
+    }
+
+    public Booking.BookingType getBookingType(){
+        return booking.getBookingType();
     }
 }

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -73,6 +74,9 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @InjectView(R.id.map)
     MapView mapView;
 
+    @InjectView(R.id.nextBtn)
+    Button nextBtn;
+
     @InjectView(R.id.mapContainer)
     ViewGroup mapContainer;
 
@@ -105,7 +109,6 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     @Inject
     ReactiveLocationProvider locationProvider;
-
 
     @Inject
     Utils utils;
@@ -140,13 +143,13 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         setupSlidingLayout();
 
         addressAutocompleteView.setVisibility(View.GONE);
-
 //        debugContainer();
 
         return slidingLayout;
     }
 
     public abstract int getMarkerResource();
+    public abstract int getNextBtnResource();
 
     @Override
     protected void processArguments(Bundle args) {
@@ -157,6 +160,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @Override
     public void onStart() {
         super.onStart();
+        nextBtn.setText(getNextBtnResource());
         mapMarker.setImageResource(getMarkerResource());
         mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
@@ -215,6 +219,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @OnClick(R.id.searchBtn)
     public void searchAddress(View view) {
         addressAutocompleteView.setVisibility(View.VISIBLE);
+        hideStaticAddressView();
         inSearchMode = true;
     }
 

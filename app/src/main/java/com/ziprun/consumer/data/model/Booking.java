@@ -27,7 +27,7 @@ public class Booking {
     private BookingType bookingType;
     private double estimateDistance;
     private double estimateCost;
-    private String notes;
+    private String instructions;
 
     public Booking(){
         sourceLocation = new AddressLocationPair();
@@ -76,12 +76,12 @@ public class Booking {
         this.bookingType = bookingType;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getInstructions() {
+        return instructions;
     }
 
-    public void setNotes(String notes) {
-        this.notes = notes;
+    public void setInstructions(String instructions) {
+        this.instructions = instructions;
     }
 
     public double getEstimateDistance() {
