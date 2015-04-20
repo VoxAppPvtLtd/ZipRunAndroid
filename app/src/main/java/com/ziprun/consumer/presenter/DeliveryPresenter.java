@@ -74,4 +74,5 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     }
 
 
+    public abstract void moveForward();
 }

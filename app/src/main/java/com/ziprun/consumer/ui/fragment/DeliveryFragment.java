@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -59,6 +60,7 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Override
     protected void processArguments(Bundle args) {
         presenter.initialize();
+        Log.i(TAG, "Booking : " + args.getString(DeliveryActivity.KEY_BOOKING));
         presenter.setBooking(args.getString(DeliveryActivity.KEY_BOOKING));
     }
 

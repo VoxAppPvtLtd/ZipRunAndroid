@@ -59,6 +59,11 @@ public class ConfirmationPresenter extends DeliveryPresenter {
         directionFetched = false;
     }
 
+    @Override
+    public void moveForward() {
+
+    }
+
     private void updateBooking() {
         String instruction = confirmationView.getInstruction();
         booking.setInstructions(instruction);
@@ -122,6 +127,10 @@ public class ConfirmationPresenter extends DeliveryPresenter {
         int distance = (int) Math.ceil(deliveryDirection.getTotalDistance(0) / 1000);
 
         int cost = distance  * rateCard.getRatePerKm();
+
+        if(cost < rateCard.getMinPrice()){
+            cost = rateCard.getMinPrice();
+        }
 
         Log.i(TAG, "Distance " +  distance + " Cost " + cost);
 

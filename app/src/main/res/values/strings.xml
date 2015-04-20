@@ -37,6 +37,12 @@
     <string name="helptext_pickup">Please Enter Items to be picked up
         along with name and contact number of the person to meet as
         well as any other necessary instructions</string>
+    <string name="msg_authentication_failure">Unable to authenticate. Check
+        connectivity or try again later</string>
+    <string name="title_dialog_confirm_booking">Order in Progress</string>
+    <string name="msg_dialog_confirm_booking">Thank you for using Ziprun. You
+        order is under process. A ziprun representative will get back to you in
+        few minutes</string>
 
 
 </resources>

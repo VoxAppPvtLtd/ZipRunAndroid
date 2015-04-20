@@ -49,5 +49,7 @@ public class ZipRunSession {
                 preferences.getString(KEY_RATE_CARD, null));
     }
 
-
+    public void authenticatUser() {
+        preferences.edit().putBoolean(KEY_IS_AUTHENTICATED, true).apply();
+    }
 }

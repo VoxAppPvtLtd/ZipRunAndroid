@@ -1,19 +1,24 @@
 package com.ziprun.consumer.ui.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.digits.sdk.android.AuthCallback;
 import com.digits.sdk.android.Digits;
-import com.digits.sdk.android.DigitsAuthButton;
 import com.digits.sdk.android.DigitsException;
 import com.digits.sdk.android.DigitsSession;
 import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.OAuthSigning;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterAuthToken;
 import com.ziprun.consumer.R;
+
+import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -29,29 +34,41 @@ public class LoginActivity extends ZipBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        final TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY,
+                TWITTER_SECRET);
         Fabric.with(this, new Digits(), new Crashlytics(), new Twitter(authConfig));
-        setContentView(R.layout.activity_login);
 
-        DigitsAuthButton digitsButton =
-                (DigitsAuthButton) findViewById(R.id.auth_button);
-        digitsButton.setCallback(new AuthCallback() {
+        Digits.authenticate(new AuthCallback() {
             @Override
             public void success(DigitsSession session,
                                 String phoneNumber) {
                 // Do something with the session
-                Log.i(TAG, "Phone Number: " + phoneNumber + " is " +
-                        "Authenticated");
+                TwitterAuthToken authToken = (TwitterAuthToken) session.getAuthToken();
+
+                OAuthSigning oauthSigning = new OAuthSigning(authConfig, authToken);
+
+                Map authHeaders = oauthSigning.getOAuthEchoHeadersForVerifyCredentials();
+
+                Log.i(TAG, phoneNumber + " " + session.getId() + " " +
+                    (String) authHeaders.get("X-Auth-Service-Provider") + " : "
+                    + (String) authHeaders.get("X-Verify-Credentials-Authorization")
+                );
+
+                zipRunSession.authenticatUser();
+                startDeliveryActivity();
             }
 
             @Override
             public void failure(DigitsException exception) {
-                // Do something on failure
+                Toast.makeText(LoginActivity.this,
+                        R.string.msg_authentication_failure, Toast.LENGTH_LONG).show();
             }
-        });
+        }, R.style.Theme_ZipRunDigit);
+    }
 
-        digitsButton
-                .setAuthTheme(android.R.style.Theme_Material);
+    private void startDeliveryActivity() {
+        startActivity(new Intent(this, DeliveryActivity.class));
+        finish();
     }
 
 

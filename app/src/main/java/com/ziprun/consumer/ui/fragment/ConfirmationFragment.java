@@ -1,6 +1,7 @@
 package com.ziprun.consumer.ui.fragment;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.gc.materialdesign.widgets.Dialog;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -35,6 +37,7 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class ConfirmationFragment extends DeliveryFragment implements OnMapReadyCallback {
     private static final String TAG = ConfirmationFragment.class.getCanonicalName();
@@ -292,5 +295,23 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
     public String getInstruction() {
         return instructions.getText().toString();
+    }
+
+
+    @OnClick(R.id.nextBtn)
+    public void onNextClicked(View view) {
+        Dialog dialog = new Dialog(getActivity(), getString(R.string.title_dialog_confirm_booking),
+                getString(R.string.msg_dialog_confirm_booking));
+
+        dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = activity.getIntent();
+                activity.finish();
+                startActivity(intent);
+            }
+        });
+
+        dialog.show();
     }
 }

@@ -26,7 +26,7 @@ public class SplashActivity extends ZipBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        DeliveryRateCard rateCard = new DeliveryRateCard(9, 2);
+        DeliveryRateCard rateCard = new DeliveryRateCard(2, 20, 9, 2);
         zipRunSession.setRateCard(rateCard);
         checkNetworkConnectivity();
 
@@ -37,7 +37,7 @@ public class SplashActivity extends ZipBaseActivity {
         if(zipRunSession.isUserAuthenticated()){
             intent = new Intent(this, DeliveryActivity.class);
         }else {
-            intent = new Intent(this, DeliveryActivity.class);
+            intent = new Intent(this, LoginActivity.class);
         }
 
         startActivity(intent);
