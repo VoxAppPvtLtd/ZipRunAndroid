@@ -51,7 +51,6 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
 
     Subscription geocodeSubscription;
 
-
     private Boolean locationEnabledFlag = null;
 
     private boolean isMapReady =  false;

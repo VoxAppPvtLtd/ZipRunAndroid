@@ -32,4 +32,9 @@ public class SourceLocationPickerFragment extends LocationPickerFragment {
     public int getNextBtnResource(){
         return R.string.go_to_order_instruction;
     }
+
+    @Override
+    public int getHelpTextResource() {
+        return R.string.help_text_source_location;
+    }
 }

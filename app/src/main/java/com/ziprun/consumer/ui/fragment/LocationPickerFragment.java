@@ -101,7 +101,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @InjectView(R.id.gecode_progress_wheel)
     ProgressWheel geocodeProgessWheel;
 
-    @InjectView(R.id.pickup_location_help_text)
+    @InjectView(R.id.help_text)
     TextView helpText;
 
     @InjectView(R.id.closeAddressBtn)
@@ -162,6 +162,8 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         super.onStart();
         nextBtn.setText(getNextBtnResource());
         mapMarker.setImageResource(getMarkerResource());
+        helpText.setText(getHelpTextResource());
+
         mapView.getMapAsync(this);
         addressAutocompleteView.setOnAddressSelectedListener(this);
     }
@@ -364,7 +366,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
             showAddressView();
 
         geocodeProgessWheel.setVisibility(View.GONE);
-        helpText.setText(R.string.pickup_location);
+        helpText.setText(getHelpTextResource());
 
         if(address == null){
             Toast.makeText(getActivity(), "Unable to fetch address. Please " +
@@ -472,4 +474,5 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         helpText.setText(R.string.fetching_address);
     }
 
+    public abstract int getHelpTextResource();
 }

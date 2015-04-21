@@ -32,4 +32,9 @@ public class DestinationLocationPickerFragment extends LocationPickerFragment {
     public int getNextBtnResource() {
         return R.string.go_to_confirmation;
     }
+
+    @Override
+    public int getHelpTextResource() {
+        return R.string.help_text_destination;
+    }
 }

@@ -3,9 +3,11 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="pickup_location">Select A Location To Pickup Or Buy
+    <string name="help_text_source_location">Select A Location To Pickup Or Buy
         Items</string>
+    <string name="help_text_destination">Select Location For Delivery
+        of Items</string>
+
     <string name="destination">Enter Destination</string>
     <string name="title_activity_delivery">DeliveryActivity</string>
     <string name="check_location_settings_failed">"Unable to Fetch Current Location "</string>
@@ -16,7 +18,7 @@
     <string name="confirm_fragment_title">Confirm</string>
     <string name="fetching_address">Fetching Address</string>
     <string name="title_delivery_location">Choose Delivery Location</string>
-    <string name="txt_estimate_distance">Ride Esitmate for %d Kms</string>
+    <string name="txt_estimate_distance">Ride Estimate for %d Kms</string>
     <string name="currency">Rs</string>
     <string name="txt_transaction_cost">+ %d%% charge on items
         purchased</string>
