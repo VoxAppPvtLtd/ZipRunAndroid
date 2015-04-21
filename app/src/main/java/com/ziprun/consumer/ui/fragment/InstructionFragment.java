@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.astuetz.PagerSlidingTabStrip;
 import com.ziprun.consumer.R;
-import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.data.model.BookingLeg;
 import com.ziprun.consumer.presenter.InstructionPresenter;
 import com.ziprun.consumer.ui.activity.DeliveryActivity;
 
@@ -49,7 +49,7 @@ public class InstructionFragment extends DeliveryFragment {
 
         ButterKnife.inject(this, view);
 
-        Booking booking = Booking.fromJson(getArguments().getString
+        BookingLeg booking = BookingLeg.fromJson(getArguments().getString
                 (DeliveryActivity.KEY_BOOKING));
 
         instructionPagerAdapter = new InstructionPagerAdapter(getActivity(),
@@ -132,10 +132,10 @@ public class InstructionFragment extends DeliveryFragment {
 
         private Context context;
 
-        private Booking booking;
+        private BookingLeg booking;
 
 
-        public InstructionPagerAdapter(Context context, Booking booking){
+        public InstructionPagerAdapter(Context context, BookingLeg booking){
             this.context = context;
             this.booking = booking;
         }
@@ -156,7 +156,7 @@ public class InstructionFragment extends DeliveryFragment {
             ((TextView)view.findViewById(R.id.helptext)).setText
                     (TABS_HELP_RESID_ARR[position]);
 
-            instructionText.setText(booking.getInstructions());
+            instructionText.setText(booking.getUserInstructions());
 
             container.addView(view, position);
 

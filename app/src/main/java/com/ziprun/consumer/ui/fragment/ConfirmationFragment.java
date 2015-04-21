@@ -27,7 +27,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.ziprun.consumer.R;
-import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.data.model.RideType;
 import com.ziprun.consumer.presenter.ConfirmationPresenter;
 import com.ziprun.consumer.utils.Utils;
 
@@ -260,7 +260,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         instructions.setText(confirmationPresenter.getInstruction());
 
         sourcePrefix.setText(
-                confirmationPresenter.getBookingType() == Booking.BookingType.BUY
+                confirmationPresenter.getBookingType() == RideType.BUY
                     ? getString(R.string.txt_buy_from)
                     : getString(R.string.txt_pickup_from));
 

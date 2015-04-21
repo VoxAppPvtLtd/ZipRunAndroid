@@ -54,7 +54,7 @@ public class SplashActivity extends ZipBaseActivity {
             @Override
             public void run() {
                 if(isOnline){
-                    Log.i(TAG, "Internert onnectivity is there");
+                    Log.i(TAG, "Internet connectivity is there");
                     switchActivity();
                 }else{
                     finish();

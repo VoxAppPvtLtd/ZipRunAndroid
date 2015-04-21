@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.data.model.BookingLeg;
 import com.ziprun.consumer.ui.activity.ForActivity;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
 import com.ziprun.consumer.utils.AndroidBus;
@@ -29,6 +30,8 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
 
     protected DeliveryFragment view;
     protected Booking booking;
+    protected int currentLeg;
+    protected BookingLeg bookingLeg;
 
     protected CompositeSubscription compositeSubscription;
 
@@ -66,13 +69,13 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     public void destroy(){
     }
 
-
-
-
-    public void setBooking(@Nullable String bookingJson){
+    public void setBooking(@Nullable String bookingJson, int currentLeg){
         booking = Booking.fromJson(bookingJson);
+        this.currentLeg = currentLeg;
+        bookingLeg = booking.getBookingLeg(this.currentLeg);
+        Log.i(TAG, "Inside: " + this.getClass().getSimpleName() + " " +
+                bookingLeg.toJson());
     }
-
 
     public abstract void moveForward();
 }

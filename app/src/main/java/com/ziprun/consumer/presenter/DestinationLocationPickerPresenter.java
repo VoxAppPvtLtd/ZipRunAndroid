@@ -14,10 +14,10 @@ public class DestinationLocationPickerPresenter extends LocationPickerPresenter 
 
     @Override
     public AddressLocationPair getSelectedLocaion() {
-        AddressLocationPair locationPair = booking.getDestLocation();
+        AddressLocationPair locationPair = bookingLeg.getDestination();
         if(locationPair.latLng == null) {
-            locationPair.latLng = booking.getSourceLocation().latLng;
-            locationPair.address = booking.getSourceLocation().address;
+            locationPair.latLng = bookingLeg.getSource().latLng;
+            locationPair.address = bookingLeg.getSource().address;
         }
 
 

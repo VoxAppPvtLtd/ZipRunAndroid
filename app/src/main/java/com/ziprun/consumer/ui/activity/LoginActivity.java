@@ -26,8 +26,8 @@ import io.fabric.sdk.android.Fabric;
 public class LoginActivity extends ZipBaseActivity {
 
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
-    private static final String TWITTER_KEY = "al9udcuqmC6j6XQQnal6HigDd";
-    private static final String TWITTER_SECRET = "NMvBd9Jz2BQsWZS7xKtPROcJcOcCicqCn7Hyhk5CCEMpoxYFn2";
+    private static final String TWITTER_KEY = "90zfIuQhostwUpunsZESPX5Vy";
+    private static final String TWITTER_SECRET = "F0eX2u0rZmYNozfXrP7AGcQLFF09Fr1LLLmkc77qJogH5qjFbU";
 
     public static final String TAG = LoginActivity.class.getName();
     @Override
@@ -44,6 +44,8 @@ public class LoginActivity extends ZipBaseActivity {
                                 String phoneNumber) {
                 // Do something with the session
                 TwitterAuthToken authToken = (TwitterAuthToken) session.getAuthToken();
+
+                Log.i(TAG, authToken.token + " " + authToken.secret);
 
                 OAuthSigning oauthSigning = new OAuthSigning(authConfig, authToken);
 

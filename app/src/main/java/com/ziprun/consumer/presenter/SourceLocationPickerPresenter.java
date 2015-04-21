@@ -14,7 +14,7 @@ public class SourceLocationPickerPresenter extends LocationPickerPresenter {
 
     @Override
     public AddressLocationPair getSelectedLocaion() {
-        return booking.getSourceLocation();
+        return bookingLeg.getSource();
     }
 
     @Override

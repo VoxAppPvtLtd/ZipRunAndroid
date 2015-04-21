@@ -11,6 +11,7 @@ import android.view.MenuItem;
 
 import com.squareup.otto.Subscribe;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.data.model.AddressLocationPair;
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.event.OnBookingInstructionSet;
 import com.ziprun.consumer.event.OnDestinationSet;
@@ -36,6 +37,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
     public static final String KEY_BOOKING = "booking";
     private static final String GOOGLE_CONNECTION_ERROR = "connection_error";
     public static final String KEY_LOCATION_TYPE = "locationType";
+    public static final String KEY_CURRENT_LEG = "current_leg";
 
     protected BackHandlerFragment currentFragment;
 
@@ -52,6 +54,8 @@ public class DeliveryActivity extends ZipBaseActivity implements
     private FragmentManager fragmentManager;
 
     private Booking booking;
+
+    private int currentLeg;
 
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
@@ -77,9 +81,13 @@ public class DeliveryActivity extends ZipBaseActivity implements
         if(savedInstanceState != null){
             booking = Booking.fromJson(savedInstanceState.getString
                     (KEY_BOOKING));
+
         }else{
             booking = new Booking();
+            booking.addBookingLeg(new AddressLocationPair());
         }
+
+        currentLeg = 0;
 
         Bundle args = getBookingBundle();
 
@@ -173,6 +181,8 @@ public class DeliveryActivity extends ZipBaseActivity implements
     private Bundle getBookingBundle(){
         Bundle args = new Bundle();
         args.putString(KEY_BOOKING, booking.toJson());
+
+        args.putInt(KEY_CURRENT_LEG, currentLeg);
         return args;
     }
 

@@ -5,8 +5,8 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
-import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
+import com.ziprun.consumer.data.model.RideType;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
@@ -66,32 +66,32 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
     private void updateBooking() {
         String instruction = confirmationView.getInstruction();
-        booking.setInstructions(instruction);
+        bookingLeg.setUserInstructions(instruction);
         bus.post(new UpdateBookingEvent(booking));
     }
 
     public LatLng getSourceLatLng(){
-        return booking.getSourceLatLng();
+        return bookingLeg.getSourceLatLng();
     }
 
     public LatLng getDestinationLatLng(){
-        return booking.getDestinationLatLng();
+        return bookingLeg.getDestinationLatLng();
     }
 
     public String getSourceAddress(){
-        return booking.getSourceAddress();
+        return bookingLeg.getSourceAddress();
     }
 
     public String getDestinationAddress(){
-        return booking.getDesinationAddress();
+        return bookingLeg.getDesinationAddress();
     }
 
 
     private void fetchDirections() {
         if(directionsObservable == null){
             directionsObservable = new GoogleDirectionAPI(ZipRunApp.Constants
-                    .API_KEY, booking.getSourceLocation().latLng,
-                    booking.getDestLocation().latLng).getDirections();
+                    .API_KEY, bookingLeg.getSource().latLng,
+                    bookingLeg.getDestination().latLng).getDirections();
 
         }
 
@@ -134,8 +134,8 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         Log.i(TAG, "Distance " +  distance + " Cost " + cost);
 
-        booking.setEstimateDistance(distance);
-        booking.setEstimateCost(cost);
+        bookingLeg.setEstimatedDistance(distance);
+        bookingLeg.setEstimatedCost(cost);
 
         List <LatLng> points = deliveryDirection.getPoints(0);
 
@@ -151,10 +151,10 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     }
 
     public String getInstruction() {
-        return booking.getInstructions();
+        return bookingLeg.getUserInstructions();
     }
 
-    public Booking.BookingType getBookingType(){
-        return booking.getBookingType();
+    public RideType getBookingType(){
+        return bookingLeg.getRideType();
     }
 }

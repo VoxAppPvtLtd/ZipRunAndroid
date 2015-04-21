@@ -1,8 +1,6 @@
 package com.ziprun.consumer.presenter;
 
-import android.support.annotation.Nullable;
-
-import com.ziprun.consumer.data.model.Booking;
+import com.ziprun.consumer.data.model.RideType;
 import com.ziprun.consumer.event.OnBookingInstructionSet;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
@@ -21,14 +19,9 @@ public class InstructionPresenter extends DeliveryPresenter {
     }
 
     @Override
-    public void setBooking(@Nullable String bookingJson) {
-        super.setBooking(bookingJson);
-    }
-
-    @Override
     public void start() {
         super.start();
-        if(booking.getBookingType() == Booking.BookingType.BUY){
+        if(bookingLeg.getRideType() == RideType.BUY){
             instructionView.changeTab(BUY_TAB_POS);
         }else {
             instructionView.changeTab(PICKUP_TAB_POS);
@@ -48,9 +41,8 @@ public class InstructionPresenter extends DeliveryPresenter {
 
     public void updateBooking(){
         int currentTab = instructionView.getCurrentTab();
-        booking.setBookingType(currentTab == BUY_TAB_POS ? Booking
-                .BookingType.BUY : Booking.BookingType.PICKUP);
-        booking.setInstructions(instructionView.getCurrentInstruction());
+        bookingLeg.setRideType(currentTab == BUY_TAB_POS ? RideType.BUY : RideType.PICKUP);
+        bookingLeg.setUserInstructions(instructionView.getCurrentInstruction());
 
         bus.post(new UpdateBookingEvent(booking));
     }
