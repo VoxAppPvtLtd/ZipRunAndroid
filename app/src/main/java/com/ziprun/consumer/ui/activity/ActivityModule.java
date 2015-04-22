@@ -13,6 +13,7 @@ import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 
 @Module(injects = {
         SplashActivity.class,
+        IntroActivity.class,
         LoginActivity.class,
         DeliveryActivity.class,
         AddressAutocompleteView.class,

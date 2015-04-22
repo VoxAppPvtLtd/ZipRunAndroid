@@ -37,7 +37,7 @@ public class SplashActivity extends ZipBaseActivity {
         if(zipRunSession.isUserAuthenticated()){
             intent = new Intent(this, DeliveryActivity.class);
         }else {
-            intent = new Intent(this, LoginActivity.class);
+            intent = new Intent(this, IntroActivity.class);
         }
 
         startActivity(intent);

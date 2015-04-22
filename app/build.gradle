@@ -112,6 +112,8 @@ dependencies {
 
     compile 'com.pnikosis:materialish-progress:1.5'
 
+    compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
+
     internalCompile 'com.facebook.stetho:stetho:1.0.1'
 
 }
