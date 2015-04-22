@@ -5,6 +5,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
+import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -35,6 +37,7 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Override
     public void onStart() {
         super.onStart();
+        Log.i(TAG, this.getClass().getSimpleName() + " Started");
         presenter.start();
     }
 
@@ -53,10 +56,29 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        presenter.destroy();
+        if(presenter != null)
+            presenter.destroy();
     }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if(savedInstanceState != null){
+            Log.i(TAG, "Saved Instance state is not null");
+            processArguments(savedInstanceState);
+        }else{
+            Log.i(TAG, "Saved Instance state is null");
+            processArguments(getArguments());
+        }
+        setActionBar(activity.getSupportActionBar());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        presenter.saveInstanceState(outState);
+    }
+
     protected void processArguments(Bundle args) {
         presenter.initialize();
         String bookingJson = args.getString(DeliveryActivity.KEY_BOOKING);
@@ -75,6 +97,9 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     }
 
     protected abstract Object getCurrentModule();
+
+    protected abstract void setActionBar(ActionBar supportActionBar);
+
 
     @Override
     public boolean handleActivityResult(int requestCode, int resultCode, Intent data) {
@@ -142,7 +167,5 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
             bus.post(new GoogleConnectionErrorDialogDismissed());
         }
     }
-
-
 
 }

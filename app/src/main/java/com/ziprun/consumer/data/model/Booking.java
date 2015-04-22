@@ -1,10 +1,8 @@
 package com.ziprun.consumer.data.model;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
 
-public class Booking {
+public class Booking extends ZipBaseModel{
     private static final String TAG = Booking.class.getCanonicalName();
     private int rateID;
     private ArrayList<BookingLeg> bookingLegs;
@@ -25,14 +23,6 @@ public class Booking {
         return bookingLegs.size();
     }
 
-    public String toJson(){
-        return new Gson().toJson(this, this.getClass());
-    }
-
-    public static Booking fromJson(String bookingJson){
-        return new Gson().fromJson(bookingJson, Booking.class);
-    }
-
 
     public BookingLeg getBookingLeg(int legIndex) {
         if(legIndex >= bookingLegs.size()){
@@ -42,4 +32,5 @@ public class Booking {
         return bookingLegs.get(legIndex);
 
     }
+
 }

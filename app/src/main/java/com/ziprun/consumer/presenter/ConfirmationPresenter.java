@@ -8,6 +8,7 @@ import com.ziprun.consumer.data.ZipRunSession;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
 import com.ziprun.consumer.data.model.RideType;
 import com.ziprun.consumer.event.UpdateBookingEvent;
+import com.ziprun.consumer.network.ZipRestApi;
 import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
 import com.ziprun.maputils.GoogleDirectionAPI;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func2;
 import rx.schedulers.Schedulers;
 
 public class ConfirmationPresenter extends DeliveryPresenter {
@@ -29,25 +31,40 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
     private Observable<Directions> directionsObservable;
 
+    private Observable<DeliveryRateCard> rateCardObservable;
+
+    private Observable<Boolean> zipObservable;
+
     private boolean isMapReady;
 
     private boolean directionFetched;
 
     private Directions deliveryDirection;
 
+    private DeliveryRateCard rateCard;
+
     @Inject
     ZipRunSession zipSession;
+
+    @Inject
+    ZipRestApi zipRestApi;
 
     public ConfirmationPresenter(DeliveryFragment view) {
         super(view);
         confirmationView = (ConfirmationFragment) view;
+    }
 
+    @Override
+    public void initialize() {
+        super.initialize();
+        directionFetched = false;
+        isMapReady = false;
     }
 
     @Override
     public void start() {
         super.start();
-        fetchDirections();
+        fetchDirectionsAndRateCard();
 
     }
 
@@ -55,8 +72,6 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     public void stop() {
         super.stop();
         updateBooking();
-        isMapReady = false;
-        directionFetched = false;
     }
 
     @Override
@@ -83,7 +98,40 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     }
 
     public String getDestinationAddress(){
-        return bookingLeg.getDesinationAddress();
+        return bookingLeg.getDestinationAddress();
+    }
+
+    private void fetchDirectionsAndRateCard(){
+        if(!directionFetched) {
+            fetchDirections();
+            fetchRateCard();
+
+            if(zipObservable == null){
+                zipObservable =  Observable.zip(directionsObservable, rateCardObservable,
+                    new Func2<Directions, DeliveryRateCard, Boolean>() {
+                        @Override
+                        public Boolean call(Directions directions,
+                                            DeliveryRateCard deliveryRateCard) {
+
+                            Log.i(TAG, "Directions and Delivery Rate Card Fetched");
+                            rateCard = deliveryRateCard;
+                            deliveryDirection = directions;
+                            directionFetched = true;
+                            return true;
+                        }
+                    }).cache()
+                    .observeOn(AndroidSchedulers.mainThread());
+            }
+        }
+
+        Log.i(TAG, "Subscribing to zipObservable");
+        compositeSubscription.add(zipObservable.subscribe(new Action1<Boolean>() {
+            @Override
+            public void call(Boolean bool) {
+                Log.i(TAG, "Show Directions called");
+                showDirection();
+            }
+        }));
     }
 
 
@@ -92,37 +140,34 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             directionsObservable = new GoogleDirectionAPI(ZipRunApp.Constants
                     .API_KEY, bookingLeg.getSource().latLng,
                     bookingLeg.getDestination().latLng).getDirections();
-
         }
 
-        compositeSubscription.add(directionsObservable
+        directionsObservable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .cache()
-                .subscribe(directionGetter));
+                .cache();
+    }
+
+    private void fetchRateCard(){
+        if(rateCardObservable == null){
+            rateCardObservable = zipRestApi.getRateCard(booking);
+        }
+
+        rateCardObservable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .cache();
+
     }
 
     public void onMapReady(){
         isMapReady = true;
     }
 
-    private Action1<Directions> directionGetter  = new Action1<Directions>() {
-        @Override
-        public void call(Directions directions) {
-
-            Log.i(TAG, "Directions Fetched ");
-            deliveryDirection = directions;
-            directionFetched = true;
-            showDirection();
-        }
-    };
-
-
     public void showDirection(){
         if(!isMapReady || !directionFetched)
             return;
 
-        DeliveryRateCard rateCard = zipSession.getRateCard();
 
         int distance = (int) Math.ceil(deliveryDirection.getTotalDistance(0) / 1000);
 
@@ -141,9 +186,8 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         confirmationView.drawRoute(points);
 
-        confirmationView.showEstimates(distance, rateCard.getRatePerKm(),  cost,
+        confirmationView.showEstimates(distance, rateCard.getRatePerKm(), cost,
                 rateCard.getTransactionCost());
-
     }
 
     public boolean hasDirections(){

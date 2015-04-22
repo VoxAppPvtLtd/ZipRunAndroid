@@ -66,7 +66,8 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
+        if(mapView != null)
+            mapView.onSaveInstanceState(outState);
     }
 
     SlidingUpPanelLayout slidingLayout;
@@ -195,8 +196,8 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     public void onDestroy() {
         Log.i(TAG, "Location Picker Fragment is destroyed");
         super.onDestroy();
-        locationPickerPresenter.destroy();
-        mapView.onDestroy();
+        if(mapView != null)
+            mapView.onDestroy();
     }
 
     @Override

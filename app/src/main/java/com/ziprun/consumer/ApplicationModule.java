@@ -6,6 +6,7 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.ziprun.consumer.network.NetworkModule;
 import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.GoogleMapService;
 import com.ziprun.consumer.utils.Utils;
@@ -16,7 +17,9 @@ import dagger.Module;
 import dagger.Provides;
 import retrofit.RestAdapter;
 
-@Module(library = true, injects={ZipRunApp.class, Utils.class})
+@Module(library = true,
+        includes = {NetworkModule.class},
+        injects={ZipRunApp.class, Utils.class})
 public class ApplicationModule {
     private static final String TAG = ApplicationModule.class.getCanonicalName();
 

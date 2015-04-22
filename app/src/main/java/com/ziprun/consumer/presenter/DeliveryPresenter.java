@@ -1,11 +1,13 @@
 package com.ziprun.consumer.presenter;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.BookingLeg;
+import com.ziprun.consumer.ui.activity.DeliveryActivity;
 import com.ziprun.consumer.ui.activity.ForActivity;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
 import com.ziprun.consumer.utils.AndroidBus;
@@ -70,7 +72,7 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     }
 
     public void setBooking(@Nullable String bookingJson, int currentLeg){
-        booking = Booking.fromJson(bookingJson);
+        booking = Booking.fromJson(bookingJson, Booking.class);
         this.currentLeg = currentLeg;
         bookingLeg = booking.getBookingLeg(this.currentLeg);
         Log.i(TAG, "Inside: " + this.getClass().getSimpleName() + " " +
@@ -78,4 +80,14 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     }
 
     public abstract void moveForward();
+
+    public BookingLeg getBookingLeg() {
+        return bookingLeg;
+    }
+
+    public  void saveInstanceState(Bundle outState){
+        outState.putString(DeliveryActivity.KEY_BOOKING, booking.toJson());
+        outState.putInt(DeliveryActivity.KEY_CURRENT_LEG, currentLeg);
+    }
+
 }

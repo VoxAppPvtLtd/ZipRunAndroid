@@ -1,19 +1,17 @@
 package com.ziprun.consumer.data.model;
 
-import com.google.gson.Gson;
-
-public class DeliveryRateCard {
+public class DeliveryRateCard  extends ZipBaseModel{
     private static final String TAG = DeliveryRateCard.class.getCanonicalName();
 
     private int rateID;
     private int minDistance;
     private int minPrice;
     private int ratePerKm;
-
     private int transactionCost;
 
-    public DeliveryRateCard(int minDistance, int minPrice, int ratePerKm,
-                            int transactionCost){
+    public DeliveryRateCard(int rateID, int minDistance, int minPrice,
+                            int ratePerKm, int transactionCost){
+        this.rateID = rateID;
         this.minDistance = minDistance;
         this.minPrice = minPrice;
         this.ratePerKm = ratePerKm;
@@ -36,13 +34,8 @@ public class DeliveryRateCard {
         return minPrice;
     }
 
-    public String toJson(){
-        return new Gson().toJson(this, this.getClass());
+
+    public int getRateID() {
+        return rateID;
     }
-
-    public static DeliveryRateCard fromJson(String json){
-        return new Gson().fromJson(json, DeliveryRateCard.class);
-    }
-
-
 }

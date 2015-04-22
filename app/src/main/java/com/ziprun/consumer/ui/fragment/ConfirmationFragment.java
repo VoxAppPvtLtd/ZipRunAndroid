@@ -128,14 +128,6 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
     }
 
-    private void showDirectionProgress() {
-        if(!confirmationPresenter.hasDirections()){
-            directionProgress = ProgressDialog.show(getActivity(),
-                    "Fetching Directions", "Fetching Directions and " +
-                            "Calculating Estimate", true);
-        }
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -152,19 +144,28 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @Override
     public void onStop() {
         super.onStop();
-        googleMap.clear();
+        directionProgress.dismiss();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+        if(mapView != null)
+            mapView.onDestroy();
+
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
         mapView.onLowMemory();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if(mapView != null)
+            mapView.onSaveInstanceState(outState);
     }
 
     @Override
@@ -203,6 +204,16 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
             }
         });
     }
+
+    private void showDirectionProgress() {
+        if(!confirmationPresenter.hasDirections()){
+            Log.i(TAG, "Show Dialog");
+            directionProgress = ProgressDialog.show(getActivity(),
+                    "Fetching Directions", "Fetching Directions and " +
+                            "Calculating Estimate", true);
+        }
+    }
+
 
     @Override
     public boolean onBackPressed() {
@@ -254,8 +265,9 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     public void showEstimates(int distance, int ratePerKm, int totalCost,
                               int transactionCost) {
 
-        directionProgress.dismiss();
+        Log.i(TAG, "Dismissing Dialog");
 
+        directionProgress.dismiss();
 
         instructions.setText(confirmationPresenter.getInstruction());
 

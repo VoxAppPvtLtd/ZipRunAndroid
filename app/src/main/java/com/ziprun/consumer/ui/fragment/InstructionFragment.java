@@ -18,7 +18,6 @@ import com.astuetz.PagerSlidingTabStrip;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.data.model.BookingLeg;
 import com.ziprun.consumer.presenter.InstructionPresenter;
-import com.ziprun.consumer.ui.activity.DeliveryActivity;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -49,11 +48,9 @@ public class InstructionFragment extends DeliveryFragment {
 
         ButterKnife.inject(this, view);
 
-        BookingLeg booking = BookingLeg.fromJson(getArguments().getString
-                (DeliveryActivity.KEY_BOOKING));
 
-        instructionPagerAdapter = new InstructionPagerAdapter(getActivity(),
-                booking);
+        instructionPagerAdapter = new InstructionPagerAdapter(getActivity());
+
         viewPager.setAdapter(instructionPagerAdapter);
 
         tabs.setViewPager(viewPager);
@@ -63,13 +60,15 @@ public class InstructionFragment extends DeliveryFragment {
         tabs.setTextSize((int) TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_SP, TAB_TEXT_SIZE, dm));
 
+
         return view;
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void processArguments(Bundle args) {
+        super.processArguments(args);
         instructionPresenter = (InstructionPresenter) presenter;
+        instructionPagerAdapter.setBookingLeg(presenter.getBookingLeg());
     }
 
     @Override
@@ -109,7 +108,6 @@ public class InstructionFragment extends DeliveryFragment {
         return instructionPagerAdapter.getInstruction(getCurrentTab());
     }
 
-
     public static class InstructionPagerAdapter extends PagerAdapter {
 
         private static final int BUY_TAB_TITLE_RESID = R.string
@@ -132,12 +130,16 @@ public class InstructionFragment extends DeliveryFragment {
 
         private Context context;
 
-        private BookingLeg booking;
+        private BookingLeg bookingLeg;
 
 
-        public InstructionPagerAdapter(Context context, BookingLeg booking){
+        public InstructionPagerAdapter(Context context){
             this.context = context;
-            this.booking = booking;
+        }
+
+        public void setBookingLeg(BookingLeg bookingLeg){
+            this.bookingLeg = bookingLeg;
+            notifyDataSetChanged();
         }
 
         @Override
@@ -156,10 +158,16 @@ public class InstructionFragment extends DeliveryFragment {
             ((TextView)view.findViewById(R.id.helptext)).setText
                     (TABS_HELP_RESID_ARR[position]);
 
-            instructionText.setText(booking.getUserInstructions());
+            if(bookingLeg != null)
+                instructionText.setText(bookingLeg.getUserInstructions());
 
-            container.addView(view, position);
+            ViewPager viewPager = (ViewPager)container;
 
+            if(container.getChildCount() >= position + 1){
+                container.addView(view, position);
+            }else{
+                container.addView(view, 0);
+            }
 
             instructionTextArr[position] = instructionText;
             return view;

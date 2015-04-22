@@ -1,7 +1,7 @@
 package com.ziprun.consumer.data.model;
 
 public enum RideType {
-    BUY("buy"), PICKUP("pickup");
+    BUY("Buy"), PICKUP("Pickup");
 
     public String rideType;
 
@@ -12,5 +12,13 @@ public enum RideType {
     @Override
     public String toString() {
         return this.rideType;
+    }
+
+    public static RideType parse(String rideType){
+        for(RideType rd: RideType.values()){
+            if(rd.rideType.toUpperCase() == rideType.toUpperCase())
+                return rd;
+        }
+        return null;
     }
 }

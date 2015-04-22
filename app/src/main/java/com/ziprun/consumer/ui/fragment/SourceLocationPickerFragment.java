@@ -5,7 +5,7 @@ import android.support.v7.app.ActionBar;
 import com.ziprun.consumer.R;
 
 public class SourceLocationPickerFragment extends LocationPickerFragment {
-    private static final String TAG = SourceLocationPickerFragment.class.getCanonicalName();
+    public static final String TAG = SourceLocationPickerFragment.class.getCanonicalName();
 
     @Override
     protected Object getCurrentModule(){

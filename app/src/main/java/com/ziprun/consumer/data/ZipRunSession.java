@@ -46,7 +46,7 @@ public class ZipRunSession {
 
     public DeliveryRateCard getRateCard(){
         return DeliveryRateCard.fromJson(
-                preferences.getString(KEY_RATE_CARD, null));
+                preferences.getString(KEY_RATE_CARD, null), DeliveryRateCard.class);
     }
 
     public void authenticatUser() {

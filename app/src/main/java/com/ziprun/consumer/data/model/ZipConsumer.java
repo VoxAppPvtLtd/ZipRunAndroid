@@ -1,6 +1,6 @@
 package com.ziprun.consumer.data.model;
 
-public class ZipConsumer {
+public class ZipConsumer extends ZipBaseModel{
     private static final String TAG = ZipConsumer.class.getCanonicalName();
 
     private String mobileNumber;

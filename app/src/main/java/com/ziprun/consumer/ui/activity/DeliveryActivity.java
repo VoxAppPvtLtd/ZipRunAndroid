@@ -24,8 +24,6 @@ import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.SourceLocationPickerFragment;
 import com.ziprun.consumer.ui.fragment.ZipBaseFragment;
 
-import java.util.ArrayList;
-
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
@@ -40,16 +38,6 @@ public class DeliveryActivity extends ZipBaseActivity implements
     public static final String KEY_CURRENT_LEG = "current_leg";
 
     protected BackHandlerFragment currentFragment;
-
-    private SourceLocationPickerFragment sourcePickerFragment;
-
-    private InstructionFragment instructionFragment;
-
-    private DestinationLocationPickerFragment destPickerFrament;
-
-    private ConfirmationFragment confirmationFragment;
-
-    private ArrayList<String> fragmentTags = new ArrayList<>();
 
     private FragmentManager fragmentManager;
 
@@ -69,35 +57,32 @@ public class DeliveryActivity extends ZipBaseActivity implements
         setSupportActionBar(actionBar);
 
         fragmentManager = getSupportFragmentManager();
-
-        sourcePickerFragment = new SourceLocationPickerFragment();
-
-        instructionFragment = new InstructionFragment();
-
-        confirmationFragment = new ConfirmationFragment();
-
-        destPickerFrament = new DestinationLocationPickerFragment();
-
         if(savedInstanceState != null){
-            booking = Booking.fromJson(savedInstanceState.getString
-                    (KEY_BOOKING));
-
-        }else{
-            booking = new Booking();
-            booking.addBookingLeg(new AddressLocationPair());
+            booking = Booking.fromJson(
+                    savedInstanceState.getString(KEY_BOOKING), Booking.class);
+            currentLeg = savedInstanceState.getInt(KEY_CURRENT_LEG);
+            return;
         }
 
+        SourceLocationPickerFragment sourcePickerFragment =
+                new SourceLocationPickerFragment();
+
+        booking = new Booking();
         currentLeg = 0;
+        booking.addBookingLeg(new AddressLocationPair());
 
         Bundle args = getBookingBundle();
-
         sourcePickerFragment.setArguments(args);
         fragmentManager.beginTransaction()
                 .add(R.id.container, sourcePickerFragment,
-                        sourcePickerFragment.getClass().getSimpleName())
+                        getFragmentTag(sourcePickerFragment))
                 .commit();
+    }
 
-        fragmentTags.add(sourcePickerFragment.getClass().getSimpleName());
+
+    private String getFragmentTag(ZipBaseFragment fragment){
+        return String.format("%s:%d", fragment.getClass().getSimpleName(),
+                currentLeg);
     }
 
 
@@ -105,6 +90,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(KEY_BOOKING, booking.toJson());
+        outState.putInt(KEY_CURRENT_LEG, currentLeg);
     }
 
     @Override
@@ -143,10 +129,11 @@ public class DeliveryActivity extends ZipBaseActivity implements
         }
 
         else if (fragmentManager.getBackStackEntryCount() > 0){
-            fragmentTags.remove(fragmentTags.size() - 1);
             Fragment fragment = getFragmentFromBackStack();
+            Log.i(TAG, "Fragment: " +  fragment.getClass().getSimpleName() +
+                    " Booking " + booking.toJson() );
+
             fragment.getArguments().putString(KEY_BOOKING, booking.toJson());
-            Log.i(TAG, "Booking " + booking.toJson());
             fragmentManager.popBackStackImmediate();
             fragmentManager.beginTransaction().commit();
 
@@ -162,19 +149,19 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     @Subscribe
     public void onSourceLocationSet(OnSourceLocationSet event){
-        moveToFragment(instructionFragment);
+        moveToFragment(new InstructionFragment());
     }
 
     @Subscribe
     public void onBookingInstructionSet(OnBookingInstructionSet event){
         //sourcePickerFragment.getArguments().putString(KEY_BOOKING,
           //      booking.toJson());
-        moveToFragment(destPickerFrament);
+        moveToFragment(new DestinationLocationPickerFragment());
     }
 
     @Subscribe
     public void onDestinationLocationSet(OnDestinationSet event){
-        moveToFragment(confirmationFragment);
+        moveToFragment(new ConfirmationFragment());
     }
 
 
@@ -189,11 +176,9 @@ public class DeliveryActivity extends ZipBaseActivity implements
     private void moveToFragment(ZipBaseFragment fragment){
         fragment.setArguments(getBookingBundle());
         fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment, fragment.getClass().getSimpleName())
-                .addToBackStack(fragment.getClass().getSimpleName())
+                .replace(R.id.container, fragment, getFragmentTag(fragment))
+                .addToBackStack(currentFragment.getTag())
                 .commit();
-        fragmentTags.add(fragment.getClass().getSimpleName());
-
     }
 
     @Override
@@ -202,12 +187,12 @@ public class DeliveryActivity extends ZipBaseActivity implements
     }
 
 
-    private Fragment getFragmentFromBackStack(){
-        if(fragmentTags.size() > 0){
-            return fragmentManager.findFragmentByTag(fragmentTags.get
-                    (fragmentTags.size() - 1));
-        }
-        return null;
-    }
+    public Fragment getFragmentFromBackStack() {
+        FragmentManager.BackStackEntry backEntry = fragmentManager
+            .getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1);
 
+        Log.i(TAG, "Back Entry Name " + backEntry.getName());
+
+        return fragmentManager.findFragmentByTag(backEntry.getName());
+    }
 }
