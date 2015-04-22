@@ -6,15 +6,7 @@
              tools:context="com.ziprun.consumer.ui.activity.DeliveryActivity"
              tools:ignore="MergeRootFrame">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/action_bar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:theme="@style/Theme.ZipRunActionBar"
-    />
-
+    <include layout="@layout/toolbar_delivery"/>
     <FrameLayout
         android:id="@+id/container"
         android:layout_below="@id/action_bar"

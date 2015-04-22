@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.BookingLeg;
+import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.activity.DeliveryActivity;
 import com.ziprun.consumer.ui.activity.ForActivity;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
@@ -60,6 +61,7 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
 
     @Override
     public void stop(){
+        updateBooking();
         bus.unregister(this);
         if(compositeSubscription != null){
             compositeSubscription.clear();
@@ -88,6 +90,10 @@ public abstract class  DeliveryPresenter implements PresenterInterface {
     public  void saveInstanceState(Bundle outState){
         outState.putString(DeliveryActivity.KEY_BOOKING, booking.toJson());
         outState.putInt(DeliveryActivity.KEY_CURRENT_LEG, currentLeg);
+    }
+
+    public void updateBooking(){
+        bus.post(new UpdateBookingEvent(booking));
     }
 
 }

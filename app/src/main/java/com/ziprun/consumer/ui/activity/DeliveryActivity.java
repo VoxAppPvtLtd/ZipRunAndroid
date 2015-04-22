@@ -4,16 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.squareup.otto.Subscribe;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.data.model.AddressLocationPair;
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.event.OnBookingInstructionSet;
+import com.ziprun.consumer.event.OnConfirmBooking;
 import com.ziprun.consumer.event.OnDestinationSet;
 import com.ziprun.consumer.event.OnSourceLocationSet;
 import com.ziprun.consumer.event.UpdateBookingEvent;
@@ -22,6 +25,7 @@ import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DestinationLocationPickerFragment;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
 import com.ziprun.consumer.ui.fragment.SourceLocationPickerFragment;
+import com.ziprun.consumer.ui.fragment.SummaryFragment;
 import com.ziprun.consumer.ui.fragment.ZipBaseFragment;
 
 import butterknife.ButterKnife;
@@ -47,6 +51,9 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
+
+    @InjectView(R.id.ziprun_icon)
+    ImageView ziprunIcon;
 
 
     @Override
@@ -95,7 +102,6 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_delivery, menu);
         return true;
     }
 
@@ -130,6 +136,11 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
         else if (fragmentManager.getBackStackEntryCount() > 0){
             Fragment fragment = getFragmentFromBackStack();
+            if(fragment == null){
+                super.onBackPressed();
+                return;
+            }
+
             Log.i(TAG, "Fragment: " +  fragment.getClass().getSimpleName() +
                     " Booking " + booking.toJson() );
 
@@ -138,6 +149,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
             fragmentManager.beginTransaction().commit();
 
         }else {
+            Log.i(TAG, "Nothing on the backstack");
             super.onBackPressed();
         }
     }
@@ -164,6 +176,13 @@ public class DeliveryActivity extends ZipBaseActivity implements
         moveToFragment(new ConfirmationFragment());
     }
 
+    @Subscribe
+    public void onConfirmBooking(OnConfirmBooking event){
+        ziprunIcon.setImageResource(R.drawable.ziprun_toolbar_icon_motion);
+        clearBackStack();
+        moveToFragment(new SummaryFragment(), false);
+
+    }
 
     private Bundle getBookingBundle(){
         Bundle args = new Bundle();
@@ -174,18 +193,30 @@ public class DeliveryActivity extends ZipBaseActivity implements
     }
 
     private void moveToFragment(ZipBaseFragment fragment){
+        moveToFragment(fragment, true);
+    }
+
+
+    private void moveToFragment(ZipBaseFragment fragment,
+                               boolean addToBackStack){
+
         fragment.setArguments(getBookingBundle());
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, fragment, getFragmentTag(fragment))
-                .addToBackStack(currentFragment.getTag())
-                .commit();
+        FragmentTransaction transaction =
+                fragmentManager.beginTransaction()
+                               .replace(R.id.container, fragment,
+                                                 getFragmentTag(fragment));
+
+        if(addToBackStack)
+            transaction.addToBackStack(currentFragment.getTag());
+
+        transaction.commit();
+
     }
 
     @Override
     public void setSelectedFragment(BackHandlerFragment selectedFragment) {
         currentFragment = selectedFragment;
     }
-
 
     public Fragment getFragmentFromBackStack() {
         FragmentManager.BackStackEntry backEntry = fragmentManager
@@ -195,4 +226,20 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
         return fragmentManager.findFragmentByTag(backEntry.getName());
     }
+
+    private void clearBackStack() {
+//
+//        if (fragmentManager.getBackStackEntryCount() > 0) {
+//            FragmentManager.BackStackEntry first = fragmentManager.getBackStackEntryAt(0);
+//            fragmentManager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+//        }
+//
+//        Log.i(TAG, "BackStack Count " + fragmentManager
+//                .getBackStackEntryCount());
+
+        fragmentManager.popBackStack(null,
+                FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+    }
+
 }

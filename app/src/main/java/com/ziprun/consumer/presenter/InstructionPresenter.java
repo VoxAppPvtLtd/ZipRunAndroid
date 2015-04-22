@@ -2,7 +2,6 @@ package com.ziprun.consumer.presenter;
 
 import com.ziprun.consumer.data.model.RideType;
 import com.ziprun.consumer.event.OnBookingInstructionSet;
-import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.InstructionFragment;
 
 public class InstructionPresenter extends DeliveryPresenter {
@@ -28,12 +27,6 @@ public class InstructionPresenter extends DeliveryPresenter {
         }
     }
 
-    @Override
-    public void stop() {
-        super.stop();
-        updateBooking();
-    }
-
     public void moveForward(){
         updateBooking();
         bus.post(new OnBookingInstructionSet());
@@ -43,7 +36,6 @@ public class InstructionPresenter extends DeliveryPresenter {
         int currentTab = instructionView.getCurrentTab();
         bookingLeg.setRideType(currentTab == BUY_TAB_POS ? RideType.BUY : RideType.PICKUP);
         bookingLeg.setUserInstructions(instructionView.getCurrentInstruction());
-
-        bus.post(new UpdateBookingEvent(booking));
+        super.updateBooking();
     }
 }

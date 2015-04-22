@@ -1,7 +1,6 @@
 package com.ziprun.consumer.ui.fragment;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -262,11 +261,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
     }
 
-    public void showEstimates(int distance, int ratePerKm, int totalCost,
-                              int transactionCost) {
-
-        Log.i(TAG, "Dismissing Dialog");
-
+    public void showEstimates() {
         directionProgress.dismiss();
 
         instructions.setText(confirmationPresenter.getInstruction());
@@ -275,8 +270,6 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
                 confirmationPresenter.getBookingType() == RideType.BUY
                     ? getString(R.string.txt_buy_from)
                     : getString(R.string.txt_pickup_from));
-
-        destinationPrefix.setText(getString(R.string.txt_deliver_to));
 
         String srcAddress =  utils.formatAddressAsHtml
                 (confirmationPresenter.getSourceAddress());
@@ -289,16 +282,20 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         destinationAddress.setText(Html.fromHtml(destAddress));
 
         calculationTxt.setText(Html.fromHtml(String.format(
-            getString(R.string.txt_calculation_method),  ratePerKm,
-                transactionCost)));
+            getString(R.string.txt_calculation_method),
+                confirmationPresenter.getRatePerKm(),
+                confirmationPresenter.getTransactionCost())));
 
         txtEstimateDistance.setText(String.format(getString(R.string
-                .txt_estimate_distance), distance));
+                .txt_estimate_distance),
+                (int)confirmationPresenter.getEstimateDistance()));
 
-        estimateCost.setText(totalCost + ".00");
+        estimateCost.setText(String.format("%.2f",
+                confirmationPresenter.getEstimatedCost()));
 
         txtTransactionCharge.setText(
-                String.format(getString(R.string.txt_transaction_cost), transactionCost));
+                String.format(getString(R.string.txt_transaction_cost),
+                        confirmationPresenter.getTransactionCost()));
 
         estimateContainer.setVisibility(View.VISIBLE);
 
@@ -318,9 +315,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = activity.getIntent();
-                activity.finish();
-                startActivity(intent);
+                confirmationPresenter.moveForward();
             }
         });
 

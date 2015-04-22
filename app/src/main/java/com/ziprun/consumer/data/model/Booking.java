@@ -1,10 +1,15 @@
 package com.ziprun.consumer.data.model;
 
+import com.ziprun.consumer.utils.Exclude;
+
 import java.util.ArrayList;
 
 public class Booking extends ZipBaseModel{
     private static final String TAG = Booking.class.getCanonicalName();
-    private int rateID;
+
+    @Exclude
+    private DeliveryRateCard rateCard;
+
     private ArrayList<BookingLeg> bookingLegs;
 
     public Booking(){
@@ -15,8 +20,8 @@ public class Booking extends ZipBaseModel{
         bookingLegs.add(new BookingLeg(src));
     }
 
-    public void setRateID(int rateID){
-        this.rateID = rateID;
+    public void setRateCard(DeliveryRateCard rateCard){
+        this.rateCard = rateCard;
     }
 
     public int getLegsCount(){
@@ -33,4 +38,7 @@ public class Booking extends ZipBaseModel{
 
     }
 
+    public DeliveryRateCard getRateCard() {
+        return rateCard;
+    }
 }

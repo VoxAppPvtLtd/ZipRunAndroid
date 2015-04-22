@@ -4,8 +4,8 @@
       tools:context="com.ziprun.consumer.ui.activity.DeliveryActivity">
 
     <item
+        android:id="@+id/ziprun_icon"
         android:orderInCategory="79"
-        android:icon="@drawable/ziprun_toolbar_icon"
         app:showAsAction="ifRoom"
         android:title=""/>
 

@@ -7,7 +7,7 @@ import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
 import com.ziprun.consumer.data.model.RideType;
-import com.ziprun.consumer.event.UpdateBookingEvent;
+import com.ziprun.consumer.event.OnConfirmBooking;
 import com.ziprun.consumer.network.ZipRestApi;
 import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
@@ -69,20 +69,15 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     }
 
     @Override
-    public void stop() {
-        super.stop();
-        updateBooking();
-    }
-
-    @Override
     public void moveForward() {
-
+        updateBooking();
+        bus.post(new OnConfirmBooking());
     }
 
-    private void updateBooking() {
+    public void updateBooking() {
         String instruction = confirmationView.getInstruction();
         bookingLeg.setUserInstructions(instruction);
-        bus.post(new UpdateBookingEvent(booking));
+        super.updateBooking();
     }
 
     public LatLng getSourceLatLng(){
@@ -169,6 +164,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             return;
 
 
+        booking.setRateCard(rateCard);
         int distance = (int) Math.ceil(deliveryDirection.getTotalDistance(0) / 1000);
 
         int cost = distance  * rateCard.getRatePerKm();
@@ -186,8 +182,8 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         confirmationView.drawRoute(points);
 
-        confirmationView.showEstimates(distance, rateCard.getRatePerKm(), cost,
-                rateCard.getTransactionCost());
+        confirmationView.showEstimates();
+        updateBooking();
     }
 
     public boolean hasDirections(){
@@ -200,5 +196,21 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
     public RideType getBookingType(){
         return bookingLeg.getRideType();
+    }
+
+    public double getEstimateDistance() {
+        return bookingLeg.getEstimatedDistance();
+    }
+
+    public double getEstimatedCost() {
+        return bookingLeg.getEstimatedCost();
+    }
+
+    public int getTransactionCost(){
+        return rateCard.getTransactionCost();
+    }
+
+    public int getRatePerKm(){
+        return rateCard.getRatePerKm();
     }
 }

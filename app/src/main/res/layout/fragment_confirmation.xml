@@ -35,138 +35,12 @@
             android:background="@color/content_background"
             android:padding="10dp">
 
-            <RelativeLayout
+            <include layout="@layout/view_estimate_container"
                 android:id="@+id/estimate_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true">
+                android:layout_alignParentTop="true"/>
 
-                <TextView
-                    android:id="@+id/txt_estimate_distance"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:textColor="@color/text_color_primary"
-                    android:textSize="20sp"
-                    android:text="@string/txt_estimate_distance"
-                    android:layout_marginBottom="10dp"/>
-
-
-                <LinearLayout
-                    android:id="@+id/estimate_cost_container"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_below="@id/txt_estimate_distance"
-                    android:layout_centerHorizontal="true">
-
-                    <TextView
-                        android:id="@+id/estimate_cost"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:textColor="@color/primary_color"
-                        android:textSize="32sp"/>
-
-                    <TextView
-                        android:id="@+id/currency"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:padding="5dp"
-                        android:gravity="center"
-                        android:textColor="@color/primary_color"
-                        android:textSize="16sp"
-                        android:text="@string/currency"/>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:id="@+id/source_marker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/txt_estimate_distance"
-                    android:layout_marginTop="5dp"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/icon_blue_map_marker"/>
-
-                <TextView
-                    android:id="@+id/txt_transaction_charge"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/text_color_hint"
-                    android:text="@string/txt_transaction_cost"
-                    android:singleLine="false"
-                    android:layout_below="@+id/estimate_cost_container"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    />
-
-
-                <ImageView
-                    android:id="@+id/dest_marker"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@id/txt_estimate_distance"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/icon_green_map_marker"/>
-
-                <TextView
-                    android:id="@+id/txt_source_prefix"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/source_marker"
-                    android:textColor="@color/text_color_primary"
-                    android:gravity="left"/>
-
-
-                <TextView
-                    android:id="@+id/source_address"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="13sp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_below="@id/txt_source_prefix"
-                    android:textColor="@color/text_color_primary"
-                    android:gravity="left"/>
-
-                <TextView
-                    android:id="@+id/txt_dest_prefix"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@id/dest_marker"
-                    android:textColor="@color/text_color_primary"
-                    android:gravity="left"/>
-
-                <TextView
-                    android:id="@+id/dest_address"
-                    android:layout_width="150dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:textSize="13sp"
-                    android:layout_alignParentRight="true"
-                    android:layout_below="@id/txt_dest_prefix"
-                    android:textColor="@color/text_color_primary"
-                    android:lineSpacingExtra="1dp"
-                    android:gravity="right"/>
-
-            </RelativeLayout>
             <LinearLayout
                 android:id="@+id/notes_container"
                 android:layout_width="match_parent"
@@ -193,7 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
-                    android:textSize="24sp"
+                    android:textSize="26sp"
                     android:textColor="@color/text_color_primary"
                     android:singleLine="false"/>
 
@@ -223,7 +97,7 @@
             android:gravity="center"
             android:textSize="18dp"
             android:drawableRight="@drawable/ic_action_forward"
-            android:background="#91d30d"/>
+            android:background="@color/secondary_color"/>
 </RelativeLayout>
 
 

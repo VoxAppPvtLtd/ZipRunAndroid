@@ -7,10 +7,14 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.Toolbar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.squareup.otto.Subscribe;
+import com.ziprun.consumer.R;
 import com.ziprun.consumer.event.GoogleConnectionErrorDialogDismissed;
 import com.ziprun.consumer.presenter.DeliveryPresenter;
 import com.ziprun.consumer.ui.activity.DeliveryActivity;
@@ -33,6 +37,13 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
 
     protected static final int REQUEST_FIX_GOOGLE_API_ERROR = 1;
 
+    protected Toolbar toolbar;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onStart() {
@@ -77,6 +88,14 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         presenter.saveInstanceState(outState);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.menu_delivery, menu);
+//        menu.findItem(R.id.ziprun_icon).setIcon(getMenuIcon());
+//
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     protected void processArguments(Bundle args) {
@@ -141,6 +160,10 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Subscribe
     public void onDialogDismissed(GoogleConnectionErrorDialogDismissed event) {
         resolvingConnectionError = false;
+    }
+
+    public int getMenuIcon() {
+        return R.drawable.ziprun_toolbar_icon;
     }
 
     /* A fragment to display an error dialog */
