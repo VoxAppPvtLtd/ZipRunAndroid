@@ -13,6 +13,7 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.model.AddressLocationPair;
+import com.ziprun.consumer.event.CurrentLocationEvent;
 import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
@@ -139,6 +140,8 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
 
             if(selectedLocation.latLng == null)
                 setSelectedLocation();
+
+            bus.post(new CurrentLocationEvent(currentLocation));
         }
     };
 

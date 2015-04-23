@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +24,12 @@ import com.google.android.gms.location.places.PlaceBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.pnikosis.materialishprogress.ProgressWheel;
+import com.squareup.otto.Subscribe;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.event.CurrentLocationEvent;
 import com.ziprun.consumer.ui.activity.ZipBaseActivity;
+import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.TextObservable;
 
 import java.util.List;
@@ -37,6 +42,7 @@ import butterknife.InjectView;
 import pl.charmas.android.reactivelocation.DataBufferObservable;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
 
@@ -51,14 +57,23 @@ public class AddressAutocompleteView extends RelativeLayout {
     @InjectView(R.id.autocompleteList)
     ListView autocompleteListView;
 
+    @InjectView(R.id.autocomplete_progress_wheel)
+    ProgressWheel autocompleteProgressWheel;
+
     @Inject
     ReactiveLocationProvider locationProvider;
 
     @Inject InputMethodManager inputMethodManager;
 
-    Location currentLocation;
+    @Inject
+    AndroidBus bus;
+
+    Location currentLocation = null;
+
+    LatLngBounds latLngBounds = null;
 
     Observable<List<PlaceAutocomplete>> autoCompleteObservable;
+    Observable<String>textObservable;
 
     PlaceAutocompleteAdapter autocompleteAdapter;
 
@@ -84,14 +99,16 @@ public class AddressAutocompleteView extends RelativeLayout {
         inflate(getContext(), R.layout.address_autocomplete_view, this);
         if (!isInEditMode()) {
             ((ZipBaseActivity) getContext()).getActivityGraph().inject(this);
-            locationProvider.getLastKnownLocation().subscribe(new Action1<Location>() {
-                @Override
-                public void call(Location location) {
-                    currentLocation = location;
-                }
-            });
+            bus.register(this);
         }
     }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        bus.unregister(this);
+    }
+
 
     @Override
     protected void onFinishInflate() {
@@ -101,6 +118,7 @@ public class AddressAutocompleteView extends RelativeLayout {
         autoCompleteObservable.subscribe(new Action1<List<PlaceAutocomplete>>() {
             @Override
             public void call(List<PlaceAutocomplete> placeAutocompletes) {
+                autocompleteProgressWheel.setVisibility(View.GONE);
                 if(autocompleteAdapter == null){
                     autocompleteAdapter = new PlaceAutocompleteAdapter(getContext(),
                             placeAutocompletes);
@@ -132,6 +150,24 @@ public class AddressAutocompleteView extends RelativeLayout {
         });
     }
 
+    @Subscribe
+    public void onCurrentLocationFetched(CurrentLocationEvent locationEvent){
+        Log.i(TAG, "Current Location Set");
+        this.currentLocation = locationEvent.currentLocation;
+        if (currentLocation != null) {
+            double latitude = currentLocation.getLatitude();
+            double longitude = currentLocation.getLongitude();
+            latLngBounds = new LatLngBounds(
+                    new LatLng(latitude - 0.05,
+                            longitude - 0.05),
+                    new LatLng(latitude + 0.05, longitude + 0.05)
+            );
+        }else{
+            latLngBounds = null;
+        }
+    }
+
+
     private Observable<Place> getPlaceObservable(final String placeID){
         return locationProvider.getGoogleApiClientObservable(Places.GEO_DATA_API)
             .flatMap(new Func1<GoogleApiClient, Observable<PlaceBuffer>>() {
@@ -151,45 +187,49 @@ public class AddressAutocompleteView extends RelativeLayout {
     }
 
     private void createAutoCompleteObservable() {
-        autoCompleteObservable = TextObservable.create(addressSearch)
-            .debounce(1, TimeUnit.SECONDS)
-            .filter(new Func1<String, Boolean>() {
-                @Override
-                public Boolean call(String s) {
-                    return !TextUtils.isEmpty(s);
-                }
-        })
-        .flatMap(new Func1<String,
-                Observable<AutocompletePredictionBuffer>>() {
-            @Override
-            public Observable<AutocompletePredictionBuffer> call(String query) {
-                LatLngBounds bounds = null;
-                if (currentLocation != null) {
-                    double latitude = currentLocation.getLatitude();
-                    double longitude = currentLocation.getLongitude();
-                    bounds = new LatLngBounds(
-                            new LatLng(latitude - 0.05,
-                                    longitude - 0.05),
-                            new LatLng(latitude + 0.05, longitude + 0.05)
-                    );
-                }
-                return locationProvider.getPlaceAutocompletePredictions
-                        (query, bounds, null);
-            }
-        }).flatMap(new Func1<AutocompletePredictionBuffer, Observable<List<PlaceAutocomplete>>>() {
-            @Override
-            public Observable<List<PlaceAutocomplete>> call(AutocompletePredictionBuffer predBuffer) {
 
-                return DataBufferObservable.from(predBuffer)
-                    .map(new Func1<AutocompletePrediction, PlaceAutocomplete>() {
-                        @Override
-                        public PlaceAutocomplete call(AutocompletePrediction
-                                                              prediction) {
-                            return new PlaceAutocomplete(prediction);
-                        }
-                    }).toList();
+        textObservable = TextObservable.create(addressSearch)
+                .observeOn(AndroidSchedulers.mainThread());
+
+        textObservable.subscribe(new Action1<String>() {
+            @Override
+            public void call(String query) {
+                if(TextUtils.isEmpty(query))
+                    autocompleteProgressWheel.setVisibility(View.GONE);
+                else
+                    autocompleteProgressWheel.setVisibility(View.VISIBLE);
             }
         });
+
+        autoCompleteObservable =
+            textObservable.debounce(1, TimeUnit.SECONDS)
+                .filter(new Func1<String, Boolean>() {
+                    @Override
+                    public Boolean call(String s) {
+                        return !TextUtils.isEmpty(s);
+                    }
+                })
+                .flatMap(new Func1<String,
+                        Observable<AutocompletePredictionBuffer>>() {
+                    @Override
+                    public Observable<AutocompletePredictionBuffer> call(String query) {
+                        return locationProvider.getPlaceAutocompletePredictions
+                                (query, latLngBounds, null);
+                }
+                }).flatMap(new Func1<AutocompletePredictionBuffer, Observable<List<PlaceAutocomplete>>>() {
+                    @Override
+                    public Observable<List<PlaceAutocomplete>> call(AutocompletePredictionBuffer predBuffer) {
+                        return DataBufferObservable.from(predBuffer)
+                            .map(new Func1<AutocompletePrediction, PlaceAutocomplete>() {
+                                @Override
+                                public PlaceAutocomplete call(AutocompletePrediction
+                                                                      prediction) {
+                                    return new PlaceAutocomplete(prediction);
+                                }
+                            }).toList();
+                    }
+                });
+
     }
 
     public void setOnAddressSelectedListener(OnAddressSelectedListener

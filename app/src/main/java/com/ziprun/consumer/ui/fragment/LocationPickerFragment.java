@@ -70,6 +70,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
             mapView.onSaveInstanceState(outState);
     }
 
+    @InjectView(R.id.slidingLayout  )
     SlidingUpPanelLayout slidingLayout;
 
     @InjectView(R.id.map)
@@ -128,11 +129,10 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
         Log.i(TAG, "On Create View Called");
 
-        slidingLayout = (SlidingUpPanelLayout)
-                inflater.inflate(R.layout.fragment_location_picker,
+        View view = inflater.inflate(R.layout.fragment_location_picker,
                         container, false);
 
-        ButterKnife.inject(this, slidingLayout);
+        ButterKnife.inject(this, view);
 
         mapView.onCreate(null);
         searchLocBtn.setBackgroundColor(getActivity().getResources()
@@ -146,7 +146,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         addressAutocompleteView.setVisibility(View.GONE);
 //        debugContainer();
 
-        return slidingLayout;
+        return view;
     }
 
     public abstract int getMarkerResource();
@@ -222,6 +222,8 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @OnClick(R.id.searchBtn)
     public void searchAddress(View view) {
         addressAutocompleteView.setVisibility(View.VISIBLE);
+        mapView.setVisibility(View.GONE);
+
         hideStaticAddressView();
         inSearchMode = true;
     }
@@ -231,6 +233,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         if(inSearchMode){
             inSearchMode = false;
             addressAutocompleteView.setVisibility(View.GONE);
+            mapView.setVisibility(View.VISIBLE);
             return true;
         }else{
             return false;
@@ -286,6 +289,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     @Override
     public void onAddressSelected(Observable<Place> place) {
+        mapView.setVisibility(View.VISIBLE);
         addressAutocompleteView.setVisibility(View.GONE);
         addressAutocompleteView.reset();
         inSearchMode = false;

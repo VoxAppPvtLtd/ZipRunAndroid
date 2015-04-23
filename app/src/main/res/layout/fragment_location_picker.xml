@@ -1,155 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
              xmlns:map="http://schemas.android.com/apk/res-auto"
              xmlns:materialdesign="http://schemas.android.com/apk/res-auto"
              xmlns:sothree="http://schemas.android.com/apk/res-auto"
              xmlns:wheel="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:fitsSystemWindows="true">
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+             android:id="@+id/slidingLayout"
              android:gravity="bottom"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:fitsSystemWindows="true"
              sothree:umanoFadeColor="@android:color/transparent">
 
-    <FrameLayout
-        android:id="@+id/mapContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.google.android.gms.maps.MapView
-            android:id="@+id/map"
+        <FrameLayout
+            android:id="@+id/mapContainer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            map:cameraZoom="15"
-            map:mapType="normal"
-            map:uiCompass="false"
-            map:uiZoomControls="false"
-            map:uiZoomGestures="true"
-        />
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/container_geocode_progess"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_margin="20dp"
-            android:background="#ffffff"
-            android:orientation="horizontal">
-
-            <com.pnikosis.materialishprogress.ProgressWheel
-                android:id="@+id/gecode_progress_wheel"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:visibility="gone"
-                matProg_rimWidth="3dp"
-                wheel:matProg_spinSpeed="0.8"
-                wheel:matProg_barColor="@color/text_color_hint"
-                wheel:matProg_progressIndeterminate="true" />
-
-            <TextView
-                android:id="@+id/help_text"
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textSize="16sp"
-                android:background="#ffffff"
-                android:textColor="@color/text_color_secondary"
-                android:gravity="center"/>
-
-        </LinearLayout>
-
-        <ImageView
-            android:id="@+id/map_marker"
-            android:layout_width="wrap_content"
-            android:layout_height="64dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/icon_blue_map_marker"
-            android:layout_gravity="center"
+            <com.google.android.gms.maps.MapView
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                map:cameraZoom="15"
+                map:mapType="normal"
+                map:uiCompass="false"
+                map:uiZoomControls="false"
+                map:uiZoomGestures="true"
             />
 
-        <com.gc.materialdesign.views.ButtonFloat
-            android:id="@+id/currentLocationBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="60dp"
-            materialdesign:animate="false"
-            materialdesign:iconDrawable="@drawable/icon_current_location" />
+            <LinearLayout
+                android:id="@+id/container_geocode_progess"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_margin="20dp"
+                android:background="#ffffff"
+                android:orientation="horizontal">
+
+                <com.pnikosis.materialishprogress.ProgressWheel
+                    android:id="@+id/gecode_progress_wheel"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    matProg_rimWidth="3dp"
+                    wheel:matProg_spinSpeed="0.8"
+                    wheel:matProg_barColor="@color/text_color_hint"
+                    wheel:matProg_progressIndeterminate="true" />
+
+                <TextView
+                    android:id="@+id/help_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:textSize="16sp"
+                    android:background="#ffffff"
+                    android:textColor="@color/text_color_secondary"
+                    android:gravity="center"/>
+
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/map_marker"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/icon_blue_map_marker"
+                android:layout_gravity="center"
+                />
+
+            <com.gc.materialdesign.views.ButtonFloat
+                android:id="@+id/currentLocationBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="60dp"
+                materialdesign:animate="false"
+                materialdesign:iconDrawable="@drawable/icon_current_location" />
 
 
-        <com.gc.materialdesign.views.ButtonFloat
-            android:id="@+id/searchBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|right"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="140dp"
-            materialdesign:animate="false"
-            materialdesign:iconDrawable="@drawable/icon_search" />
+            <com.gc.materialdesign.views.ButtonFloat
+                android:id="@+id/searchBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="15dp"
+                android:layout_marginBottom="140dp"
+                materialdesign:animate="false"
+                materialdesign:iconDrawable="@drawable/icon_search" />
 
-        <com.ziprun.consumer.ui.custom.AddressAutocompleteView
-            android:id="@+id/address_autocomplete_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#eeeeee"
-            android:visibility="gone"/>
-
-    </FrameLayout>
-    <RelativeLayout
+        </FrameLayout>
+        <RelativeLayout
             android:id="@+id/static_address"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:padding="20dp"
             android:background="@color/content_background">
 
-        <ImageView
-            android:id="@+id/closeAddressBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:color="@color/black"
-            android:src="@drawable/icon_clear"/>
-
-        <LinearLayout
-            android:id="@+id/addressText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignRight="@id/closeAddressBtn"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/closeAddressBtn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Location Selected: "
-                android:textSize="20dp"
-                android:textColor="@color/text_color_primary"
+                android:layout_alignParentRight="true"
+                android:color="@color/black"
+                android:src="@drawable/icon_clear"/>
 
-            />
-            <TextView
-                android:id="@+id/address"
-                android:layout_width="match_parent"
+            <LinearLayout
+                android:id="@+id/addressText"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_color_secondary"
-                android:textSize="16dp"
-                android:singleLine="false"
-            />
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignRight="@id/closeAddressBtn"
+                android:orientation="vertical">
 
-        </LinearLayout>
-        <Button android:id="@+id/nextBtn"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_alignParentBottom="true"
-            android:textColor="@color/white"
-            android:gravity="center"
-            android:textSize="18dp"
-            android:drawableRight="@drawable/ic_action_forward"
-            android:background="#91d30d"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Location Selected: "
+                    android:textSize="20dp"
+                    android:textColor="@color/text_color_primary"
 
-    </RelativeLayout>
+                />
+                <TextView
+                    android:id="@+id/address"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_color_secondary"
+                    android:textSize="16dp"
+                    android:singleLine="false"
+                />
 
-</com.sothree.slidinguppanel.SlidingUpPanelLayout>
+            </LinearLayout>
+            <Button android:id="@+id/nextBtn"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_alignParentBottom="true"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:textSize="18dp"
+                android:drawableRight="@drawable/ic_action_forward"
+                android:background="#91d30d"/>
+
+        </RelativeLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
+    <com.ziprun.consumer.ui.custom.AddressAutocompleteView
+        android:id="@+id/address_autocomplete_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#eeeeee"
+        android:visibility="gone"/>
+</FrameLayout>
+
