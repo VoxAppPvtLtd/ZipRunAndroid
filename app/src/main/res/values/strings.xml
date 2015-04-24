@@ -48,7 +48,13 @@
 
     <string name="msg_status_pending">A Ziprun representative will call
         you in few minutes</string>
-
+    <string name="title_dialog_fetching_directions">Fetching Directions</string>
+    <string name="msg_dialog_fetching_direction">Fetching Directions and Calculating Estimate</string>
+    <string name="title_dialog_submit_booking">Submit Booking</string>
+    <string name="msg_dialog_submit_booking">Submitting Booking</string>
+    <string name="error_submit_booking">Unable to submit booking. Try again or contact zipdial</string>
+    <string name="title_dialog_error_directions">Unable to calculate estimate</string>
+    <string name="msg_dialog_error_directions">We are unable to fetch the route at this time and hence and are not able to calculate the estimate.  Do you still want to continue with the booking?</string>
 
 
 </resources>

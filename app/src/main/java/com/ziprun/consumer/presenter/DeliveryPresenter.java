@@ -18,7 +18,7 @@ import javax.inject.Inject;
 
 import rx.subscriptions.CompositeSubscription;
 
-public abstract class  DeliveryPresenter implements PresenterInterface {
+public abstract class DeliveryPresenter implements PresenterInterface {
     private static final String TAG = DeliveryPresenter.class.getCanonicalName();
 
     @Inject

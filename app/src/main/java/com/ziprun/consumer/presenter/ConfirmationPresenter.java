@@ -5,9 +5,12 @@ import android.util.Log;
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
+import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
 import com.ziprun.consumer.data.model.RideType;
+import com.ziprun.consumer.event.BookingSubmissionStatus;
 import com.ziprun.consumer.event.OnConfirmBooking;
+import com.ziprun.consumer.event.OnEstimateCalculationFailure;
 import com.ziprun.consumer.network.ZipRestApi;
 import com.ziprun.consumer.ui.fragment.ConfirmationFragment;
 import com.ziprun.consumer.ui.fragment.DeliveryFragment;
@@ -34,10 +37,13 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     private Observable<DeliveryRateCard> rateCardObservable;
 
     private Observable<Boolean> zipObservable;
+    private Observable<Booking> submitBookingObservable;
 
     private boolean isMapReady;
 
     private boolean directionFetched;
+
+    private boolean submittingBooking = false;
 
     private Directions deliveryDirection;
 
@@ -64,8 +70,27 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     @Override
     public void start() {
         super.start();
-        fetchDirectionsAndRateCard();
+        if(booking.isSubmitted()) {
+            confirmationView.onBookingSubmission(
+                    new BookingSubmissionStatus(true));
+        }
+        else if(submittingBooking){
+            submitBooking();
+        }
+        else{
+            fetchDirectionsAndRateCard();
+        }
 
+    }
+
+    @Override
+    public void stop() {
+        super.stop();
+        if(submittingBooking){
+            confirmationView.dismissSubmitBookingDialog();
+        }
+        if(!directionFetched && zipObservable != null)
+            confirmationView.dismissDirectionFetchingDialog();
     }
 
     @Override
@@ -97,6 +122,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
     }
 
     private void fetchDirectionsAndRateCard(){
+        confirmationView.showDirectionProgress();
         if(!directionFetched) {
             fetchDirections();
             fetchRateCard();
@@ -110,6 +136,8 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
                             Log.i(TAG, "Directions and Delivery Rate Card Fetched");
                             rateCard = deliveryRateCard;
+                            Log.i(TAG, "Delivery Rate Card: " + rateCard
+                                    .toJson());
                             deliveryDirection = directions;
                             directionFetched = true;
                             return true;
@@ -125,6 +153,18 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             public void call(Boolean bool) {
                 Log.i(TAG, "Show Directions called");
                 showDirection();
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                try{
+                    Log.e(TAG, "Unable to fetch directios or rate card", throwable);
+                    bus.post(new OnEstimateCalculationFailure());
+                }catch (Exception ex){
+                    Log.e(TAG, "Exception inside on error while fetching " +
+                            "directions or routes", ex);
+                    confirmationView.dismissDirectionFetchingDialog();
+                }
             }
         }));
     }
@@ -163,7 +203,6 @@ public class ConfirmationPresenter extends DeliveryPresenter {
         if(!isMapReady || !directionFetched)
             return;
 
-
         booking.setRateCard(rateCard);
         int distance = (int) Math.ceil(deliveryDirection.getTotalDistance(0) / 1000);
 
@@ -184,6 +223,34 @@ public class ConfirmationPresenter extends DeliveryPresenter {
 
         confirmationView.showEstimates();
         updateBooking();
+    }
+
+    public void submitBooking(){
+        submittingBooking = true;
+        confirmationView.showBookingSubmissionProgess();
+        if(submitBookingObservable == null){
+            submitBookingObservable = zipRestApi.createBooking(booking);
+        }
+
+        compositeSubscription.add(submitBookingObservable
+            .subscribe(new Action1<Booking>() {
+                @Override
+                public void call(Booking responseBooking) {
+                    submittingBooking = false;
+                    Log.i(TAG, "Booking submitted successfully");
+                    booking.setSubmitted();
+                    bus.post(new BookingSubmissionStatus(true));
+
+
+                }
+            }, new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    Log.e(TAG, "Unable to submit booking", throwable);
+                    submittingBooking = false;
+                    bus.post(new BookingSubmissionStatus(false));
+                }
+            }));
     }
 
     public boolean hasDirections(){

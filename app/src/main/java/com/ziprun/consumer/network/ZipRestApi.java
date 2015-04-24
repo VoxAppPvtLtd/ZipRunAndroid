@@ -4,8 +4,8 @@ import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
 import com.ziprun.consumer.data.model.ZipConsumer;
 
+import retrofit.http.Body;
 import retrofit.http.Field;
-import retrofit.http.GET;
 import retrofit.http.Header;
 import retrofit.http.POST;
 import rx.Observable;
@@ -18,10 +18,13 @@ public interface ZipRestApi {
               @Field("userID") String userID,
               @Field("mobileNumber") String mobileNumber);
 
-    @GET("/consumer/ratecard")
-    Observable<DeliveryRateCard> getRateCard(Booking booking);
+    @POST("/booking_rate/")
+    Observable<DeliveryRateCard> getRateCard(@Body Booking booking);
 
-    @POST("/boooking")
-    Observable<Booking> createBooking(Booking booking);
+    @POST("/booking/")
+    Observable<Booking> createBooking(@Body Booking booking);
 
 }
+
+
+

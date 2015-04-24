@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gc.materialdesign.widgets.Dialog;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,8 +26,11 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.otto.Subscribe;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.data.model.RideType;
+import com.ziprun.consumer.event.BookingSubmissionStatus;
+import com.ziprun.consumer.event.OnEstimateCalculationFailure;
 import com.ziprun.consumer.presenter.ConfirmationPresenter;
 import com.ziprun.consumer.utils.Utils;
 
@@ -56,6 +60,9 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @InjectView(R.id.slidingPanel)
     ViewGroup estimateContainer;
 
+    @InjectView(R.id.estimate_cost_container)
+    ViewGroup estimateCostContainer;
+
     @InjectView(R.id.txt_estimate_distance)
     TextView txtEstimateDistance;
 
@@ -84,6 +91,8 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     EditText instructions;
 
     ProgressDialog directionProgress;
+
+    ProgressDialog submitBookingProgress;
 
     ConfirmationPresenter confirmationPresenter;
 
@@ -123,7 +132,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         super.onStart();
         sourceLatLng = confirmationPresenter.getSourceLatLng();
         destLatLng = confirmationPresenter.getDestinationLatLng();
-        showDirectionProgress();
+        setupBookingView();
 
     }
 
@@ -204,15 +213,20 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         });
     }
 
-    private void showDirectionProgress() {
+    public void showDirectionProgress() {
         if(!confirmationPresenter.hasDirections()){
             Log.i(TAG, "Show Dialog");
             directionProgress = ProgressDialog.show(getActivity(),
-                    "Fetching Directions", "Fetching Directions and " +
-                            "Calculating Estimate", true);
+                    getString(R.string.title_dialog_fetching_directions),
+                    getString(R.string.msg_dialog_fetching_direction), true);
         }
     }
 
+    public void showBookingSubmissionProgess(){
+        submitBookingProgress =  ProgressDialog.show(getActivity(),
+            getString(R.string.title_dialog_submit_booking),
+            getString(R.string.msg_dialog_submit_booking), true);
+    }
 
     @Override
     public boolean onBackPressed() {
@@ -222,6 +236,25 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @Override
     protected Object getCurrentModule() {
         return new ConfirmationModule(this);
+    }
+
+    private void setupBookingView() {
+        instructions.setText(confirmationPresenter.getInstruction());
+
+        sourcePrefix.setText(
+                confirmationPresenter.getBookingType() == RideType.BUY
+                        ? getString(R.string.txt_buy_from)
+                        : getString(R.string.txt_pickup_from));
+
+        String srcAddress =  utils.formatAddressAsHtml
+                (confirmationPresenter.getSourceAddress());
+
+        String destAddress = utils.formatAddressAsHtml(
+                confirmationPresenter.getDestinationAddress());
+
+        sourceAddress.setText(Html.fromHtml(srcAddress));
+
+        destinationAddress.setText(Html.fromHtml(destAddress));
     }
 
 
@@ -264,30 +297,16 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     public void showEstimates() {
         directionProgress.dismiss();
 
-        instructions.setText(confirmationPresenter.getInstruction());
-
-        sourcePrefix.setText(
-                confirmationPresenter.getBookingType() == RideType.BUY
-                    ? getString(R.string.txt_buy_from)
-                    : getString(R.string.txt_pickup_from));
-
-        String srcAddress =  utils.formatAddressAsHtml
-                (confirmationPresenter.getSourceAddress());
-
-        String destAddress = utils.formatAddressAsHtml(
-                confirmationPresenter.getDestinationAddress());
-
-        sourceAddress.setText(Html.fromHtml(srcAddress));
-
-        destinationAddress.setText(Html.fromHtml(destAddress));
+        setEstimateBlockVisibility(View.VISIBLE);
 
         calculationTxt.setText(Html.fromHtml(String.format(
             getString(R.string.txt_calculation_method),
                 confirmationPresenter.getRatePerKm(),
                 confirmationPresenter.getTransactionCost())));
 
-        txtEstimateDistance.setText(String.format(getString(R.string
-                .txt_estimate_distance),
+
+        txtEstimateDistance.setText(
+            String.format(getString(R.string.txt_estimate_distance),
                 (int)confirmationPresenter.getEstimateDistance()));
 
         estimateCost.setText(String.format("%.2f",
@@ -297,8 +316,17 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
                 String.format(getString(R.string.txt_transaction_cost),
                         confirmationPresenter.getTransactionCost()));
 
-        estimateContainer.setVisibility(View.VISIBLE);
+        showSlidingPanel();
+    }
 
+    private void setEstimateBlockVisibility(int visibility){
+        estimateCostContainer.setVisibility(visibility);
+        txtTransactionCharge.setVisibility(visibility);
+
+    }
+
+    private void showSlidingPanel(){
+        estimateContainer.setVisibility(View.VISIBLE);
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
     }
 
@@ -309,16 +337,49 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
     @OnClick(R.id.nextBtn)
     public void onNextClicked(View view) {
-        Dialog dialog = new Dialog(getActivity(), getString(R.string.title_dialog_confirm_booking),
-                getString(R.string.msg_dialog_confirm_booking));
+        confirmationPresenter.submitBooking();
+    }
 
-        dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmationPresenter.moveForward();
-            }
-        });
+    @Subscribe
+    public void estimateCalculationFailed(OnEstimateCalculationFailure event){
+        directionProgress.dismiss();
+        setEstimateBlockVisibility(View.GONE);
+        txtEstimateDistance.setText("Unable to calculate estimate currently.");
+        showSlidingPanel();
+    }
 
-        dialog.show();
+
+    @Subscribe
+    public void onBookingSubmission(BookingSubmissionStatus status){
+        submitBookingProgress.dismiss();
+        if(status.success){
+            Dialog dialog = new Dialog(getActivity(),
+                    getString(R.string.title_dialog_confirm_booking),
+                    getString(R.string.msg_dialog_confirm_booking));
+
+            dialog.setOnAcceptButtonClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    confirmationPresenter.moveForward();
+                }
+            });
+
+            dialog.show();
+        }else{
+            Toast.makeText(getActivity(),
+                    R.string.error_submit_booking, Toast.LENGTH_LONG).show();
+        }
+    }
+
+
+    public void dismissSubmitBookingDialog() {
+        if(directionProgress != null)
+            directionProgress.dismiss();
+    }
+
+
+    public void dismissDirectionFetchingDialog() {
+        if(submitBookingProgress != null)
+            submitBookingProgress.dismiss();
     }
 }

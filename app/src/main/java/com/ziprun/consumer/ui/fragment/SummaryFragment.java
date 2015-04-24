@@ -29,6 +29,9 @@ public class SummaryFragment extends  DeliveryFragment{
     @Inject
     Utils utils;
 
+    @InjectView(R.id.estimate_cost_container)
+    ViewGroup estimateCostContainer;
+
     @InjectView(R.id.status)
     TextView statusUpdate;
 
@@ -123,15 +126,31 @@ public class SummaryFragment extends  DeliveryFragment{
 
         destinationAddress.setText(Html.fromHtml(destAddress));
 
+        if(summaryPresenter.hasEstimate()){
+            setEstimateBlockVisibility(View.VISIBLE);
+            showEstimate();
+
+        }else{
+            setEstimateBlockVisibility(View.GONE);
+            txtEstimateDistance.setText("Unable to calculate estimate currently.");
+        }
+    }
+
+    public void showEstimate(){
         txtEstimateDistance.setText(
-            String.format(getString(R.string.txt_estimate_distance),
-                    (int)summaryPresenter.getEstimateDistance()));
+                String.format(getString(R.string.txt_estimate_distance),
+                        (int)summaryPresenter.getEstimateDistance()));
 
         estimateCost.setText(summaryPresenter.getEstimatedCost() + ".00");
 
         txtTransactionCharge.setText(
                 String.format(getString(R.string.txt_transaction_cost),
                         summaryPresenter.getTransactionCost()));
+    }
+
+    private void setEstimateBlockVisibility(int visibility){
+        estimateCostContainer.setVisibility(visibility);
+        txtTransactionCharge.setVisibility(visibility);
 
     }
 

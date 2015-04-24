@@ -372,6 +372,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
         geocodeProgessWheel.setVisibility(View.GONE);
         helpText.setText(getHelpTextResource());
+        nextBtn.setEnabled(true);
 
         if(address == null){
             Toast.makeText(getActivity(), "Unable to fetch address. Please " +
@@ -477,6 +478,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     public void startGeocoding() {
         geocodeProgessWheel.setVisibility(View.VISIBLE);
         helpText.setText(R.string.fetching_address);
+        nextBtn.setEnabled(false);
     }
 
     public abstract int getHelpTextResource();

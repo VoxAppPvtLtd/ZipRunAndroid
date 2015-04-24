@@ -57,4 +57,7 @@ public class SummaryPresenter extends DeliveryPresenter {
     }
 
 
+    public boolean hasEstimate() {
+        return booking.getRateCard() != null;
+    }
 }

@@ -127,9 +127,6 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     private Action1<Location> locationSetter = new Action1<Location>() {
         @Override
         public void call(Location location) {
-            if(locationEnabledFlag != null && locationEnabledFlag == false)
-                return;
-
             currentLocation = location;
             currentLatLng = utils.getLatLngFromLocation(currentLocation);
             Log.i(TAG, "New Location Updated " + location.toString());
@@ -141,6 +138,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             if(selectedLocation.latLng == null)
                 setSelectedLocation();
 
+            locationPickerView.showCurrentLocationBtn(true);
             bus.post(new CurrentLocationEvent(currentLocation));
         }
     };
@@ -200,10 +198,11 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
 
     public void enableLocationFlag(boolean enabled){
         locationEnabledFlag = enabled;
-        locationPickerView.showCurrentLocationBtn(enabled);
         if(!enabled) {
             currentLatLng = null;
             currentLocation = null;
+        }else{
+            locationPickerView.showCurrentLocationBtn(true);
         }
         setSelectedLocation();
     }
@@ -223,6 +222,9 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         else if(!locationEnabledFlag){
             // GPS not enabled, hence we are setting current location as some
             // default latlng
+            currentLatLng = null;
+            currentLocation = null;
+            locationPickerView.showCurrentLocationBtn(false);
             selectedLocation.latLng = ZipRunApp.Constants
                     .DEFAULT_CAMERA_POSITION;
             locationPickerView.setInitialPosition(ZipRunApp.Constants.DEFAULT_CAMERA_POSITION);
@@ -312,6 +314,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     }
 
     private void performReverseGeocode(){
+        selectedLocation.address = "";
         locationPickerView.startGeocoding();
         if(geocodeSubscription != null){
             compositeSubscription.remove(geocodeSubscription);
@@ -341,7 +344,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
                 public void call(Throwable throwable) {
                     Log.e(TAG, throwable.getMessage(), throwable);
                     locationPickerView.updateAddress(null);
-                    selectedLocation.address = null;
+                    selectedLocation.address = "";
                 }
             });
 

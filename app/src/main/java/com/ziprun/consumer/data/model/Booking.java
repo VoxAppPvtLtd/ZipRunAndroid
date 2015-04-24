@@ -1,5 +1,6 @@
 package com.ziprun.consumer.data.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.ziprun.consumer.utils.Exclude;
 
 import java.util.ArrayList;
@@ -10,6 +11,12 @@ public class Booking extends ZipBaseModel{
     @Exclude
     private DeliveryRateCard rateCard;
 
+    @SerializedName("rate")
+    private int rateID;
+
+    @Exclude boolean submitted;
+
+    @SerializedName("legs")
     private ArrayList<BookingLeg> bookingLegs;
 
     public Booking(){
@@ -22,6 +29,15 @@ public class Booking extends ZipBaseModel{
 
     public void setRateCard(DeliveryRateCard rateCard){
         this.rateCard = rateCard;
+        this.rateID = rateCard.getRateID();
+    }
+
+    public void setSubmitted(){
+        this.submitted = true;
+    }
+
+    public boolean isSubmitted(){
+        return submitted;
     }
 
     public int getLegsCount(){

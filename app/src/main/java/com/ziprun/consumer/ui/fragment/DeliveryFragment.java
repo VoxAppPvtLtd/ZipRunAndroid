@@ -87,7 +87,8 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        presenter.saveInstanceState(outState);
+        if(presenter != null)
+            presenter.saveInstanceState(outState);
     }
 
     @Override

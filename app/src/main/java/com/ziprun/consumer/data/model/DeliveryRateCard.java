@@ -1,8 +1,11 @@
 package com.ziprun.consumer.data.model;
 
+import com.google.gson.annotations.SerializedName;
+
 public class DeliveryRateCard  extends ZipBaseModel{
     private static final String TAG = DeliveryRateCard.class.getCanonicalName();
 
+    @SerializedName("rate_id")
     private int rateID;
     private int minDistance;
     private int minPrice;
@@ -38,4 +41,5 @@ public class DeliveryRateCard  extends ZipBaseModel{
     public int getRateID() {
         return rateID;
     }
+
 }
