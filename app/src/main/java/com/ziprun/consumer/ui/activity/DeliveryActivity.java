@@ -61,7 +61,11 @@ public class DeliveryActivity extends ZipBaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delivery);
         ButterKnife.inject(this);
-        setSupportActionBar(actionBar);
+        try {
+            setSupportActionBar(actionBar);
+        }catch (Throwable t){
+            Log.e(TAG, "Fucking Samsung sort your issues out");
+        }
 
         fragmentManager = getSupportFragmentManager();
         if(savedInstanceState != null){
@@ -204,7 +208,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
         FragmentTransaction transaction =
                 fragmentManager.beginTransaction()
                                .replace(R.id.container, fragment,
-                                                 getFragmentTag(fragment));
+                                       getFragmentTag(fragment));
 
         if(addToBackStack)
             transaction.addToBackStack(currentFragment.getTag());

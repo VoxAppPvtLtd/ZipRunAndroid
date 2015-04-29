@@ -9,6 +9,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ziprun.consumer.R;
@@ -58,6 +59,9 @@ public class SummaryFragment extends  DeliveryFragment{
 
     @InjectView(R.id.instructions)
     TextView instructions;
+
+    @InjectView(R.id.slider_icon)
+    ImageView sliderIcon;
     
     SummaryPresenter summaryPresenter; 
 
@@ -68,6 +72,8 @@ public class SummaryFragment extends  DeliveryFragment{
                 container, false);
 
         ButterKnife.inject(this, view);
+
+        sliderIcon.setVisibility(View.GONE);
 
         return view;
     }

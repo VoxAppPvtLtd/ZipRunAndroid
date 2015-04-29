@@ -138,7 +138,14 @@ public final class Utils {
         return TextUtils.join("<br/>", formattedAddress);
     }
 
-
-
+    public String getCityFromAddress(String address){
+        String []addressParts = address.split(",");
+        String lastPart = addressParts[addressParts.length - 1].trim();
+        if(lastPart.equals("India")){
+            return addressParts[addressParts.length - 2].trim().split(" ")[0];
+        }else{
+            return lastPart.split(" ")[0];
+        }
+    }
 
 }

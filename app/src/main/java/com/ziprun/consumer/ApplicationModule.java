@@ -6,6 +6,8 @@ import android.view.Display;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.ziprun.consumer.data.ZipRunSession;
+import com.ziprun.consumer.data.model.ZipConsumer;
 import com.ziprun.consumer.network.NetworkModule;
 import com.ziprun.consumer.utils.AndroidBus;
 import com.ziprun.consumer.utils.GoogleMapService;
@@ -63,5 +65,9 @@ public class ApplicationModule {
         return new AndroidBus();
     }
 
+    @Provides
+    ZipConsumer providesZipConsumer(ZipRunSession zipRunSession){
+       return zipRunSession.getConsumer();
+    }
 
 }

@@ -41,17 +41,13 @@
                 android:background="#ffffff"
                 android:orientation="horizontal">
 
-                <com.pnikosis.materialishprogress.ProgressWheel
-                    android:id="@+id/gecode_progress_wheel"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_gravity="center"
-                    android:gravity="center"
-                    android:visibility="gone"
-                    matProg_rimWidth="3dp"
-                    wheel:matProg_spinSpeed="0.8"
-                    wheel:matProg_barColor="@color/text_color_hint"
-                    wheel:matProg_progressIndeterminate="true" />
+                <ImageView
+                    android:id="@+id/searchBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:padding="15dp"
+                    android:src="@drawable/icon_search"/>
 
                 <TextView
                     android:id="@+id/help_text"
@@ -87,16 +83,6 @@
                 materialdesign:iconDrawable="@drawable/icon_current_location" />
 
 
-            <com.gc.materialdesign.views.ButtonFloat
-                android:id="@+id/searchBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
-                android:layout_marginRight="15dp"
-                android:layout_marginBottom="140dp"
-                materialdesign:animate="false"
-                materialdesign:iconDrawable="@drawable/icon_search" />
-
         </FrameLayout>
         <RelativeLayout
             android:id="@+id/static_address"
@@ -105,6 +91,7 @@
             android:padding="20dp"
             android:background="@color/content_background">
 
+
             <ImageView
                 android:id="@+id/closeAddressBtn"
                 android:layout_width="wrap_content"
@@ -112,6 +99,40 @@
                 android:layout_alignParentRight="true"
                 android:color="@color/black"
                 android:src="@drawable/icon_clear"/>
+
+            <LinearLayout
+                android:id="@+id/progress_fetching_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignRight="@id/closeAddressBtn"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <com.pnikosis.materialishprogress.ProgressWheel
+                    android:id="@+id/gecode_progress_wheel"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    matProg_rimWidth="3dp"
+                    wheel:matProg_spinSpeed="0.8"
+                    wheel:matProg_barColor="@color/text_color_hint"
+                    wheel:matProg_progressIndeterminate="true" />
+
+                <TextView
+                    android:id="@+id/txt_fetch_address"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/fetching_address"
+                    android:textSize="20sp"
+                    android:textColor="@color/text_color_secondary"
+                    android:gravity="center"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/addressText"

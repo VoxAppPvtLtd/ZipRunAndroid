@@ -3,7 +3,7 @@
     <color name="text_color_primary">#dd000000</color>
     <color name="text_color_secondary">#89000000</color>
     <color name="text_color_hint">#42000000</color>
-
+    <color name="text_color_hint_bluebg">#6d819a</color>
     <color name="primary_color">#336799</color>
     <color name="secondary_color">#91d30d</color>
     <color name="statusbar_color">#29538f</color>

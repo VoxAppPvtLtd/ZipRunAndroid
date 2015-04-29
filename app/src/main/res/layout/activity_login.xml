@@ -1,15 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/login_container"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingLeft="@dimen/activity_horizontal_margin"
-                android:paddingRight="@dimen/activity_horizontal_margin"
-                android:paddingTop="@dimen/activity_vertical_margin"
-                android:paddingBottom="@dimen/activity_vertical_margin"
-                tools:context=".LoginActivity">
-    <com.digits.sdk.android.DigitsAuthButton
-        android:id="@+id/auth_button"
+                android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/loginbg_container"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentTop="true"
+        android:padding="25dp"
+        android:background="@drawable/login_bg">
+
+        <TextView
+            android:id="@+id/txt_ziprun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ziprun"
+            android:layout_alignParentTop="true"
+            android:textColor="@color/white"
+            android:textStyle="bold|italic"
+            android:textSize="40sp"
+            android:textAllCaps="true"/>
+
+        <TextView
+            android:id="@+id/txt_verification_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_ziprun"
+            android:singleLine="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="@string/msg_mobile_verification"/>
+
+        <TextView
+            android:id="@+id/txt_verification_helptext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_verification_msg"
+            android:layout_marginTop="5dp"
+            android:singleLine="false"
+            android:textColor="@color/text_color_hint_bluebg"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:text="@string/helptext_mobile_verification"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/txt_countrycode"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="60dp"
+        android:layout_below="@id/loginbg_container"
+        android:paddingLeft="30dp"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textColor="@color/text_color_secondary"
+        android:text="+91 - "/>
+
+
+    <EditText
+        android:id="@+id/mobile_number"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/loginbg_container"
+        android:layout_toRightOf="@id/txt_countrycode"
+        android:paddingRight="20dp"
+        android:drawableRight="@drawable/icon_clear"
+        android:background="@android:color/transparent"
+        android:drawablePadding="10dp"
+        android:maxLength="10"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:hint="Enter 10 digit mobile number"
+        android:textColor="@color/text_color_secondary"/>
+
+    <EditText
+        android:id="@+id/verification_code"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@id/loginbg_container"
+        android:layout_toRightOf="@id/txt_countrycode"
+        android:paddingLeft = "20dp"
+        android:paddingRight="20dp"
+        android:drawableRight="@drawable/icon_clear"
+        android:background="@android:color/transparent"
+        android:drawablePadding="10dp"
+        android:maxLength="6"
+        android:inputType="number"
+        android:textSize="20sp"
+        android:visibility="gone"
+        android:hint="Enter 6 digit verification code"
+        android:textColor="@color/text_color_secondary"/>
+
+
+    <Button android:id="@+id/nextBtn"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="20dp"
+            android:layout_marginLeft = "10dp"
+            android:layout_marginRight= "10dp"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:textSize="18dp"
+            android:text="@string/btn_send_verification_code"
+            android:drawableRight="@drawable/ic_action_forward"
+            android:background="@color/secondary_color"/>
+
+
 
 </RelativeLayout>

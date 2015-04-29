@@ -119,11 +119,11 @@ public class InstructionFragment extends DeliveryFragment {
         private static final int BUY_TAB_HELP_RESID = R.string.helptext_buy;
         private static final int PICKUP_TAB_HELP_RESID = R.string.helptext_pickup;
 
-        private static final int[]TABS_RESID_ARR = new int[]{BUY_TAB_TITLE_RESID,
-                PICKUP_TAB_TITLE_RESID};
+        private static final int[]TABS_RESID_ARR = new
+                int[]{PICKUP_TAB_TITLE_RESID, BUY_TAB_TITLE_RESID};
 
         private static final int []TABS_HELP_RESID_ARR = new int[]{
-                BUY_TAB_HELP_RESID, PICKUP_TAB_HELP_RESID
+                PICKUP_TAB_HELP_RESID, BUY_TAB_HELP_RESID,
         };
 
         private EditText[] instructionTextArr = new EditText[2];

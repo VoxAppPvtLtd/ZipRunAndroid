@@ -83,7 +83,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     ViewGroup mapContainer;
 
     @InjectView(R.id.searchBtn)
-    ButtonFloat searchLocBtn;
+    ImageView searchLocBtn;
 
     @InjectView(R.id.currentLocationBtn)
     ButtonFloat currentLocationBtn;
@@ -108,6 +108,13 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     @InjectView(R.id.closeAddressBtn)
     ImageView closeAddresBtn;
+
+    @InjectView(R.id.progress_fetching_address)
+    ViewGroup progressContainer;
+
+    @InjectView(R.id.addressText)
+    ViewGroup addressText;
+
 
     @Inject
     ReactiveLocationProvider locationProvider;
@@ -366,27 +373,6 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
     }
 
-    public void updateAddress(String address){
-        if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
-            showAddressView();
-
-        geocodeProgessWheel.setVisibility(View.GONE);
-        helpText.setText(getHelpTextResource());
-        nextBtn.setEnabled(true);
-
-        if(address == null){
-            Toast.makeText(getActivity(), "Unable to fetch address. Please " +
-                            "Check Internet Connectivity or try again later",
-                    Toast.LENGTH_LONG).show();
-
-            addressView.setText("Address Not Found");
-
-            return;
-        }
-
-        addressView.setText(Html.fromHtml(address));
-    }
-
 
     public void enableLocationServices(Status status) {
         try {
@@ -476,10 +462,40 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     }
 
     public void startGeocoding() {
-        geocodeProgessWheel.setVisibility(View.VISIBLE);
-        helpText.setText(R.string.fetching_address);
+        showAddressView();
+        progressContainer.setVisibility(View.VISIBLE);
+        addressText.setVisibility(View.GONE);
         nextBtn.setEnabled(false);
     }
 
+    public void updateAddress(String address){
+        if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.HIDDEN)
+            showAddressView();
+
+        progressContainer.setVisibility(View.GONE);
+        addressText.setVisibility(View.VISIBLE);
+
+        nextBtn.setEnabled(true);
+
+        if(address == null){
+            Toast.makeText(getActivity(), "Unable to fetch address. Please " +
+                            "Check Internet Connectivity or try again later",
+                    Toast.LENGTH_LONG).show();
+
+            addressView.setText("Address Not Found");
+
+            return;
+        }
+
+        addressView.setText(Html.fromHtml(address));
+    }
+
     public abstract int getHelpTextResource();
+
+    public void showNotServicedError() {
+        Toast.makeText(getActivity(), R.string.not_serviced_error, Toast.LENGTH_LONG).show();
+        progressContainer.setVisibility(View.GONE);
+        addressText.setVisibility(View.VISIBLE);
+        hideStaticAddressView();
+    }
 }

@@ -7,8 +7,8 @@ import com.ziprun.consumer.ui.fragment.InstructionFragment;
 public class InstructionPresenter extends DeliveryPresenter {
     private static final String TAG = InstructionPresenter.class.getCanonicalName();
 
-    private static final int BUY_TAB_POS = 0;
-    private static final int PICKUP_TAB_POS = 1;
+    private static final int BUY_TAB_POS = 1;
+    private static final int PICKUP_TAB_POS = 0;
 
     protected InstructionFragment instructionView;
 

@@ -35,9 +35,21 @@ android {
         versionCode 1
         versionName "0.1"
     }
+
+    signingConfigs {
+        release {
+            storeFile file("ziprun.keystore")
+            storePassword "ynaKdSx6HgcnqkX"
+            keyAlias "ziprun"
+            keyPassword "ynaKdSx6HgcnqkX"
+        }
+    }
+
+
     buildTypes {
         debug {
             applicationIdSuffix '.debug'
+            debuggable true
             proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard-rules.pro'
             proguardFile 'proguard-butterknife.pro'
@@ -54,6 +66,7 @@ android {
         }
 
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -62,9 +75,13 @@ android {
     productFlavors {
         internal {
             applicationId 'com.ziprun.consumer.dev'
+            def host = "http://" + getLocalIp("en0")
+
+            buildConfigField "String", "APP_URL", "\"" + host + ":8000/\""
         }
         production {
             applicationId 'com.ziprun.consumer'
+            buildConfigField "String", "APP_URL", "\"http://app.ziprun.in/\""
         }
     }
 
@@ -72,6 +89,16 @@ android {
         exclude 'META-INF/services/javax.annotation.processing.Processor'
         exclude 'META-INF/LICENSE.txt'
         exclude 'META-INF/NOTICE.txt'
+    }
+}
+
+def getLocalIp(String interfaceName) {
+    NetworkInterface iface =  NetworkInterface.getByName(interfaceName);
+    for (InterfaceAddress address : iface.getInterfaceAddresses()) {
+        String ip =  address.getAddress().getHostAddress()
+        if (ip.length() <= 15) {
+            return ip;
+        }
     }
 }
 

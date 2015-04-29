@@ -15,6 +15,15 @@
         android:textSize="20sp"
         android:layout_marginBottom="10dp"/>
 
+    <ImageView
+        android:id="@+id/slider_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_toRightOf="@id/txt_estimate_distance"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@drawable/icon_sliding_drawer"/>
 
     <LinearLayout
         android:id="@+id/estimate_cost_container"
@@ -48,9 +57,9 @@
         android:id="@+id/source_marker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/txt_estimate_distance"
-        android:layout_marginTop="5dp"
         android:scaleType="fitCenter"
         android:src="@drawable/icon_blue_map_marker"/>
 
@@ -71,6 +80,7 @@
         android:id="@+id/dest_marker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:layout_alignParentRight="true"
         android:layout_below="@id/txt_estimate_distance"
         android:scaleType="fitCenter"

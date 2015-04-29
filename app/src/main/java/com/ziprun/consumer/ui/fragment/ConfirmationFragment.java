@@ -344,7 +344,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     public void estimateCalculationFailed(OnEstimateCalculationFailure event){
         directionProgress.dismiss();
         setEstimateBlockVisibility(View.GONE);
-        txtEstimateDistance.setText("Unable to calculate estimate currently.");
+        txtEstimateDistance.setText(R.string.msg_error_estimate);
         showSlidingPanel();
     }
 

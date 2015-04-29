@@ -9,7 +9,6 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.widget.Toolbar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -37,7 +36,6 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
 
     protected static final int REQUEST_FIX_GOOGLE_API_ERROR = 1;
 
-    protected Toolbar toolbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

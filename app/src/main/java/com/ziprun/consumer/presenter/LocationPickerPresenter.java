@@ -18,6 +18,7 @@ import com.ziprun.consumer.event.UpdateBookingEvent;
 import com.ziprun.consumer.ui.fragment.LocationPickerFragment;
 import com.ziprun.consumer.utils.RetryWithDelay;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -249,12 +250,17 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             @Override
             public void call(Place place) {
                 performGeocode = false;
-                selectedLocation.latLng = place.getLatLng();
-                selectedLocation.address = String.format("%s, %s",
+                String formattedAddr = String.format("%s, %s",
                         place.getName(), place.getAddress());
-                moveToSelectedAddress();
 
 
+                if(verifyDeliveryArea(formattedAddr)){
+                    selectedLocation.latLng = place.getLatLng();
+                    selectedLocation.address = formattedAddr;
+                    moveToSelectedAddress();
+                }else{
+                    locationPickerView.showNotServicedError();
+                }
             }
         });
     }
@@ -328,16 +334,20 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             .subscribe(new Action1<List<Address>>() {
                 @Override
                 public void call(List<Address> addresses) {
-
                     if (addresses.size() == 0)
                         return;
 
                     selectedLocation.address = utils.addressToString(
                             addresses.get(0), ", ");
 
-                    String address = utils.formatAddressAsHtml(selectedLocation.address);
-                    Log.i(TAG, "Reverse Geocoded Address " + address);
-                    locationPickerView.updateAddress(address);
+                    if(verifyDeliveryArea(selectedLocation.address)){
+                        String address = utils.formatAddressAsHtml(selectedLocation.address);
+                        Log.i(TAG, "Reverse Geocoded Address " + address);
+                        locationPickerView.updateAddress(address);
+                    }else{
+                        locationPickerView.showNotServicedError();
+                    }
+
                 }
             }, new Action1<Throwable>() {
                 @Override
@@ -349,6 +359,11 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             });
 
         compositeSubscription.add(geocodeSubscription);
+    }
+
+    public boolean verifyDeliveryArea(String address){
+        String city = utils.getCityFromAddress(address).toLowerCase();
+        return Arrays.asList(ZipRunApp.Constants.CITIES_SERVED).contains(city);
     }
 
 

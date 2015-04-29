@@ -1,15 +1,16 @@
-package com.ziprun.consumer;
+    package com.ziprun.consumer;
 
-import android.app.Application;
-import android.content.Context;
+    import android.app.Application;
+    import android.content.Context;
+    import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.maps.model.LatLng;
-import com.twitter.sdk.android.Twitter;
-import com.twitter.sdk.android.core.TwitterAuthConfig;
+    import com.crashlytics.android.Crashlytics;
+    import com.google.android.gms.maps.model.LatLng;
+    import com.twitter.sdk.android.Twitter;
+    import com.twitter.sdk.android.core.TwitterAuthConfig;
 
-import dagger.ObjectGraph;
-import io.fabric.sdk.android.Fabric;
+    import dagger.ObjectGraph;
+    import io.fabric.sdk.android.Fabric;
 
 public class ZipRunApp extends Application {
 
@@ -31,6 +32,8 @@ public class ZipRunApp extends Application {
         ZipRunApp.context = getApplicationContext();
         applicationGraph = ObjectGraph.create(getModules());
         applicationGraph.inject(this);
+        Log.i(TAG, "App URl: " + getAppURL());
+
     }
 
     public static Context getAppContext() {
@@ -53,13 +56,21 @@ public class ZipRunApp extends Application {
         return Modules.list(this);
     }
 
+    public String getAppURL() {
+        return BuildConfig.APP_URL;
+    }
+
 
     public final static class Constants {
 
         public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
-        public static final String CONTACT_NO = "+919824587433";
+        public static final String CONTACT_NO = "+918882779999";
 
         public static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
+
+        public static String[] CITIES_SERVED = {
+            "delhi", "gurgaon", "noida", "faridabad"
+        };
     }
 }
 

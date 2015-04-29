@@ -3,10 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="help_text_source_location">Select A Location To Pickup Or Buy
-        Items</string>
-    <string name="help_text_destination">Select Location For Delivery
-        of Items</string>
+    <string name="help_text_source_location">Pickup/Buy Location</string>
+    <string name="help_text_destination">Delivery Location</string>
 
     <string name="destination">Enter Destination</string>
     <string name="title_activity_delivery">DeliveryActivity</string>
@@ -53,8 +51,20 @@
     <string name="title_dialog_submit_booking">Submit Booking</string>
     <string name="msg_dialog_submit_booking">Submitting Booking</string>
     <string name="error_submit_booking">Unable to submit booking. Try again or contact zipdial</string>
-    <string name="title_dialog_error_directions">Unable to calculate estimate</string>
-    <string name="msg_dialog_error_directions">We are unable to fetch the route at this time and hence and are not able to calculate the estimate.  Do you still want to continue with the booking?</string>
+    <string name="msg_error_estimate">Unable to calculate  estimate
+        currently</string>
+    <string name="msg_mobile_verification">Kindly Enter your 10 digits mobile number below and confirm registration</string>
+    <string name="helptext_mobile_verification">Note: We will send you a SMS with verification code, kindly use that on next screen.</string>
+    <string name="btn_send_verification_code">Send me Verification Code</string>
+    <string name="btn_verify_code">Verify Code</string>
+    <string name="msg_otp_verification">Enter Verification Code Below</string>
+    <string name="helptext_otp_verification">You must have received an SMS with the verification code. Please puch in below. In not go back and try again</string>
+    <string name="title_dialog_wait">Please Wait</string>
+
+    <string name="msg_dialog_send_verification_request">Sending
+        verification request</string>
+    <string name="msg_dialog_verifying_otp">Verifying OTP</string>
+    <string name="not_serviced_error">Currently our services is only available in Delhi NCR region</string>
 
 
 </resources>

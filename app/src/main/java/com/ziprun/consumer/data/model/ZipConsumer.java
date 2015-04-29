@@ -5,15 +5,27 @@ public class ZipConsumer extends ZipBaseModel{
 
     private String mobileNumber;
 
-    private String userID;
+    private String consumerId;
 
-    private String apiKey;
+    private String token;
 
 
-    public ZipConsumer(String mobileNumber, String userID, String apiKey){
+    public ZipConsumer(String mobileNumber, String consumerId, String token){
         this.mobileNumber = mobileNumber;
-        this.userID = userID;
-        this.apiKey = apiKey;
+        this.consumerId = consumerId;
+        this.token = token;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public String getConsumerId() {
+        return consumerId;
+    }
+
+    public String getToken() {
+        return token;
     }
 
 }
