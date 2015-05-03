@@ -119,15 +119,20 @@ public class AddressAutocompleteView extends RelativeLayout {
             @Override
             public void call(List<PlaceAutocomplete> placeAutocompletes) {
                 autocompleteProgressWheel.setVisibility(View.GONE);
-                if(autocompleteAdapter == null){
+                if (autocompleteAdapter == null) {
                     autocompleteAdapter = new PlaceAutocompleteAdapter(getContext(),
                             placeAutocompletes);
 
                     autocompleteListView.setAdapter(autocompleteAdapter);
 
-                }else{
+                } else {
                     autocompleteAdapter.update(placeAutocompletes);
                 }
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Log.e(TAG, "Error on auto complete");
             }
         });
 
@@ -194,10 +199,15 @@ public class AddressAutocompleteView extends RelativeLayout {
         textObservable.subscribe(new Action1<String>() {
             @Override
             public void call(String query) {
-                if(TextUtils.isEmpty(query))
+                if (TextUtils.isEmpty(query))
                     autocompleteProgressWheel.setVisibility(View.GONE);
                 else
                     autocompleteProgressWheel.setVisibility(View.VISIBLE);
+            }
+        }, new Action1<Throwable>() {
+            @Override
+            public void call(Throwable throwable) {
+                Log.e(TAG, "Error while observing text", throwable);
             }
         });
 
