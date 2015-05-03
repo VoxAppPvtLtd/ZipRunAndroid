@@ -21,4 +21,5 @@ public class SourceLocationPickerPresenter extends LocationPickerPresenter {
     public void moveForward() {
         bus.post(new OnSourceLocationSet()) ;
     }
+
 }

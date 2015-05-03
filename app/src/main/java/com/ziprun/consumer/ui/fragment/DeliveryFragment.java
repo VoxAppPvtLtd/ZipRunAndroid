@@ -9,6 +9,7 @@ import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -155,6 +156,27 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
         dialogFragment.show(getFragmentManager(),
                 "Google Connecion Error");
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+
+        Log.i(TAG, "Coming Here");
+        int id = item.getItemId();
+
+        switch(id){
+            case android.R.id.home: {
+                Log.i(TAG, "Back Button Pressed in action bar");
+                getActivity().onBackPressed();
+
+            }
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     @Subscribe
     public void onDialogDismissed(GoogleConnectionErrorDialogDismissed event) {

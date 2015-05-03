@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.ziprun.consumer.ForApplication;
+import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.DeliveryRateCard;
 import com.ziprun.consumer.data.model.ZipConsumer;
 
@@ -31,6 +32,7 @@ public class ZipRunSession {
     private static final String KEY_RATE_CARD = "rate_card";
 
     private static final String KEY_CONSUMER = "consumer";
+    private static final String KEY_BOOKING = "booking";
 
     Context appContext;
 
@@ -66,5 +68,15 @@ public class ZipRunSession {
         String consumerJson = preferences.getString(KEY_CONSUMER, null);
         return consumerJson != null ? ZipConsumer.fromJson(consumerJson,
                 ZipConsumer.class) : null;
+    }
+
+    public void setBooking(Booking booking){
+        preferences.edit().putString(KEY_BOOKING, booking.toJson()).apply();
+    }
+
+    public Booking getBooking(){
+        String bookingJson = preferences.getString(KEY_BOOKING, null);
+        return bookingJson != null ?
+                Booking.fromJson(bookingJson, Booking.class) : null;
     }
 }

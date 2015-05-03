@@ -28,7 +28,7 @@ public class BookingLeg extends ZipBaseModel {
     public BookingLeg(AddressLocationPair src){
         source = src;
         destination = new AddressLocationPair();
-        rideType = RideType.BUY;
+        rideType = RideType.PICKUP;
     }
 
     public BookingLeg(AddressLocationPair source,

@@ -1,7 +1,5 @@
 package com.ziprun.consumer.ui.fragment;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -162,15 +160,8 @@ public class SummaryFragment extends  DeliveryFragment{
 
     @OnClick(R.id.callBtn)
     public void onCallBtnClicked(View view){
-
-
-        startDialActivity(ZipRunApp.Constants.CONTACT_NO);
-    }
-
-    private void startDialActivity(String phone){
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse("tel:" + phone));
-        startActivity(intent);
+        utils.startDialActivity(getActivity(),
+                ZipRunApp.Constants.CONTACT_NO);
     }
 
 

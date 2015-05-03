@@ -1,9 +1,12 @@
 package com.ziprun.consumer.utils;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Location;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Display;
@@ -148,4 +151,9 @@ public final class Utils {
         }
     }
 
+    public void startDialActivity(Activity activity, String phone){
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse("tel:" + phone));
+        activity.startActivity(intent);
+    }
 }

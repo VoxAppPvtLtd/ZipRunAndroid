@@ -58,13 +58,25 @@
     <string name="btn_send_verification_code">Send me Verification Code</string>
     <string name="btn_verify_code">Verify Code</string>
     <string name="msg_otp_verification">Enter Verification Code Below</string>
-    <string name="helptext_otp_verification">You must have received an SMS with the verification code. Please puch in below. In not go back and try again</string>
+    <string name="helptext_otp_verification">You must have received an SMS
+        with the verification code. Please punch in below. If not, go back
+        and try again</string>
     <string name="title_dialog_wait">Please Wait</string>
 
     <string name="msg_dialog_send_verification_request">Sending
         verification request</string>
     <string name="msg_dialog_verifying_otp">Verifying OTP</string>
     <string name="not_serviced_error">Currently our services is only available in Delhi NCR region</string>
+    <string name="drawer_open">Navigation Drawer Open</string>
+    <string name="drawer_close">Navigation Drawer Close</string>
+    <string name="error_no_last_booking">No booking created yet</string>
 
+    <string-array name="nav_items">
+        <item>New Booking</item>
+        <item>Track Booking</item>
+        <item>FAQ</item>
+        <item>Contact Us</item>
+        <item>Report Issue</item>
+    </string-array>
 
 </resources>

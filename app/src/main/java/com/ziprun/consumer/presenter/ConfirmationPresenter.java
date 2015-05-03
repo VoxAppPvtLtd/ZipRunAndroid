@@ -239,6 +239,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
                     submittingBooking = false;
                     Log.i(TAG, "Booking submitted successfully");
                     booking.setSubmitted();
+                    zipSession.setBooking(booking);
                     bus.post(new BookingSubmissionStatus(true));
 
 
