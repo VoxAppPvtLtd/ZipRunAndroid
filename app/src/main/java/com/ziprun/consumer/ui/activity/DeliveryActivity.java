@@ -359,6 +359,14 @@ public class DeliveryActivity extends ZipBaseActivity implements
                 fragmentManager.getBackStackEntryCount();
         drawerToggle.setDrawerIndicatorEnabled(backStackEntryCount == 0);
 
+        drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
+
     }
 
     @Override

@@ -53,14 +53,15 @@
     <string name="error_submit_booking">Unable to submit booking. Try again or contact zipdial</string>
     <string name="msg_error_estimate">Unable to calculate  estimate
         currently</string>
-    <string name="msg_mobile_verification">Kindly Enter your 10 digits mobile number below and confirm registration</string>
+    <string name="msg_mobile_verification">Kindly enter your 10 digits mobile
+        number to register</string>
     <string name="helptext_mobile_verification">Note: We will send you a SMS with verification code, kindly use that on next screen.</string>
     <string name="btn_send_verification_code">Send me Verification Code</string>
     <string name="btn_verify_code">Verify Code</string>
     <string name="msg_otp_verification">Enter Verification Code Below</string>
-    <string name="helptext_otp_verification">You must have received an SMS
-        with the verification code. Please punch in below. If not, go back
-        and try again</string>
+    <string name="helptext_otp_verification">You will receive an SMS
+        shortly with verification code. Please enter it below to
+        confirm registration</string>
     <string name="title_dialog_wait">Please Wait</string>
 
     <string name="msg_dialog_send_verification_request">Sending

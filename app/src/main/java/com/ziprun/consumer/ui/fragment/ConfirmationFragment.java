@@ -84,9 +84,6 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @InjectView(R.id.txt_dest_prefix)
     TextView destinationPrefix;
 
-    @InjectView(R.id.txt_calculation)
-    TextView calculationTxt;
-
     @InjectView(R.id.review_notes)
     EditText instructions;
 
@@ -298,12 +295,6 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         directionProgress.dismiss();
 
         setEstimateBlockVisibility(View.VISIBLE);
-
-        calculationTxt.setText(Html.fromHtml(String.format(
-            getString(R.string.txt_calculation_method),
-                confirmationPresenter.getRatePerKm(),
-                confirmationPresenter.getTransactionCost())));
-
 
         txtEstimateDistance.setText(
             String.format(getString(R.string.txt_estimate_distance),

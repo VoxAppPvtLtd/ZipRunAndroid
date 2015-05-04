@@ -103,6 +103,9 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     @InjectView(R.id.gecode_progress_wheel)
     ProgressWheel geocodeProgessWheel;
 
+    @InjectView(R.id.container_help_text)
+    ViewGroup containerHelpText;
+
     @InjectView(R.id.help_text)
     TextView helpText;
 
@@ -226,7 +229,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         locationPickerPresenter.onCameraChanged(cameraPosition.target);
     }
 
-    @OnClick(R.id.searchBtn)
+    @OnClick(R.id.container_help_text)
     public void searchAddress(View view) {
         addressAutocompleteView.setVisibility(View.VISIBLE);
         mapView.setVisibility(View.GONE);

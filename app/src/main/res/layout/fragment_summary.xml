@@ -37,18 +37,26 @@
         android:text="Instructions"
     />
 
-    <TextView
-        android:id="@+id/instructions"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/txt_instructions"
         android:layout_marginTop="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:gravity="left"
-        android:singleLine="false"
-        android:textSize="26sp"
-        android:textColor="@color/text_color_primary"/>
+        android:layout_marginBottom="70dp"
+        android:layout_below="@id/txt_instructions">
+
+        <TextView
+            android:id="@+id/instructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:gravity="left"
+            android:singleLine="false"
+            android:textSize="22sp"
+            android:textColor="@color/text_color_primary"/>
+
+    </ScrollView>
+
 
     <Button android:id="@+id/callBtn"
             android:layout_width="match_parent"

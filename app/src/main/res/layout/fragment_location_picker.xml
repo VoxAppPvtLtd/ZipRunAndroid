@@ -34,7 +34,7 @@
             />
 
             <LinearLayout
-                android:id="@+id/container_geocode_progess"
+                android:id="@+id/container_help_text"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:layout_margin="20dp"

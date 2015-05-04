@@ -6,15 +6,15 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.location.Address;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Display;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ForApplication;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -102,19 +102,11 @@ public final class Utils {
 
 
     public boolean isOnline(){
-        Runtime runtime = Runtime.getRuntime();
-        Process ipProcess = null;
-        try {
-            ipProcess = runtime.exec("/system/bin/ping -c 1 8.8.8.8");
-            int     exitValue = 0;
-            exitValue = ipProcess.waitFor();
-            return (exitValue == 0);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Unable to check if app is online", e);
-        } catch (IOException e) {
-            Log.e(TAG, "Unable to check if app is online", e);
-        }
-        return false;
+        ConnectivityManager cm =
+                (ConnectivityManager) appContext.getSystemService(Context
+                        .CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 
     public float calculateDistance(LatLng source, LatLng dest){
