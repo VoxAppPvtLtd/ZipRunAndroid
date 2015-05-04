@@ -186,7 +186,7 @@ public class BookingLeg extends ZipBaseModel {
             LatLng sourcePoint = bookingLeg.getSourceLatLng();            
             JsonObject sourcePointJson = new JsonObject();
             sourcePointJson.addProperty("latitude", sourcePoint.latitude);
-            sourcePointJson.addProperty("longitude", sourcePoint.latitude);
+            sourcePointJson.addProperty("longitude", sourcePoint.longitude);
                        
             jsonObject.add("source_point", sourcePointJson);
             jsonObject.addProperty("source_address", bookingLeg.getSourceAddress());
@@ -194,7 +194,7 @@ public class BookingLeg extends ZipBaseModel {
             LatLng destinationPoint = bookingLeg.getDestinationLatLng();
             JsonObject destinationPointJson = new JsonObject();
             destinationPointJson.addProperty("latitude", destinationPoint.latitude);
-            destinationPointJson.addProperty("longitude", destinationPoint.latitude);
+            destinationPointJson.addProperty("longitude", destinationPoint.longitude);
 
             jsonObject.add("destination_point", destinationPointJson);
             jsonObject.addProperty("destination_address", 
