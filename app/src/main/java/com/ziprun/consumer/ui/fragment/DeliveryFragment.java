@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import javax.inject.Inject;
+
+import timber.log.Timber;
 
 public abstract  class DeliveryFragment extends ZipBaseFragment  {
     private static final String TAG = DeliveryFragment.class.getCanonicalName();
@@ -47,7 +48,7 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     @Override
     public void onStart() {
         super.onStart();
-        Log.i(TAG, this.getClass().getSimpleName() + " Started");
+        Timber.d(this.getClass().getSimpleName() + " Started");
         presenter.start();
     }
 
@@ -74,10 +75,10 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if(savedInstanceState != null){
-            Log.i(TAG, "Saved Instance state is not null");
+            Timber.d("Saved Instance state is not null");
             processArguments(savedInstanceState);
         }else{
-            Log.i(TAG, "Saved Instance state is null");
+            Timber.d("Saved Instance state is null");
             processArguments(getArguments());
         }
         setActionBar(activity.getSupportActionBar());
@@ -163,12 +164,12 @@ public abstract  class DeliveryFragment extends ZipBaseFragment  {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-        Log.i(TAG, "Coming Here");
+        Timber.d("Coming Here");
         int id = item.getItemId();
 
         switch(id){
             case android.R.id.home: {
-                Log.i(TAG, "Back Button Pressed in action bar");
+                Timber.d("Back Button Pressed in action bar");
                 getActivity().onBackPressed();
 
             }

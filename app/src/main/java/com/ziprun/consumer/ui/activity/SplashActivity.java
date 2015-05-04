@@ -2,13 +2,14 @@ package com.ziprun.consumer.ui.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.ziprun.consumer.R;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import timber.log.Timber;
 
 public class SplashActivity extends ZipBaseActivity {
     private static final String TAG = SplashActivity.class.getCanonicalName();
@@ -51,7 +52,7 @@ public class SplashActivity extends ZipBaseActivity {
             @Override
             public void run() {
                 if(isOnline){
-                    Log.i(TAG, "Internet connectivity is there");
+                    Timber.d("Internet connectivity is there");
                     switchActivity();
                 }else{
                     finish();

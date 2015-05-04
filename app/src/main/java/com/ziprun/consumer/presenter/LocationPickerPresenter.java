@@ -30,6 +30,7 @@ import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public abstract class LocationPickerPresenter extends DeliveryPresenter {
     private static final String TAG = LocationPickerPresenter.class.getCanonicalName();
@@ -75,7 +76,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     @Override
     public void start() {
         super.start();
-        Log.i(TAG, "Presenter Started");
+        Timber.d("Presenter Started");
         selectedLocation = getSelectedLocaion();
         if(selectedLocation == null){
             selectedLocation = new AddressLocationPair();
@@ -111,7 +112,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             @Override
             public void call(LocationSettingsResult locationSettingsResult) {
                 Status status = locationSettingsResult.getStatus();
-                Log.i(TAG, "Location Settings Status " + status
+                Timber.d("Location Settings Status " + status
                         .getStatusMessage());
 
                 if (status.isSuccess()) {
@@ -130,7 +131,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         public void call(Location location) {
             currentLocation = location;
             currentLatLng = utils.getLatLngFromLocation(currentLocation);
-            Log.i(TAG, "New Location Updated " + location.toString());
+            Timber.d("New Location Updated " + location.toString());
 
             if(isMapReady){
                locationPickerView.setCurrentLocationMarker(currentLatLng);
@@ -147,15 +148,14 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     private Action1<Throwable> locationProviderError = new Action1<Throwable>() {
         @Override
         public void call(Throwable throwable) {
-            Log.e(TAG, "Unable to Check Location Settings ",
-                    throwable);
+            Timber.e(throwable, "Unable to Check Location Settings ");
             if (throwable instanceof GoogleAPIConnectionException) {
                 ConnectionResult connectionResult =
                         ((GoogleAPIConnectionException) throwable).getConnectionResult();
                 try {
                     view.resolveGoogleAPIConnectionError(connectionResult);
                 } catch (Exception e) {
-                    Log.e(TAG, "Unable to connect to google api", e);
+                    Timber.e(e, "Unable to connect to google api");
                     enableLocationFlag(false);
                 }
 
@@ -191,7 +191,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     }
 
     public void onMapReady(){
-        Log.i(TAG, "Map Ready");
+        Timber.d("Map Ready");
         isMapReady = true;
         setSelectedLocation();
     }
@@ -216,7 +216,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         else if(selectedLocation.latLng != null && selectedLocation.address != null){
             // If Selected Location is already set, we don't care about current
             // Location
-            Log.i(TAG, "Move Camera to Existing Selected Address");
+            Timber.d("Move Camera to Existing Selected Address");
             moveToSelectedAddress();
         }
 
@@ -233,7 +233,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         }
         else if(currentLocation != null) {
             //Current Position Found. Setting it as selectedLocation
-            Log.i(TAG, "Move Camera to Current Location");
+            Timber.d("Move Camera to Current Location");
             selectedLocation.latLng = currentLatLng;
             locationPickerView.setInitialPosition(currentLatLng);
 
@@ -268,7 +268,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     public void moveToSelectedAddress(){
         performGeocode = false;
         locationPickerView.moveCamera(selectedLocation.latLng, false);
-        Log.i(TAG, "Selected Location Address: " + selectedLocation.address);
+        Timber.d("Selected Location Address: " + selectedLocation.address);
         locationPickerView.updateAddress(utils.formatAddressAsHtml(selectedLocation.address));
         locationPickerView.enableCameraListener(true);
         performGeocode = true;
@@ -280,15 +280,15 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
     }
 
     public void onCameraChanged(LatLng camPos){
-        Log.i(TAG, "Camera Changed. Update Selected Location " + camPos.toString()
+        Timber.d("Camera Changed. Update Selected Location " + camPos.toString()
                 + " "  + performGeocode + "  " + selectedLocation.latLng );
 
         if(shouldDoGeocoding(camPos)) {
-            Log.i(TAG, "Performing Geocoding");
+            Timber.d("Performing Geocoding");
             updateSelectedLocation(camPos);
             performReverseGeocode();
         }else{
-            Log.i(TAG, "Shouldnt do geocoding, distance is too less");
+            Timber.d("Shouldnt do geocoding, distance is too less");
             updateSelectedLocation(camPos);
             if(selectedLocation.address != null ){
                 locationPickerView.updateAddress(utils.formatAddressAsHtml(selectedLocation.address));
@@ -311,7 +311,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             float meters = utils.calculateDistance
                     (selectedLocation.latLng, pos);
 
-            Log.i(TAG, "Ditance btn point in meters " + meters);
+            Timber.d("Ditance btn point in meters " + meters);
 
 
             return utils.calculateDistance(selectedLocation.latLng, pos) > 10;
@@ -342,7 +342,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
 
                     if(verifyDeliveryArea(selectedLocation.address)){
                         String address = utils.formatAddressAsHtml(selectedLocation.address);
-                        Log.i(TAG, "Reverse Geocoded Address " + address);
+                        Timber.d("Reverse Geocoded Address " + address);
                         locationPickerView.updateAddress(address);
                     }else{
                         locationPickerView.showNotServicedError();
@@ -352,7 +352,7 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    Log.e(TAG, throwable.getMessage(), throwable);
+                    Timber.e(throwable, throwable.getMessage());
                     locationPickerView.updateAddress(null);
                     selectedLocation.address = "";
                 }

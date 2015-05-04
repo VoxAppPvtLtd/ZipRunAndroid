@@ -45,6 +45,7 @@ import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import timber.log.Timber;
 
 public class AddressAutocompleteView extends RelativeLayout {
     private static final String TAG = AddressAutocompleteView.class.getCanonicalName();
@@ -157,7 +158,7 @@ public class AddressAutocompleteView extends RelativeLayout {
 
     @Subscribe
     public void onCurrentLocationFetched(CurrentLocationEvent locationEvent){
-        Log.i(TAG, "Current Location Set");
+        Timber.d("Current Location Set");
         this.currentLocation = locationEvent.currentLocation;
         if (currentLocation != null) {
             double latitude = currentLocation.getLatitude();
@@ -207,7 +208,7 @@ public class AddressAutocompleteView extends RelativeLayout {
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                Log.e(TAG, "Error while observing text", throwable);
+                Timber.e(throwable, "Error while observing text");
             }
         });
 

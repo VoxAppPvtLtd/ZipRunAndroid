@@ -30,6 +30,7 @@ import rx.Observable;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import timber.log.Timber;
 
 public class LoginActivity extends ZipBaseActivity {
     private static final String TAG = LoginActivity.class.getCanonicalName();
@@ -209,14 +210,14 @@ public class LoginActivity extends ZipBaseActivity {
                 isVerifying = false;
                 progressDialog.dismiss();
                 otpVerificationObs = null;
-                Log.i(TAG, "Consumer: " + zipConsumer.toJson());
+                Timber.d("Consumer: " + zipConsumer.toJson());
                 zipRunSession.setConsumer(zipConsumer);
                 startDeliveryActivity();
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                Log.e(TAG, "Error while verifying otp", throwable);
+                Timber.e(throwable, "Error while verifying otp");
                 isVerifying = false;
                 progressDialog.dismiss();
                 otpVerificationObs = null;

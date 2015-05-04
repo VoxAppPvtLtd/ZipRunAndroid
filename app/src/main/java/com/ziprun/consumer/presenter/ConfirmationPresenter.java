@@ -26,6 +26,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.functions.Func2;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class ConfirmationPresenter extends DeliveryPresenter {
     private static final String TAG = ConfirmationPresenter.class.getCanonicalName();
@@ -134,9 +135,9 @@ public class ConfirmationPresenter extends DeliveryPresenter {
                         public Boolean call(Directions directions,
                                             DeliveryRateCard deliveryRateCard) {
 
-                            Log.i(TAG, "Directions and Delivery Rate Card Fetched");
+                            Timber.d("Directions and Delivery Rate Card Fetched");
                             rateCard = deliveryRateCard;
-                            Log.i(TAG, "Delivery Rate Card: " + rateCard
+                            Timber.d("Delivery Rate Card: " + rateCard
                                     .toJson());
                             deliveryDirection = directions;
                             directionFetched = true;
@@ -147,21 +148,21 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             }
         }
 
-        Log.i(TAG, "Subscribing to zipObservable");
+        Timber.d("Subscribing to zipObservable");
         compositeSubscription.add(zipObservable.subscribe(new Action1<Boolean>() {
             @Override
             public void call(Boolean bool) {
-                Log.i(TAG, "Show Directions called");
+                Timber.d("Show Directions called");
                 showDirection();
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
                 try{
-                    Log.e(TAG, "Unable to fetch directios or rate card", throwable);
+                    Timber.e("Unable to fetch directios or rate card", throwable);
                     bus.post(new OnEstimateCalculationFailure());
                 }catch (Exception ex){
-                    Log.e(TAG, "Exception inside on error while fetching " +
+                    Timber.e("Exception inside on error while fetching " +
                             "directions or routes", ex);
                     confirmationView.dismissDirectionFetchingDialog();
                 }
@@ -212,7 +213,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             cost = rateCard.getMinPrice();
         }
 
-        Log.i(TAG, "Distance " +  distance + " Cost " + cost);
+        Timber.d("Distance " + distance + " Cost " + cost);
 
         bookingLeg.setEstimatedDistance(distance);
         bookingLeg.setEstimatedCost(cost);
@@ -237,7 +238,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
                 @Override
                 public void call(Booking responseBooking) {
                     submittingBooking = false;
-                    Log.i(TAG, "Booking submitted successfully");
+                    Timber.d("Booking submitted successfully");
                     booking.setSubmitted();
                     zipSession.setBooking(booking);
                     bus.post(new BookingSubmissionStatus(true));
@@ -247,7 +248,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
             }, new Action1<Throwable>() {
                 @Override
                 public void call(Throwable throwable) {
-                    Log.e(TAG, "Unable to submit booking", throwable);
+                    Timber.e("Unable to submit booking", throwable);
                     submittingBooking = false;
                     bus.post(new BookingSubmissionStatus(false));
                 }

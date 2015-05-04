@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import timber.log.Timber;
 
 public class ConfirmationFragment extends DeliveryFragment implements OnMapReadyCallback {
     private static final String TAG = ConfirmationFragment.class.getCanonicalName();
@@ -185,7 +185,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-                Log.i(TAG, "onPanelSlide, offset " + slideOffset);
+                Timber.d("onPanelSlide, offset " + slideOffset);
             }
 
             @Override
@@ -200,19 +200,19 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
 
             @Override
             public void onPanelAnchored(View panel) {
-                Log.i(TAG, "onPanelAnchored");
+                Timber.d("onPanelAnchored");
             }
 
             @Override
             public void onPanelHidden(View panel) {
-                Log.i(TAG, "onPanelHidden");
+                Timber.d("onPanelHidden");
             }
         });
     }
 
     public void showDirectionProgress() {
         if(!confirmationPresenter.hasDirections()){
-            Log.i(TAG, "Show Dialog");
+            Timber.d("Show Dialog");
             directionProgress = ProgressDialog.show(getActivity(),
                     getString(R.string.title_dialog_fetching_directions),
                     getString(R.string.msg_dialog_fetching_direction), true);
@@ -258,7 +258,7 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
     @Override
     public void onMapReady(final GoogleMap map) {
 
-        Log.i(TAG, "Map is Ready ");
+        Timber.d("Map is Ready ");
         this.googleMap = map;
         MapsInitializer.initialize(getActivity());
 

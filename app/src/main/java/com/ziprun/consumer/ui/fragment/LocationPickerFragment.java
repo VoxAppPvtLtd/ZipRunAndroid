@@ -6,7 +6,6 @@ import android.content.IntentSender;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +42,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
+import timber.log.Timber;
 
 public abstract class LocationPickerFragment extends DeliveryFragment implements
         OnMapReadyCallback, GoogleMap.OnCameraChangeListener,
@@ -137,7 +137,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        Log.i(TAG, "On Create View Called");
+        Timber.d("On Create View Called");
 
         View view = inflater.inflate(R.layout.fragment_location_picker,
                         container, false);
@@ -204,7 +204,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "Location Picker Fragment is destroyed");
+        Timber.d("Location Picker Fragment is destroyed");
         super.onDestroy();
         if(mapView != null)
             mapView.onDestroy();
@@ -308,7 +308,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
     }
 
     public void showAddressView(){
-        Log.i(TAG, "Show Address View Called");
+        Timber.d("Show Address View Called");
         staticAddressView.setVisibility(View.VISIBLE);
         final int origHeight = mapContainer.getHeight();
         slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
@@ -327,9 +327,6 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
                         (ViewGroup.LayoutParams)mapContainer.getLayoutParams();
 
                 lp.height = origHeight - view.getHeight();
-
-                Log.i(TAG," On Panel Expanded" +  origHeight + " " + view
-                        .getHeight() + " " + mapContainer.getHeight());
 
                 mapContainer.setLayoutParams(lp);
 
@@ -358,12 +355,12 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 //                        (this);
 //                int height = mapContainer.getMeasuredHeight();
 //
-//                Log.i(TAG, "Map Container Height " + height );
-//                Log.i(TAG, "Current Position Top " +
+//                Timber.d("Map Container Height " + height );
+//                Timber.d("Current Position Top " +
 //                        currentLocationBtn.getTop());
-//                Log.i(TAG, "Map Container Top " + mapContainer.getTop());
+//                Timber.d("Map Container Top " + mapContainer.getTop());
 //
-//                Log.i(TAG, "Search Btn Position Top " +
+//                Timber.d("Search Btn Position Top " +
 //                        searchLocBtn.getTop());
 //
 //
@@ -381,7 +378,7 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         try {
             status.startResolutionForResult(getActivity(), REQUEST_CHECK_LOCATION_SETTINGS);
         } catch (IntentSender.SendIntentException e) {
-            Log.e(TAG, "Unable to resolve status error", e);
+            Timber.e(e, "Unable to resolve status error");
             locationPickerPresenter.enableLocationFlag(false);
         }
     }
@@ -426,14 +423,14 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         moveCamera(pos, true, new GoogleMap.CancelableCallback() {
             @Override
             public void onFinish() {
-                Log.i(TAG, "Camera Reached " + pos.toString());
+                Timber.d("Camera Reached " + pos.toString());
                 locationPickerPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }
 
             @Override
             public void onCancel() {
-                Log.i(TAG, "Camera Cancelled " + pos.toString());
+                Timber.d("Camera Cancelled " + pos.toString());
                 locationPickerPresenter.enableGeocode(true);
                 googleMap.setOnCameraChangeListener(LocationPickerFragment.this);
             }

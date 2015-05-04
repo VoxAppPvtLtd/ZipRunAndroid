@@ -1,7 +1,5 @@
 package com.ziprun.consumer.managers;
 
-import android.util.Log;
-
 import com.ziprun.consumer.data.model.ZipConsumer;
 
 import javax.inject.Inject;
@@ -22,7 +20,6 @@ public class TokenRequestInterceptor implements RequestInterceptor {
     @Override
     public void intercept(RequestFacade request) {
         if(zipConsumer == null){
-            Log.i(TAG, "Consumer null");
             return;
         }
 

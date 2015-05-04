@@ -1,15 +1,17 @@
     package com.ziprun.consumer;
 
     import android.app.Application;
-import android.content.Context;
+    import android.content.Context;
 
-import com.crashlytics.android.Crashlytics;
-import com.google.android.gms.maps.model.LatLng;
+    import com.crashlytics.android.Crashlytics;
+    import com.google.android.gms.maps.model.LatLng;
+    import com.ziprun.consumer.utils.CrashlyticsTree;
 
-import dagger.ObjectGraph;
-import io.fabric.sdk.android.Fabric;
+    import dagger.ObjectGraph;
+    import io.fabric.sdk.android.Fabric;
+    import timber.log.Timber;
 
-public class ZipRunApp extends Application {
+    public class ZipRunApp extends Application {
 
     private static final String TAG = ZipRunApp.class.getCanonicalName();
     public static ZipRunApp APPLICATION;
@@ -20,11 +22,21 @@ public class ZipRunApp extends Application {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
+
+        setupLogger();
         APPLICATION = this;
         ZipRunApp.context = getApplicationContext();
         applicationGraph = ObjectGraph.create(getModules());
         applicationGraph.inject(this);
 
+    }
+
+    private void setupLogger() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        } else {
+            Timber.plant(new CrashlyticsTree());
+        }
     }
 
     public static Context getAppContext() {

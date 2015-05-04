@@ -10,7 +10,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +43,7 @@ import com.ziprun.consumer.ui.fragment.ZipBaseFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import timber.log.Timber;
 
 public class DeliveryActivity extends ZipBaseActivity implements
         BackHandlerFragment.BackHandlerInterface {
@@ -96,7 +96,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
         try {
             setSupportActionBar(actionBar);
         }catch (Throwable t){
-            Log.e(TAG, "Fucking Samsung sort your issues out");
+            Timber.wtf(TAG, "Fucking Samsung sort your issues out");
         }
 
         setupNavigationDrawer();
@@ -225,12 +225,12 @@ public class DeliveryActivity extends ZipBaseActivity implements
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
 
-        Log.i(TAG, "Activity Coming Here");
+        Timber.d("Activity Coming Here");
         int id = item.getItemId();
 
         switch(id){
             case android.R.id.home: {
-                Log.i(TAG, "Back Button Pressed in action bar");
+                Timber.d("Back Button Pressed in action bar");
                 onBackPressed();
 
             }
@@ -256,15 +256,15 @@ public class DeliveryActivity extends ZipBaseActivity implements
                 return;
             }
 
-            Log.i(TAG, "Fragment: " +  fragment.getClass().getSimpleName() +
-                    " Booking " + booking.toJson() );
+            Timber.d("Fragment: " + fragment.getClass().getSimpleName() +
+                    " Booking " + booking.toJson());
 
             fragment.getArguments().putString(KEY_BOOKING, booking.toJson());
             fragmentManager.popBackStackImmediate();
             fragmentManager.beginTransaction().commit();
 
         }else {
-            Log.i(TAG, "Nothing on the backstack");
+            Timber.d("Nothing on the backstack");
             super.onBackPressed();
         }
     }
@@ -339,21 +339,12 @@ public class DeliveryActivity extends ZipBaseActivity implements
         FragmentManager.BackStackEntry backEntry = fragmentManager
             .getBackStackEntryAt(fragmentManager.getBackStackEntryCount() - 1);
 
-        Log.i(TAG, "Back Entry Name " + backEntry.getName());
+        Timber.d("Back Entry Name " + backEntry.getName());
 
         return fragmentManager.findFragmentByTag(backEntry.getName());
     }
 
     private void clearBackStack() {
-//
-//        if (fragmentManager.getBackStackEntryCount() > 0) {
-//            FragmentManager.BackStackEntry first = fragmentManager.getBackStackEntryAt(0);
-//            fragmentManager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
-//        }
-//
-//        Log.i(TAG, "BackStack Count " + fragmentManager
-//                .getBackStackEntryCount());
-
         fragmentManager.popBackStack(null,
                 FragmentManager.POP_BACK_STACK_INCLUSIVE);
 

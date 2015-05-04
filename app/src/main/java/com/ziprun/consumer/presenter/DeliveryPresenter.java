@@ -3,7 +3,6 @@ package com.ziprun.consumer.presenter;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.BookingLeg;
@@ -17,6 +16,7 @@ import com.ziprun.consumer.utils.Utils;
 import javax.inject.Inject;
 
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 
 public abstract class DeliveryPresenter implements PresenterInterface {
     private static final String TAG = DeliveryPresenter.class.getCanonicalName();
@@ -52,7 +52,7 @@ public abstract class DeliveryPresenter implements PresenterInterface {
     public void start(){
         bus.register(this);
         compositeSubscription = new CompositeSubscription();
-        Log.i(TAG, "Composite Subscription Created ");
+        Timber.d("Composite Subscription Created ");
     }
 
     @Override
@@ -77,7 +77,7 @@ public abstract class DeliveryPresenter implements PresenterInterface {
         booking = Booking.fromJson(bookingJson, Booking.class);
         this.currentLeg = currentLeg;
         bookingLeg = booking.getBookingLeg(this.currentLeg);
-        Log.i(TAG, "Inside: " + this.getClass().getSimpleName() + " " +
+        Timber.d("Inside: " + this.getClass().getSimpleName() + " " +
                 bookingLeg.toJson());
     }
 

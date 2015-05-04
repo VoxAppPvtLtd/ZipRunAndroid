@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import timber.log.Timber;
+
 /**
  * Adapter that handles Autocomplete requests from the Places Geo Data API.
  * Results are encoded as {@link PlaceAutocompleteAdapter.PlaceAutocomplete}
@@ -178,7 +180,7 @@ public class PlaceAutocompleteAdapter
      */
     private ArrayList<PlaceAutocomplete> getAutocomplete(CharSequence constraint) {
         if (mGoogleApiClient != null) {
-            Log.i(TAG, "Starting autocomplete query for: " + constraint);
+            Timber.d("Starting autocomplete query for: " + constraint);
 
             // Submit the query to the autocomplete API and retrieve a PendingResult that will
             // contain the results when the query completes.
@@ -202,7 +204,7 @@ public class PlaceAutocompleteAdapter
                 return null;
             }
 
-            Log.i(TAG, "Query completed. Received " + autocompletePredictions.getCount()
+            Timber.d("Query completed. Received " + autocompletePredictions.getCount()
                     + " predictions.");
 
             // Copy the results into our own data structure, because we can't hold onto the buffer.

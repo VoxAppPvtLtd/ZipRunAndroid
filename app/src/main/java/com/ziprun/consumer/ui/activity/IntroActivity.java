@@ -8,7 +8,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +28,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class IntroActivity extends ZipBaseActivity {
     private static final String TAG = IntroActivity.class.getCanonicalName();
@@ -118,7 +118,7 @@ class IntroPagerAdapter extends PagerAdapter{
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
-        Log.i(TAG, "Instantiate Item called");
+        Timber.d("Instantiate Item called");
 
         LayoutInflater inflater = LayoutInflater.from(context);
         final ImageView introImgView =  (ImageView)inflater.inflate(
@@ -133,7 +133,7 @@ class IntroPagerAdapter extends PagerAdapter{
             .subscribe(new Action1<Bitmap>() {
                 @Override
                 public void call(Bitmap bitmap) {
-                    Log.i(TAG, "Bitmap Received Yipee " + position);
+                    Timber.d("Bitmap Received Yipee " + position);
                     introImgView.setImageBitmap(bitmap);
                 }
             });
@@ -142,7 +142,7 @@ class IntroPagerAdapter extends PagerAdapter{
 
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
-        Log.i(TAG, "Destroy Item called");
+        Timber.d("Destroy Item called");
         container.removeView((View) object);
         object = null;
     }
@@ -181,7 +181,7 @@ class IntroPagerAdapter extends PagerAdapter{
         // Calculate inSampleSize
         options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
-        Log.i(TAG, "Sampling Size: " + options.inSampleSize);
+        Timber.d("Sampling Size: " + options.inSampleSize);
 
                 // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
@@ -194,7 +194,7 @@ class IntroPagerAdapter extends PagerAdapter{
         final int height = options.outHeight;
         final int width = options.outWidth;
 
-        Log.i(TAG, reqWidth + " " + reqHeight + " "  + width + " " + height);
+        Timber.d(reqWidth + " " + reqHeight + " "  + width + " " + height);
         int inSampleSize = 1;
 
         if (height > reqHeight || width > reqWidth) {
