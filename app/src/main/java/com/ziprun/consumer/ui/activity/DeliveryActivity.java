@@ -155,6 +155,12 @@ public class DeliveryActivity extends ZipBaseActivity implements
                     utils.startDialActivity(DeliveryActivity.this,
                             ZipRunApp.Constants.CONTACT_NO);
                 }
+                else if(position == 4){
+                    utils.startEmailActivity(DeliveryActivity.this,
+                            ZipRunApp.Constants.REPORT_ISSUE_ADDRESS,
+                            ZipRunApp.Constants.REPORT_ISSUE_SUBJECT);
+                }
+                drawerLayout.closeDrawer(Gravity.LEFT);
             }
         });
 
@@ -171,7 +177,6 @@ public class DeliveryActivity extends ZipBaseActivity implements
         if(bking != null){
             booking = bking;
             moveToFragment(new SummaryFragment(), false);
-            drawerLayout.closeDrawer(Gravity.LEFT);
 
         }else{
             Toast.makeText(this, R.string.error_no_last_booking,

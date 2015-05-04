@@ -148,4 +148,13 @@ public final class Utils {
         intent.setData(Uri.parse("tel:" + phone));
         activity.startActivity(intent);
     }
+
+    public void startEmailActivity(Activity activity, String[] addresses,
+                                   String subject) {
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("mailto:")); // only email apps should handle this
+        intent.putExtra(Intent.EXTRA_EMAIL, addresses);
+        intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        activity.startActivity(Intent.createChooser(intent, "Send Email"));
+    }
 }

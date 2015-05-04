@@ -57,6 +57,11 @@ public class ZipRunApp extends Application {
         public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
         public static final String CONTACT_NO = "+918882779999";
 
+        public static final String[] REPORT_ISSUE_ADDRESS = {"dev@ziprun.in",
+                "madhu@ziprun.in"};
+
+        public static final String  REPORT_ISSUE_SUBJECT = "Issue With ZipRun";
+
         public static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
 
         public static String[] CITIES_SERVED = {
