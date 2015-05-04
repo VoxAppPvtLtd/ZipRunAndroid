@@ -75,7 +75,6 @@
     <string-array name="nav_items">
         <item>New Booking</item>
         <item>Track Booking</item>
-        <item>FAQ</item>
         <item>Contact Us</item>
         <item>Report Issue</item>
     </string-array>

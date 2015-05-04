@@ -69,8 +69,7 @@
         public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
         public static final String CONTACT_NO = "+918882779999";
 
-        public static final String[] REPORT_ISSUE_ADDRESS = {"dev@ziprun.in",
-                "madhu@ziprun.in"};
+        public static final String[] REPORT_ISSUE_ADDRESS = {"hello@ziprun.in"};
 
         public static final String  REPORT_ISSUE_SUBJECT = "Issue With ZipRun";
 

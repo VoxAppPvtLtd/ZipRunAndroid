@@ -151,11 +151,11 @@ public class DeliveryActivity extends ZipBaseActivity implements
                     }
                 } else if (position == 1) {
                     showLastBooking();
-                } else if (position == 3) {
+                } else if (position == 2) {
                     utils.startDialActivity(DeliveryActivity.this,
                             ZipRunApp.Constants.CONTACT_NO);
                 }
-                else if(position == 4){
+                else if(position == 3){
                     utils.startEmailActivity(DeliveryActivity.this,
                             ZipRunApp.Constants.REPORT_ISSUE_ADDRESS,
                             ZipRunApp.Constants.REPORT_ISSUE_SUBJECT);
@@ -385,7 +385,6 @@ class NavigationDrawerAdapter extends ArrayAdapter<String> {
     private int  []navIcons =  {
             R.drawable.icon_new_booking,
             R.drawable.icon_track_booking,
-            R.drawable.icon_faq,
             R.drawable.icon_call,
             R.drawable.icon_report_issue,
     };
