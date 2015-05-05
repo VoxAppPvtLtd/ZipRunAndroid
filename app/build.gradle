@@ -57,6 +57,12 @@ android {
         debug {
             applicationIdSuffix '.debug'
             debuggable true
+        }
+
+        release {
+            signingConfig signingConfigs.release
+            debuggable false
+            minifyEnabled false
             proguardFile getDefaultProguardFile('proguard-android.txt')
             proguardFile 'proguard-rules.pro'
             proguardFile 'proguard-butterknife.pro'
@@ -70,12 +76,6 @@ android {
             proguardFile 'proguard-square-otto.pro'
             proguardFile 'proguard-square-retrofit.pro'
             proguardFile 'proguard-support-v7-appcompat.pro'
-        }
-
-        release {
-            signingConfig signingConfigs.release
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -155,6 +155,8 @@ dependencies {
     compile 'fr.avianey.com.viewpagerindicator:library:2.4.1@aar'
 
     compile 'com.jakewharton.timber:timber:3.0.2'
+
+    compile 'com.github.hotchemi:android-rate:0.4.3'
 
     internalCompile 'com.facebook.stetho:stetho:1.0.1'
 

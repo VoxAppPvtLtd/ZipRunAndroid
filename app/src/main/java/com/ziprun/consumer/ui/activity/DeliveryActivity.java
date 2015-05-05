@@ -24,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.otto.Subscribe;
+import com.ziprun.consumer.BuildConfig;
 import com.ziprun.consumer.R;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.model.AddressLocationPair;
@@ -43,6 +44,7 @@ import com.ziprun.consumer.ui.fragment.ZipBaseFragment;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import hotchemi.android.rate.AppRate;
 import timber.log.Timber;
 
 public class DeliveryActivity extends ZipBaseActivity implements
@@ -105,9 +107,30 @@ public class DeliveryActivity extends ZipBaseActivity implements
 
         setupNavigationDrawer();
 
-
         fragmentManager = getSupportFragmentManager();
 
+        startDeliveryApp(savedInstanceState);
+
+        askForUserRating();
+
+    }
+
+    private void askForUserRating() {
+
+        AppRate.with(this)
+            .setInstallDays(2) // default 10, 0 means install day.
+            .setLaunchTimes(4) // default 10
+            .setRemindInterval(2) // default 1
+            .setShowNeutralButton(true) // default true
+            .setDebug(BuildConfig.DEBUG) // default false
+            .monitor();
+
+
+        // Show a dialog if meets conditions
+        AppRate.showRateDialogIfMeetsConditions(this);
+    }
+
+    private void startDeliveryApp(Bundle savedInstanceState) {
         if(savedInstanceState != null){
             booking = Booking.fromJson(
                     savedInstanceState.getString(KEY_BOOKING), Booking.class);
@@ -115,13 +138,13 @@ public class DeliveryActivity extends ZipBaseActivity implements
             return;
         }
 
-        SourceLocationPickerFragment sourcePickerFragment =
-                new SourceLocationPickerFragment();
 
         booking = new Booking();
         currentLeg = 0;
         booking.addBookingLeg(new AddressLocationPair());
 
+        SourceLocationPickerFragment sourcePickerFragment =
+                new SourceLocationPickerFragment();
         Bundle args = getBookingBundle();
         sourcePickerFragment.setArguments(args);
         fragmentManager.beginTransaction()

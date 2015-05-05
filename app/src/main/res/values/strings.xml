@@ -74,6 +74,8 @@
     <string name="btn_register_now">Register Now</string>
     <string name="hint_mobile_number">Enter mobile number</string>
     <string name="hint_verification_code">Enter verification code</string>
+    <string name="rate_dialog_message">If you enjoy using Ziprun would you mind
+        taking a moment to rate it? It won\'t take more than a minute. Thanks for your support!</string>
 
     <string-array name="nav_items">
         <item>New Booking</item>
