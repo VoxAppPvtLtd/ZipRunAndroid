@@ -51,8 +51,6 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
 
     public static final int REQUEST_CHECK_LOCATION_SETTINGS = 0;
 
-    private static final LatLng DELHI_LATLNG = new LatLng(28.586086, 77.171541);
-
     private static final LocationRequest locationRequest =
             LocationRequest.create()
                            .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)

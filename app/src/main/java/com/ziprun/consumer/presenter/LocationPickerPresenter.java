@@ -202,6 +202,8 @@ public abstract class LocationPickerPresenter extends DeliveryPresenter {
         if(!enabled) {
             currentLatLng = null;
             currentLocation = null;
+            locationPickerView.showCurrentLocationBtn(false);
+            bus.post(new CurrentLocationEvent(currentLocation));
         }else{
             locationPickerView.showCurrentLocationBtn(true);
         }

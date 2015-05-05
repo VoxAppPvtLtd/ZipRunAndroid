@@ -27,6 +27,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.pnikosis.materialishprogress.ProgressWheel;
 import com.squareup.otto.Subscribe;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.event.CurrentLocationEvent;
 import com.ziprun.consumer.ui.activity.ZipBaseActivity;
 import com.ziprun.consumer.utils.AndroidBus;
@@ -133,7 +134,8 @@ public class AddressAutocompleteView extends RelativeLayout {
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
-                Log.e(TAG, "Error on auto complete");
+                autocompleteProgressWheel.setVisibility(View.GONE);
+                Log.e(TAG, "Error on auto complete", throwable);
             }
         });
 
@@ -158,19 +160,22 @@ public class AddressAutocompleteView extends RelativeLayout {
 
     @Subscribe
     public void onCurrentLocationFetched(CurrentLocationEvent locationEvent){
-        Timber.d("Current Location Set");
+        double latitude, longitude;
+
         this.currentLocation = locationEvent.currentLocation;
         if (currentLocation != null) {
-            double latitude = currentLocation.getLatitude();
-            double longitude = currentLocation.getLongitude();
-            latLngBounds = new LatLngBounds(
-                    new LatLng(latitude - 0.05,
-                            longitude - 0.05),
-                    new LatLng(latitude + 0.05, longitude + 0.05)
-            );
+            latitude = currentLocation.getLatitude();
+            longitude = currentLocation.getLongitude();
         }else{
-            latLngBounds = null;
+            latitude = ZipRunApp.Constants.DELHI_LATLNG.latitude;
+            longitude = ZipRunApp.Constants.DELHI_LATLNG.longitude;
         }
+        latLngBounds = new LatLngBounds(
+                new LatLng(latitude - 0.05,
+                        longitude - 0.05),
+                new LatLng(latitude + 0.05, longitude + 0.05)
+        );
+
     }
 
 

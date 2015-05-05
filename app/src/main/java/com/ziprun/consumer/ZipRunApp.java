@@ -72,6 +72,7 @@
         public static final String[] REPORT_ISSUE_ADDRESS = {"hello@ziprun.in"};
 
         public static final String  REPORT_ISSUE_SUBJECT = "Issue With ZipRun";
+        public static final LatLng DELHI_LATLNG = new LatLng(28.586086, 77.171541);
 
         public static String API_KEY = "AIzaSyBc58zTmjGgsLR2N4RDkjiTN5HgBlwHUJo";
 
