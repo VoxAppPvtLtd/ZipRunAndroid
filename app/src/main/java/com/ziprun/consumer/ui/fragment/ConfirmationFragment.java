@@ -262,7 +262,8 @@ public class ConfirmationFragment extends DeliveryFragment implements OnMapReady
         this.googleMap = map;
         MapsInitializer.initialize(getActivity());
 
-        confirmationPresenter.onMapReady();
+        if(confirmationPresenter != null)
+            confirmationPresenter.onMapReady();
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         builder.include(sourceLatLng);

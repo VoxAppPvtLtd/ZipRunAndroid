@@ -53,6 +53,8 @@ public class InstructionFragment extends DeliveryFragment {
 
         viewPager.setAdapter(instructionPagerAdapter);
 
+        tabs.setShouldExpand(true);
+
         tabs.setViewPager(viewPager);
 
         DisplayMetrics dm = getResources().getDisplayMetrics();

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:textSize="16sp"
+        android:textSize="@dimen/default_text"
         android:textColor="@color/text_color_secondary"/>
 
     <ScrollView
@@ -23,7 +23,7 @@
             android:id="@+id/edit_instruction"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
+            android:textSize="@dimen/xlarge_text"
             android:singleLine="false"
             android:textColor="@color/text_color_primary"
             />

@@ -66,6 +66,9 @@ public class DeliveryActivity extends ZipBaseActivity implements
     @InjectView(R.id.drawer_layout)
     DrawerLayout drawerLayout;
 
+    @InjectView(R.id.contentView)
+    ViewGroup contentView;
+
     @InjectView(R.id.action_bar)
     Toolbar actionBar;
 
@@ -92,6 +95,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_delivery);
         ButterKnife.inject(this);
+        contentView.requestTransparentRegion(contentView);
 
         try {
             setSupportActionBar(actionBar);
@@ -317,6 +321,7 @@ public class DeliveryActivity extends ZipBaseActivity implements
     private void moveToFragment(ZipBaseFragment fragment,
                                boolean addToBackStack){
 
+        contentView.requestTransparentRegion(contentView);
         fragment.setArguments(getBookingBundle());
         FragmentTransaction transaction =
                 fragmentManager.beginTransaction()

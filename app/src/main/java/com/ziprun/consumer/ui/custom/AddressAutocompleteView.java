@@ -148,7 +148,7 @@ public class AddressAutocompleteView extends RelativeLayout {
                     return;
 
                 PlaceAutocomplete autocomplete =
-                        autocompleteAdapter.getItem(position);
+                            autocompleteAdapter.getItem(position);
 
                 Observable<Place> placeObservable = getPlaceObservable
                         (autocomplete.getPlaceID());

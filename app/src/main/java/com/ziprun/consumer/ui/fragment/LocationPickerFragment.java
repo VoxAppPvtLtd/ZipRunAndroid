@@ -219,7 +219,8 @@ public abstract class LocationPickerFragment extends DeliveryFragment implements
         this.googleMap = googleMap;
         MapsInitializer.initialize(this.getActivity());
         this.googleMap.setMyLocationEnabled(false);
-        locationPickerPresenter.onMapReady();
+        if(locationPickerPresenter != null)
+            locationPickerPresenter.onMapReady();
     }
 
     @Override

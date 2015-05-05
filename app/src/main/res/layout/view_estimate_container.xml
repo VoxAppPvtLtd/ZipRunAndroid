@@ -12,7 +12,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:textColor="@color/text_color_primary"
-        android:textSize="20sp"
+        android:textSize="@dimen/large_text"
         android:layout_marginBottom="10dp"/>
 
     <ImageView
@@ -48,7 +48,7 @@
             android:padding="5dp"
             android:gravity="center"
             android:textColor="@color/primary_color"
-            android:textSize="16sp"
+            android:textSize="@dimen/default_text"
             android:text="@string/currency"/>
 
     </LinearLayout>
@@ -94,7 +94,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:textSize="14sp"
+        android:textSize="@dimen/small_text"
         android:textStyle="bold"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/source_marker"
@@ -105,7 +105,7 @@
         android:id="@+id/txt_dest_prefix"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="14sp"
+        android:textSize="@dimen/small_text"
         android:textStyle="bold"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
@@ -130,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_marginRight="10dp"
-            android:textSize="13sp"
+            android:textSize="@dimen/micro_text"
             android:textColor="@color/text_color_primary"
             android:lineSpacingExtra="1dp"
             android:gravity="left"/>
@@ -142,7 +142,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:layout_marginLeft="10dp"
-            android:textSize="13sp"
+            android:textSize="@dimen/micro_text"
             android:textColor="@color/text_color_primary"
             android:lineSpacingExtra="1dp"
             android:gravity="right"/>

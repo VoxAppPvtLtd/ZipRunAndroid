@@ -3,6 +3,7 @@ package com.ziprun.consumer.ui.activity;
 import android.content.Context;
 
 import com.ziprun.consumer.ui.custom.AddressAutocompleteView;
+import com.ziprun.consumer.ui.fragment.DeliveryFragment;
 
 import javax.inject.Singleton;
 
@@ -18,6 +19,7 @@ import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
         LoginActivity.class,
         DeliveryActivity.class,
         AddressAutocompleteView.class,
+        DeliveryFragment.ErrorDialogFragment.class,
     }, complete = false,
        library = true)
 public class ActivityModule {

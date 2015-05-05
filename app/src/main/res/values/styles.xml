@@ -35,4 +35,22 @@
         <item name="colorAccent">#ff398622</item>
     </style>
 
+
+    <style name="ZipRunTextInput" parent="@android:style/TextAppearance">
+        <item name="android:textSize">@dimen/default_text</item>
+    </style>
+
+    <style name="ZipRunTextInput.Small">
+        <item name="android:textSize">@dimen/small_text</item>
+    </style>
+
+    <style name="ZipRunTextInput.Medium">
+        <item name="android:textSize">@dimen/medium_text</item>
+    </style>
+
+    <style name="ZipRunTextInput.Large">
+        <item name="android:textSize">@dimen/large_text</item>
+    </style>
+    
+
 </resources>

@@ -10,8 +10,8 @@
     <string name="title_activity_delivery">DeliveryActivity</string>
     <string name="check_location_settings_failed">"Unable to Fetch Current Location "</string>
 
-    <string name="instruction_buy_something">Buy Something</string>
-    <string name="instruction_pickup_something">Pick Up Something</string>
+    <string name="instruction_buy_something">Buy</string>
+    <string name="instruction_pickup_something">Pick Up</string>
     <string name="instruction_fragment_title">Give Instructions To</string>
     <string name="confirm_fragment_title">Confirm</string>
     <string name="fetching_address">Fetching Address</string>
@@ -71,6 +71,9 @@
     <string name="drawer_open">Navigation Drawer Open</string>
     <string name="drawer_close">Navigation Drawer Close</string>
     <string name="error_no_last_booking">No booking created yet</string>
+    <string name="btn_register_now">Register Now</string>
+    <string name="hint_mobile_number">Enter mobile number</string>
+    <string name="hint_verification_code">Enter verification code</string>
 
     <string-array name="nav_items">
         <item>New Booking</item>
