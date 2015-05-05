@@ -3,19 +3,22 @@ buildscript {
         mavenCentral()
         jcenter()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://www.testfairy.com/maven' }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.1.3'
+        classpath 'com.android.tools.build:gradle:1.2.2'
         classpath 'io.fabric.tools:gradle:1.18.0'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
         classpath 'com.droidtitan:lint-cleaner-plugin:0.3.0'
+        classpath 'com.testfairy.plugins.gradle:testfairy:1.+'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'com.droidtitan.lintcleaner'
+apply plugin: 'testfairy'
 
 
 repositories {
@@ -27,6 +30,10 @@ repositories {
 android {
     compileSdkVersion 22
     buildToolsVersion "22.0.1"
+
+    testfairyConfig {
+        apiKey "ef01273ec233e9cdacb2f9de3778fb54611a99f1"
+    }
 
     defaultConfig {
         applicationId "com.ziprun.consumer"

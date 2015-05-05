@@ -23,7 +23,7 @@ public class BookingLeg extends ZipBaseModel {
     private double estimatedCost;
     private long estimatedTime; //Seconds
     private double purchaseAmount;
-    private String userInstructions;
+        private String userInstructions;
 
     public BookingLeg(AddressLocationPair src){
         source = src;
@@ -201,6 +201,8 @@ public class BookingLeg extends ZipBaseModel {
                     bookingLeg.getDestinationAddress());
 
             jsonObject.addProperty("ride_type", bookingLeg.getRideType().toString());
+
+            jsonObject.addProperty("user_instructions", bookingLeg.getUserInstructions());
             
             jsonObject.addProperty("estimated_time", bookingLeg.getEstimatedTime());
 
