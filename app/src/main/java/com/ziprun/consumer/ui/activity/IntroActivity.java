@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.viewpagerindicator.CirclePageIndicator;
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.ZipEventTracker;
 import com.ziprun.consumer.utils.Utils;
 
 import javax.inject.Inject;
@@ -42,6 +43,9 @@ public class IntroActivity extends ZipBaseActivity {
     @InjectView(R.id.registerBtn)
     Button registerBtn;
 
+    @Inject
+    ZipEventTracker eventTracker;
+
     IntroPagerAdapter introPagerAdapter;
 
     @Override
@@ -49,6 +53,7 @@ public class IntroActivity extends ZipBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
         ButterKnife.inject(this);
+        eventTracker.trackAppFlow(IntroActivity.class.getSimpleName());
         introPagerAdapter = new IntroPagerAdapter(this);
         viewPager.setAdapter(introPagerAdapter);
 

@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ziprun.consumer.R;
+import com.ziprun.consumer.ZipEventTracker;
 import com.ziprun.consumer.data.model.AuthOTP;
 import com.ziprun.consumer.data.model.ZipConsumer;
 import com.ziprun.consumer.network.ZipRestApi;
@@ -66,6 +67,9 @@ public class LoginActivity extends ZipBaseActivity {
     @Inject
     ZipRestApi zipRestApi;
 
+    @Inject
+    ZipEventTracker eventTracker;
+
     Observable<Response> mobileVerificationObs;
 
     Observable<ZipConsumer> otpVerificationObs;
@@ -87,6 +91,8 @@ public class LoginActivity extends ZipBaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.inject(this);
+        eventTracker.trackAppFlow(LoginActivity.class.getSimpleName() + ": " +
+                "Verify Mobile Number");
 
         if(savedInstanceState != null){
             currentState = savedInstanceState.getInt(KEY_CURRENT_STATE);
@@ -145,6 +151,9 @@ public class LoginActivity extends ZipBaseActivity {
 
 
     public void setupVerificationCodeState(){
+        eventTracker.trackAppFlow(LoginActivity.class.getSimpleName() + ": " +
+                "Verify OTP");
+
         currentState = VERIFICATION_CODE_STATE;
         countryCodeText.setVisibility(View.GONE);
         editMobileNumber.setVisibility(View.GONE);
@@ -212,6 +221,7 @@ public class LoginActivity extends ZipBaseActivity {
                 otpVerificationObs = null;
                 Timber.d("Consumer: " + zipConsumer.toJson());
                 zipRunSession.setConsumer(zipConsumer);
+                eventTracker.authenticateUser();
                 startDeliveryActivity();
             }
         }, new Action1<Throwable>() {

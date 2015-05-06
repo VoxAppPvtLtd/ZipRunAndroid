@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.appsflyer.AppsFlyerLib;
 import com.ziprun.consumer.R;
 
 import java.util.Timer;
@@ -20,6 +21,7 @@ public class SplashActivity extends ZipBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        AppsFlyerLib.sendTracking(getApplicationContext());
 
     }
 

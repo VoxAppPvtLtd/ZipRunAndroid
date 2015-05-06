@@ -1,7 +1,5 @@
 package com.ziprun.consumer.presenter;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.ziprun.consumer.ZipRunApp;
 import com.ziprun.consumer.data.ZipRunSession;
@@ -241,6 +239,7 @@ public class ConfirmationPresenter extends DeliveryPresenter {
                     Timber.d("Booking submitted successfully");
                     booking.setSubmitted();
                     zipSession.setBooking(booking);
+                    eventTracker.newBooking();
                     bus.post(new BookingSubmissionStatus(true));
 
 

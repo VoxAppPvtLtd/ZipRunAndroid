@@ -7,6 +7,9 @@ import com.ziprun.consumer.R;
 public class SourceLocationPickerFragment extends LocationPickerFragment {
     public static final String TAG = SourceLocationPickerFragment.class.getCanonicalName();
 
+
+
+
     @Override
     protected Object getCurrentModule(){
         return new SourceLocationPickerModule(this);

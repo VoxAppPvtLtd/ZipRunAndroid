@@ -1,15 +1,19 @@
     package com.ziprun.consumer;
 
     import android.app.Application;
-    import android.content.Context;
+import android.content.Context;
 
-    import com.crashlytics.android.Crashlytics;
-    import com.google.android.gms.maps.model.LatLng;
-    import com.ziprun.consumer.utils.CrashlyticsTree;
+import com.appsflyer.AppsFlyerLib;
+import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.maps.model.LatLng;
+import com.ziprun.consumer.data.model.ZipConsumer;
+import com.ziprun.consumer.utils.CrashlyticsTree;
 
-    import dagger.ObjectGraph;
-    import io.fabric.sdk.android.Fabric;
-    import timber.log.Timber;
+import javax.inject.Inject;
+
+import dagger.ObjectGraph;
+import io.fabric.sdk.android.Fabric;
+import timber.log.Timber;
 
     public class ZipRunApp extends Application {
 
@@ -17,6 +21,9 @@
     public static ZipRunApp APPLICATION;
     private static Context context;
     protected ObjectGraph applicationGraph;
+
+    @Inject
+    ZipConsumer zipConsumer;
 
     @Override
     public void onCreate() {
@@ -28,7 +35,7 @@
         ZipRunApp.context = getApplicationContext();
         applicationGraph = ObjectGraph.create(getModules());
         applicationGraph.inject(this);
-
+        setupAppsFlyerSDK();
     }
 
     private void setupLogger() {
@@ -36,6 +43,14 @@
             Timber.plant(new Timber.DebugTree());
         } else {
             Timber.plant(new CrashlyticsTree());
+        }
+    }
+
+    private void setupAppsFlyerSDK(){
+        AppsFlyerLib.setAppsFlyerKey(Constants.APPSFLYER_DEV_KEY);
+        AppsFlyerLib.setCurrencyCode(Constants.ISO_CURRENCY_CODE);
+        if(zipConsumer != null){
+            AppsFlyerLib.setAppUserId(zipConsumer.getMobileNumber());
         }
     }
 
@@ -68,6 +83,8 @@
 
         public static final LatLng DEFAULT_CAMERA_POSITION = new LatLng(28.586086, 77.171541);
         public static final String CONTACT_NO = "+918882779999";
+        public static final String APPSFLYER_DEV_KEY = "G2tjmajjYFqKPNTjgLSnW";
+        public static final String ISO_CURRENCY_CODE = "INR";
 
         public static final String[] REPORT_ISSUE_ADDRESS = {"hello@ziprun.in"};
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
+import com.ziprun.consumer.ZipEventTracker;
 import com.ziprun.consumer.data.model.Booking;
 import com.ziprun.consumer.data.model.BookingLeg;
 import com.ziprun.consumer.event.UpdateBookingEvent;
@@ -31,6 +32,9 @@ public abstract class DeliveryPresenter implements PresenterInterface {
     @Inject
     AndroidBus bus;
 
+    @Inject
+    ZipEventTracker eventTracker;
+
     protected DeliveryFragment view;
     protected Booking booking;
     protected int currentLeg;
@@ -52,7 +56,7 @@ public abstract class DeliveryPresenter implements PresenterInterface {
     public void start(){
         bus.register(this);
         compositeSubscription = new CompositeSubscription();
-        Timber.d("Composite Subscription Created ");
+        eventTracker.trackAppFlow(getClass().getSimpleName());
     }
 
     @Override
